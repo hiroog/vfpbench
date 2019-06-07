@@ -1,0 +1,217 @@
+// 2014 Hiroyuki Ogasawara
+// vim:ts=4 sw=4 noet:
+
+#ifndef	BENCHMARK_TEST_H_
+#define	BENCHMARK_TEST_H_
+
+#include	<minilib/Platform.h>
+#include	"ThreadAdapter.h"
+#include	"MultiAdapter.h"
+#include	<minilib/FixedArray.h>
+#include	<minilib/SystemInfo.h>
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+class BenchmarkTestBase {
+public:
+	flatlib::util::FixedArrayPOD<ITestBase*>	BenchArray;
+	unsigned int	BenchIndex= 0;
+private:
+	void	Quit();
+public:
+	BenchmarkTestBase();
+	virtual ~BenchmarkTestBase();
+	unsigned int	Init( unsigned int unit_count );
+	void			AddBench( ITestBase* bench );
+	template<typename T>
+	void			AddBenchSingle( unsigned int group )
+	{
+		AddBench( flatlib::memory::New<ThreadAdapter<T>>( group ) );
+	}
+	template<typename T>
+	void			AddBenchMulti( unsigned int group )
+	{
+		AddBench( flatlib::memory::New<MultiAdapter<T>>( group ) );
+	}
+	unsigned int	GetBenchCount() const;
+	ITestBase*		GetBenchmark( unsigned int index ) const;
+	void	SetLoop( unsigned int index, unsigned int loop );
+	void	UpdateLoop( float loop_scale );
+};
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+#if flCPU_ARM7 || flCPU_ARM6
+
+# include	"VFP32SP_Test.h"
+# include	"VFP32DP_Test.h"
+# include	"MatrixTest_VFP32SP.h"
+typedef	VFP32SP::FloatTest		FPU_SP_Test;
+typedef	VFP32DP::FloatTest		FPU_DP_Test;
+typedef	VFP32SP::MatrixTest		MatrixTest;
+
+class BenchmarkTest : public BenchmarkTestBase {
+public:
+	BenchmarkTest()
+	{
+		unsigned int	group_count= Init( 6 );
+		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
+			AddBenchSingle<FPU_SP_Test>( gi );
+			AddBenchSingle<FPU_DP_Test>( gi );
+			AddBenchSingle<MatrixTest>( gi );
+			AddBenchMulti<FPU_SP_Test>( gi );
+			AddBenchMulti<FPU_DP_Test>( gi );
+			AddBenchMulti<MatrixTest>( gi );
+		}
+	}
+};
+
+#endif
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+#if flCPU_ARM64
+
+# include	"VFP64HP_Test.h"
+# include	"VFP64SP_Test.h"
+# include	"VFP64DP_Test.h"
+# include	"MatrixTest_VFP64SP.h"
+typedef	VFP64HP::FloatTest	FPU_HP_Test;
+typedef	VFP64SP::FloatTest	FPU_SP_Test;
+typedef	VFP64DP::FloatTest	FPU_DP_Test;
+typedef	VFP64SP::MatrixTest	MatrixTest;
+
+class BenchmarkTest : public BenchmarkTestBase {
+public:
+	BenchmarkTest()
+	{
+		unsigned int	test_count= 6;
+		bool	half= flatlib::Info.HasInstructionSet( flatlib::CPUFeature::ARM_FPHP );
+		if( half ){
+			test_count+= 2;
+		}
+		unsigned int	group_count= Init( test_count );
+		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
+			if( half ){
+				AddBenchSingle<FPU_HP_Test>( gi );
+			}
+			AddBenchSingle<FPU_SP_Test>( gi );
+			AddBenchSingle<FPU_DP_Test>( gi );
+			AddBenchSingle<MatrixTest>( gi );
+			if( half ){
+				AddBenchMulti<FPU_HP_Test>( gi );
+			}
+			AddBenchMulti<FPU_SP_Test>( gi );
+			AddBenchMulti<FPU_DP_Test>( gi );
+			AddBenchMulti<MatrixTest>( gi );
+		}
+	}
+};
+
+#endif
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+#if flCPU_X86
+
+# include	"SSE32SP_Test.h"
+# include	"SSE32DP_Test.h"
+# include	"MatrixTest_SSESP.h"
+typedef	SSE32SP::FloatTest		FPU_SP_Test;
+typedef	SSE32DP::FloatTest		FPU_DP_Test;
+typedef	SSESP::MatrixTest		MatrixTest;
+
+class BenchmarkTest : public BenchmarkTestBase {
+public:
+	BenchmarkTest()
+	{
+		unsigned int	group_count= Init( 6 );
+		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
+			AddBenchSingle<FPU_SP_Test>( gi );
+			AddBenchSingle<FPU_DP_Test>( gi );
+			AddBenchSingle<MatrixTest>( gi );
+			AddBenchMulti<FPU_SP_Test>( gi );
+			AddBenchMulti<FPU_DP_Test>( gi );
+			AddBenchMulti<MatrixTest>( gi );
+		}
+	}
+};
+
+#endif
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+#if flCPU_X64
+
+# include	"SSE64SP_Test.h"
+# include	"SSE64DP_Test.h"
+# include	"MatrixTest_SSESP.h"
+typedef	SSE64SP::FloatTest	FPU_SP_Test;
+typedef	SSE64DP::FloatTest	FPU_DP_Test;
+typedef	SSESP::MatrixTest	MatrixTest;
+
+class BenchmarkTest : public BenchmarkTestBase {
+public:
+	BenchmarkTest()
+	{
+		unsigned int	group_count= Init( 6 );
+		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
+			AddBenchSingle<FPU_SP_Test>( gi );
+			AddBenchSingle<FPU_DP_Test>( gi );
+			AddBenchSingle<MatrixTest>( gi );
+			AddBenchMulti<FPU_SP_Test>( gi );
+			AddBenchMulti<FPU_DP_Test>( gi );
+			AddBenchMulti<MatrixTest>( gi );
+		}
+	}
+};
+
+#endif
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+#if flCPU_MIPS32 || flCPU_MIPS64
+
+# include	"MIPSSP_Test.h"
+# include	"MIPSDP_Test.h"
+typedef	MIPSSP::FloatTest	FPU_SP_Test;
+typedef	MIPSDP::FloatTest	FPU_DP_Test;
+
+class BenchmarkTest : public BenchmarkTestBase {
+public:
+	BenchmarkTest()
+	{
+		unsigned int	group_count= Init( 4 );
+		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
+			AddBenchSingle<FPU_SP_Test>( gi );
+			AddBenchSingle<FPU_DP_Test>( gi );
+			AddBenchMulti<FPU_SP_Test>( gi );
+			AddBenchMulti<FPU_DP_Test>( gi );
+		}
+	}
+};
+
+#endif
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+
+
+
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+#endif
+
+
+

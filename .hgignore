@@ -1,0 +1,18 @@
+syntax: glob
+.git
+obj
+vfpbench
+*.swp
+src/bk
+log.txt
+__pycache__
+*_Debug
+*_Release
+*_Retail
+vfpbench_log*.txt
+*.pv
+*.bak
+*.pyc
+cpu_info_cache.txt
+output_log.txt
+.save.log
