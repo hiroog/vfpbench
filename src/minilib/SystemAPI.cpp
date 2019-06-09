@@ -3,6 +3,7 @@
 
 #include	"SystemAPI.h"
 #include	"ConsoleIO.h"
+#include	"Assert.h"
 
 #if flOS_UNIX
 # include	<time.h>

@@ -16,3 +16,5 @@ vfpbench_log*.txt
 cpu_info_cache.txt
 output_log.txt
 .save.log
+###
+.DS_Store

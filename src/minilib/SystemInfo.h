@@ -89,6 +89,7 @@ private:
 	void	DecodeCpuInfo();
 	void	DecodeCpuTopologyImmediate();
 	void	DecodeCpuTopology();
+	void	GetHWInfo();
 	void	GetCPUSpecification();
 public:
 	SystemInfo();

@@ -14,6 +14,9 @@ vfpbench_log*.txt
 *.pyc
 cpu_info_cache.txt
 output_log.txt
+.save.log
 ###
 cpulist.py
 run_bench.py
+###
+.DS_Store

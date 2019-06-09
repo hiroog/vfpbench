@@ -58,14 +58,16 @@ def makeExeName( env, src_file ):
 
 env= tool.createTargetEnvironment()
 env.EXE_NAME_FUNC= makeExeName
-env.addCCFlags( ['-DflPRESET_LINUX=1'] )
 env.addIncludePath( ['src'] )
 
 if env.getHostPlatform() == 'macOS':
+    env.addCCFlags( ['-DflPRESET_OSX=1'] )
     if env.getTargetPlatform() == 'macOS' or env.getTargetPlatform() == 'iOS':
-        src_list= src_list_base + [
-            ]
         env.addLinkFlags( '-framework Cocoa'.split() )
+
+if env.getHostPlatform() == 'Linux':
+    env.addCCFlags( ['-DflPRESET_LINUX=1'] )
+
 
 env.refresh()
 

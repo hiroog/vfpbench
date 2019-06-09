@@ -17,6 +17,13 @@
 # include	<map>
 #endif
 
+#if flOS_DARWIN
+# include	<sys/types.h>
+# include	<sys/sysctl.h>
+# include	<mach/mach.h>
+# include	<mach/mach_host.h>
+#endif
+
 #if (flCPU_X86 || flCPU_X64) && flCC_CLANG
 # include	<cpuid.h>
 #endif
@@ -30,6 +37,484 @@ SystemInfo	Info;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+
+//=============================================================================
+// OS
+//=============================================================================
+
+
+//-----------------------------------------------------------------------------
+#if flOS_LINUX
+//-----------------------------------------------------------------------------
+
+namespace {
+//-----------------------------------------------------------------------------
+
+static unsigned int GetBitCount( uint64_t bit )
+{
+	unsigned int	count= 0;
+	for( unsigned int i= 0 ; i< 32 ; i++, bit>>= 1 ){
+		if( bit & 1 ){
+			count++;
+		}
+	}
+	return	count;
+}
+
+static bool	LoadOneLine( char* line_buffer, size_t buffer_size, const char* path )
+{
+	*line_buffer= '\0';
+	FILE*	fp= fopen( path, "r" );
+	if( fp ){
+		if( !fgets( line_buffer, buffer_size-1, fp ) ){
+			*line_buffer= '\0';
+		}
+		fclose( fp );
+	}
+	return	*line_buffer != '\0';
+}
+
+static unsigned int		IsExists( const char* path )
+{
+	struct stat	sbuf;
+	if( stat( path, &sbuf ) == -1 ){
+		return	0;
+	}
+	if( S_ISDIR( sbuf.st_mode ) ){
+		return	2;
+	}
+	if( S_ISREG( sbuf.st_mode ) ){
+		return	1;
+	}
+	return	0;
+}
+
+static char*	SkipColon( char* ptr )
+{
+	for(; *ptr && *ptr != ':' ; ptr++ );
+	if( *ptr == ':' ){
+		ptr++;
+	}
+	return	ptr;
+}
+
+static char*	SkipSpace( char* ptr )
+{
+	for(; *ptr && *ptr <= ' ' ; ptr++ );
+	return	ptr;
+}
+
+static const char*	SkipSpace( const char* ptr )
+{
+	for(; *ptr && *ptr <= ' ' ; ptr++ );
+	return	ptr;
+}
+
+static uint64_t	DecodeCpuRegion( const char* ptr )
+{
+	uint64_t		bit= 0;
+	unsigned int	previd= 0;
+	for(; *ptr ;){
+		bool	region= false;
+		ptr= SkipSpace( ptr );
+		if( *ptr == '-' ){
+			region= true;
+			ptr++;
+		}
+		if( *ptr < '0' || *ptr > '9' ){
+			break;
+		}
+		unsigned int id= atoi( ptr );
+		for(; *ptr >= '0' && *ptr <= '9' ; ptr++ );
+		for(; *ptr == ',' ; ptr++ );
+		if( region ){
+		   for( unsigned int i= previd+1 ; i< id ; i++ ){
+			   bit|= 1<<i;
+		   }
+		}
+		bit|= 1<<id;
+		previd= id;
+	}
+	return	bit;
+}
+
+static unsigned int GetCpuCount( const char* path )
+{
+	const int	MAX_LINE_SIZE= 128;
+	char	line_buffer[MAX_LINE_SIZE];
+	if( LoadOneLine( line_buffer, MAX_LINE_SIZE-2, path ) ){
+		return	GetBitCount( DecodeCpuRegion( line_buffer ) );
+	}
+	return	0;
+}
+
+
+//-----------------------------------------------------------------------------
+}
+
+void SystemInfo::DecodeCpuTopologyImmediate()
+{
+	{
+		const int	MAX_PATH_SIZE= 256;
+		const int	MAX_LINE_SIZE= 256;
+		char	path_buffer[MAX_PATH_SIZE];
+		char	line_buffer[MAX_LINE_SIZE];
+		for( unsigned int ci= 0 ; ci< CPU_COUNT_MAX ; ci++ ){
+			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d", ci );
+			if( !IsExists( path_buffer ) ){
+				break;
+			}
+			auto&	core= CoreList[ci];
+			core.Index= ci;
+			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/thread_siblings", ci );
+			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
+				core.ThreadMask= strtoull( line_buffer, nullptr, 16 );
+			}
+
+			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/core_siblings", ci );
+			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
+				core.ClusterMask= strtoull( line_buffer, nullptr, 16 );
+			}
+
+			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq", ci );
+			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
+				core.CoreClock= atoi( line_buffer );
+			}
+
+			TotalThreadCount= ci + 1;
+		}
+	}
+	{
+		unsigned int	core_count= TotalThreadCount;
+		unsigned int	group_id= 0;
+		unsigned int	thread_id= 0;
+		std::map<uint64_t,unsigned int>		group_map;
+		std::map<uint64_t,unsigned int>		thread_map;
+		for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
+			auto&	core= CoreList[ci];
+			{
+				const auto&	thread= thread_map.find( core.ThreadMask );
+				if( thread == thread_map.end() ){
+					thread_map[ core.ThreadMask ]= thread_id++;
+				}
+			}
+			{
+				const auto&	group= group_map.find( core.ClusterMask );
+				if( group == group_map.end() ){
+					group_map[ core.ClusterMask ]= group_id++;
+				}
+			}
+		}
+		PhysicalCoreCount= thread_id;
+		CoreGroupCount= group_id;
+		for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
+			auto&	core= CoreList[ci];
+			const auto&	thread= thread_map.find( core.ThreadMask );
+			core.PhysicalCoreID= thread->second;
+			const auto&	group= group_map.find( core.ClusterMask );
+			core.ClusterGroupID= group->second;
+		}
+	}
+}
+
+
+void SystemInfo::DecodeCpuTopology()
+{
+	unsigned int	present= GetCpuCount( "/sys/devices/system/cpu/present" );
+	{
+		unsigned int	offline= GetCpuCount( "/sys/devices/system/cpu/offline" );
+		if( offline == 0 ){
+			DecodeCpuTopologyImmediate();
+			return;
+		}
+	}
+	thread::Atomic<unsigned int>	ExitFlag( 0 );
+	util::FixedArrayPOD<thread::ThreadFunctionBase*>	ThreadArray( present );
+	for( unsigned int ti= 0 ; ti< present ; ti++ ){
+		auto*	thread= thread::CreateThreadFunction( [&ExitFlag](){
+					for(; ExitFlag.Get() == 0 ;){
+						math::Matrix4	m1, m2, m3;
+						m1.SetIdentity();
+						m2.SetIdentity();
+						m3.MulCopy( m1, m2 );
+					}
+				});
+		ThreadArray[ti]= thread;
+		thread->Run();
+	}
+	for(;;){
+		unsigned int	offline= GetCpuCount( "/sys/devices/system/cpu/offline" );
+		if( offline == 0 ){
+			DecodeCpuTopologyImmediate();
+			ExitFlag= 1;
+			break;
+		}
+		time::SleepMS( 50 );
+	}
+	for( unsigned int ti= 0 ; ti< present ; ti++ ){
+		auto*	thread= ThreadArray[ti];
+		thread->Join();
+		memory::SafeDelete( thread );
+		ThreadArray[ti]= nullptr;
+	}
+}
+
+
+void SystemInfo::DecodeCpuInfo()
+{
+	bool	info_feature= false;
+	bool	info_devname= false;
+	const int	MAX_LINE_BYTE= 1024 * 2;
+	char	linebuffer[MAX_LINE_BYTE+8];
+	FILE*	fp= fopen( "/proc/cpuinfo", "r" );
+	if( !fp ){
+		return;
+	}
+	for(; fgets( linebuffer, MAX_LINE_BYTE, fp ) ;){
+//FL_LOG( "[%s]\n", linebuffer );
+		if( !info_feature ){
+			if(
+#if flCPU_ARM6 || flCPU_ARM7 || flCPU_ARM64
+				!strncmp( linebuffer, "Features", 8 )
+#endif
+#if flCPU_X64 || flCPU_X86
+				!strncmp( linebuffer, "flags", 5 )
+#endif
+					){
+				char*	lp= SkipColon( linebuffer );
+				if( *lp ){
+					for(; *lp ;){
+						lp= SkipSpace( lp );
+						const char*	top= lp;
+						for(; *lp && !(*lp <= ' ' && *lp) ; lp++ );
+						if( *lp && *lp <= ' ' ){
+							*lp++= '\0';
+						}
+  //FL_LOG( "word=[%s]\n", top );
+#if flCPU_ARM7 || flCPU_ARM64
+						if( !strcmp( top, "neon" ) ){
+							SetInstructionSet( CPUFeature::ARM_NEON );
+						}else if( !strcmp( top, "vfpv4" ) ){
+							SetInstructionSet( CPUFeature::ARM_VFPV4 );
+						}else if( !strcmp( top, "asimd" ) ){
+							SetInstructionSet( CPUFeature::ARM_NEON );
+						}else if( !strcmp( top, "fphp" ) ){
+							SetInstructionSet( CPUFeature::ARM_FPHP );
+						}else if( !strcmp( top, "asimdhp" ) ){
+							SetInstructionSet( CPUFeature::ARM_SIMDHP );
+						}else if( !strcmp( top, "crc32" ) ){
+							SetInstructionSet( CPUFeature::ARM_CRC32 );
+						}else if( !strcmp( top, "sha1" ) ){
+							SetInstructionSet( CPUFeature::ARM_SHA1 );
+						}else if( !strcmp( top, "sha2" ) ){
+							SetInstructionSet( CPUFeature::ARM_SHA2 );
+						}else if( !strcmp( top, "aes" ) ){
+							SetInstructionSet( CPUFeature::ARM_AES );
+						}
+#else
+						if( !strcmp( top, "aes" ) ){
+						}
+#endif
+					}
+				}
+				info_feature= true;
+			}
+		}
+		if( !info_devname ){
+#if flCPU_ARM7 || flCPU_ARM64
+			if( !strncmp( linebuffer, "Hardware", 8 ) ){
+				char*	lp= SkipColon( linebuffer );
+				lp= SkipSpace( lp );
+				strcpy_s( DeviceName, DEVICE_NAME_BUFFER_SIZE-1, lp );
+				info_devname= true;
+			}
+#endif
+#if flCPU_X64 || flCPU_X86
+			if( !strncmp( linebuffer, "model name", 10 ) ){
+				char*	lp= SkipColon( linebuffer );
+				lp= SkipSpace( lp );
+				strcpy_s( DeviceName, DEVICE_NAME_BUFFER_SIZE-1, lp );
+				info_devname= true;
+			}
+#endif
+		}
+	}
+	fclose( fp );
+}
+
+
+//-----------------------------------------------------------------------------
+#endif  // Linux
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+#if flOS_DARWIN
+//-----------------------------------------------------------------------------
+
+namespace {
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+static int getSysInt( int id )
+{
+	int mib[2];
+	mib[0]= CTL_HW;
+	mib[1]= id;
+	int		data= 0;
+	size_t	len= sizeof(data);
+	sysctl( mib, 2, &data, &len, nullptr, 0 );
+	return	data;
+}
+
+static void	dumpSysInt( int id, const char* msg )
+{
+	FL_LOG( "HW INFO: %s = %u\n", msg, getSysInt( id ) );
+}
+
+static uint64_t	getSysLong( int id )
+{
+	int mib[2];
+	mib[0]= CTL_HW;
+	mib[1]= id;
+	uint64_t	data= 0;
+	size_t	len= sizeof(data);
+	sysctl( mib, 2, &data, &len, nullptr, 0 );
+	return	data;
+}
+
+static void	dumpSysLong( int id, const char* msg )
+{
+	FL_LOG( "HW INFO: %s = %llu\n", msg, getSysLong( id ) );
+}
+
+static void dumpSysString( int id, const char* msg )
+{
+	int mib[2];
+	mib[0]= CTL_HW;
+	mib[1]= id;
+	const int	STRING_BUF_SIZE= 128;
+	char	buf[STRING_BUF_SIZE];
+	size_t	len= STRING_BUF_SIZE;
+	sysctl( mib, 2, buf, &len, nullptr, 0 );
+	FL_LOG( "HW INFO: %s = %s\n", msg, buf );
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+}
+
+void SystemInfo::GetHWInfo()
+{
+	{
+		//int		count= getSysInt( HW_NCPU );
+		CoreList[0].CoreClock= static_cast<uint32_t>(getSysInt( HW_CPU_FREQ )) / 1000;
+
+		dumpSysString( HW_MACHINE, "Machine" );
+		dumpSysString( HW_MODEL, "Model" );
+		dumpSysString( HW_MACHINE_ARCH, "Arch" );
+
+		dumpSysInt( HW_NCPU, "NCPU" );
+		dumpSysInt( HW_BYTEORDER, "ByteOrder" );
+		dumpSysInt( HW_PHYSMEM, "PhysMem" );
+		dumpSysInt( HW_USERMEM, "UserMem" );
+		dumpSysInt( HW_PAGESIZE, "PageSize" );
+		dumpSysInt( HW_FLOATINGPT, "Float" );
+		dumpSysInt( HW_VECTORUNIT, "VectorUnit" );
+		dumpSysInt( HW_BUS_FREQ, "BusFreq" );
+		dumpSysInt( HW_CPU_FREQ, "CpuFreq" );
+		dumpSysInt( HW_CACHELINE, "CacheLine" );
+		dumpSysInt( HW_L1ICACHESIZE, "L1Size I" );
+		dumpSysInt( HW_L1DCACHESIZE, "L1Size D" );
+		dumpSysInt( HW_L2SETTINGS,	"L2Settings" );
+		dumpSysInt( HW_L2CACHESIZE, "L2CacheSize" );
+		dumpSysInt( HW_L3SETTINGS,	"L3Settings" );
+		dumpSysInt( HW_L3CACHESIZE, "L3CacheSize" );
+		dumpSysInt( HW_TB_FREQ,		"TB_FREQ" );
+		dumpSysLong( HW_MEMSIZE,	"MemSize" );
+		dumpSysInt( HW_AVAILCPU,	"AvailCpu" );
+	}
+
+	{
+		host_basic_info	basic_info;
+		mach_msg_type_number_t	info_count= HOST_BASIC_INFO_COUNT;
+		host_t	host= mach_host_self();
+		host_info( host, HOST_BASIC_INFO, (host_info_t)&basic_info, &info_count );
+		FL_LOG( "sizeof(natural_t)= %d\n",	sizeof(natural_t) );
+		FL_LOG( "sizeof(integer_t)= %d\n",	sizeof(integer_t) );
+		FL_LOG( "sizeof(cpu_type_t)= %d\n",	sizeof(cpu_type_t) );
+		FL_LOG( "sizeof(cpu_subtype_t)= %d\n",	sizeof(cpu_subtype_t) );
+		FL_LOG( "sizeof(cpu_threadtype_t)= %d\n",	sizeof(cpu_threadtype_t) );
+		FL_LOG( "max_cpus         = %d\n",	basic_info.max_cpus );
+		FL_LOG( "avail_cpus       = %d\n",	basic_info.avail_cpus );
+		FL_LOG( "memory_size      = %d\n",	basic_info.memory_size );
+		FL_LOG( "cpu_type         = %d\n",	basic_info.cpu_type );
+		FL_LOG( "cpu_subtype      = %d\n",	basic_info.cpu_subtype );
+		FL_LOG( "cpu_threadtype   = %d\n",	basic_info.cpu_threadtype ); // 1=HT
+		FL_LOG( "physical_cpu     = %d\n",	basic_info.physical_cpu );
+		FL_LOG( "physical_cpu_max = %d\n",	basic_info.physical_cpu_max );
+		FL_LOG( "logical_cpu      = %d\n",	basic_info.logical_cpu );
+		FL_LOG( "logical_cpu_max  = %d\n",	basic_info.logical_cpu_max );
+		FL_LOG( "max_mem          = %lld\n", basic_info.max_mem );
+
+		TotalThreadCount= basic_info.logical_cpu_max;
+		PhysicalCoreCount= basic_info.physical_cpu_max;
+	}
+
+	{
+		host_t	host= mach_host_self();
+		processor_basic_info_t	info_ptr= nullptr;
+		mach_msg_type_number_t	info_count= 0;
+		natural_t	processor_count= 0;
+		host_processor_info( host, PROCESSOR_BASIC_INFO, &processor_count, (processor_info_array_t*)&info_ptr, &info_count );
+
+		FL_LOG( "*processor***********\n" );
+		FL_LOG( "processor_count = %d %d %d %d %d\n", processor_count, info_count, (int)sizeof(processor_basic_info), sizeof(natural_t)*PROCESSOR_BASIC_INFO_COUNT, PROCESSOR_BASIC_INFO_COUNT );
+		for( int pi= 0 ; pi< processor_count ; pi++ ){
+		FL_LOG( "   cpu_type    = %08x\n", info_ptr->cpu_type );
+		FL_LOG( "   cpu_subtype = %d\n", info_ptr->cpu_subtype );
+		FL_LOG( "   running     = %d\n", info_ptr->running );
+		FL_LOG( "   slot_num    = %d\n", info_ptr->slot_num );
+		FL_LOG( "   is_master   = %d\n", info_ptr->is_master );
+		info_ptr++;
+		}
+
+		vm_deallocate( mach_task_self(), (vm_address_t)info_ptr, (vm_size_t)( info_count * sizeof(natural_t) ) );
+		FL_LOG( "*processor***********\n" );
+	}
+
+
+
+
+# if __ARM_NEON__
+	SetInstructionSet( CPUFeature::ARM_NEON );
+# endif
+# if __AARCH64_SIMD__
+	SetInstructionSet( CPUFeature::ARM_NEON );
+# endif
+# if __ARM64_ARCH_8__
+	SetInstructionSet( CPUFeature::ARM_64 );
+# endif
+# if __ARM_VFPV4__
+	SetInstructionSet( CPUFeature::ARM_VFPV4 );
+# endif
+
+
+	DumpCpuGroup();
+}
+
+
+
+//-----------------------------------------------------------------------------
+#endif // Darwin
+//-----------------------------------------------------------------------------
+
+
+
+//=============================================================================
+// CPU
+//=============================================================================
+
 
 
 //-----------------------------------------------------------------------------
@@ -191,330 +676,6 @@ void	SystemInfo::GetCPUSpecification()
 
 
 //-----------------------------------------------------------------------------
-#if flOS_LINUX
-//-----------------------------------------------------------------------------
-
-namespace {
-//-----------------------------------------------------------------------------
-
-static unsigned int GetBitCount( uint64_t bit )
-{
-	unsigned int	count= 0;
-	for( unsigned int i= 0 ; i< 32 ; i++, bit>>= 1 ){
-		if( bit & 1 ){
-			count++;
-		}
-	}
-	return	count;
-}
-
-static bool	LoadOneLine( char* line_buffer, size_t buffer_size, const char* path )
-{
-	*line_buffer= '\0';
-	FILE*	fp= fopen( path, "r" );
-	if( fp ){
-		if( !fgets( line_buffer, buffer_size-1, fp ) ){
-			*line_buffer= '\0';
-		}
-		fclose( fp );
-	}
-	return	*line_buffer != '\0';
-}
-
-static unsigned int		IsExists( const char* path )
-{
-	struct stat	sbuf;
-	if( stat( path, &sbuf ) == -1 ){
-		return	0;
-	}
-	if( S_ISDIR( sbuf.st_mode ) ){
-		return	2;
-	}
-	if( S_ISREG( sbuf.st_mode ) ){
-		return	1;
-	}
-	return	0;
-}
-
-static char*	SkipColon( char* ptr )
-{
-	for(; *ptr && *ptr != ':' ; ptr++ );
-	if( *ptr == ':' ){
-		ptr++;
-	}
-	return	ptr;
-}
-
-static char*	SkipSpace( char* ptr )
-{
-	for(; *ptr && *ptr <= ' ' ; ptr++ );
-	return	ptr;
-}
-
-static const char*	SkipSpace( const char* ptr )
-{
-	for(; *ptr && *ptr <= ' ' ; ptr++ );
-	return	ptr;
-}
-
-static uint64_t	DecodeCpuRegion( const char* ptr )
-{
-	uint64_t		bit= 0;
-	unsigned int	previd= 0;
-	for(; *ptr ;){
-		bool	region= false;
-		ptr= SkipSpace( ptr );
-		if( *ptr == '-' ){
-			region= true;
-			ptr++;
-		}
-		if( *ptr < '0' || *ptr > '9' ){
-			break;
-		}
-		unsigned int id= atoi( ptr );
-		for(; *ptr >= '0' && *ptr <= '9' ; ptr++ );
-		for(; *ptr == ',' ; ptr++ );
-		if( region ){
-		   for( unsigned int i= previd+1 ; i< id ; i++ ){
-			   bit|= 1<<i;
-		   }
-		}
-		bit|= 1<<id;
-		previd= id;
-	}
-	return	bit;
-}
-
-static unsigned int GetCpuCount( const char* path )
-{
-	const int	MAX_LINE_SIZE= 128;
-	char	line_buffer[MAX_LINE_SIZE];
-	if( LoadOneLine( line_buffer, MAX_LINE_SIZE-2, path ) ){
-		return	GetBitCount( DecodeCpuRegion( line_buffer ) );
-	}
-	return	0;
-}
-
-
-//-----------------------------------------------------------------------------
-}
-
-void SystemInfo::DumpCpuGroup() const
-{
-	FL_LOG( "Total Core Cound : %d\n", TotalThreadCount );
-	unsigned int	core_count= TotalThreadCount;
-	for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
-		const auto&	core= CoreList[ci];
-		FL_PRINT( "%2d: P:%02d G:%02d %8dKHz G:%08llx T:%08llx\n", core.Index, core.PhysicalCoreID, core.ClusterGroupID, core.CoreClock, core.ClusterMask, core.ThreadMask );
-	}
-}
-
-void SystemInfo::DecodeCpuTopologyImmediate()
-{
-	{
-		const int	MAX_PATH_SIZE= 256;
-		const int	MAX_LINE_SIZE= 256;
-		char	path_buffer[MAX_PATH_SIZE];
-		char	line_buffer[MAX_LINE_SIZE];
-		for( unsigned int ci= 0 ; ci< CPU_COUNT_MAX ; ci++ ){
-			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d", ci );
-			if( !IsExists( path_buffer ) ){
-				break;
-			}
-			auto&	core= CoreList[ci];
-			core.Index= ci;
-#if 0
-			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/core_id", ci );
-			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
-				core.PhysicalCoreID= atoi( line_buffer );
-			}
-#endif
-			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/thread_siblings", ci );
-			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
-				core.ThreadMask= strtoull( line_buffer, nullptr, 16 );
-			}
-
-			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/core_siblings", ci );
-			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
-				core.ClusterMask= strtoull( line_buffer, nullptr, 16 );
-			}
-
-			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq", ci );
-			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
-				core.CoreClock= atoi( line_buffer );
-			}
-
-			TotalThreadCount= ci + 1;
-		}
-	}
-	{
-		unsigned int	core_count= TotalThreadCount;
-		unsigned int	group_id= 0;
-		unsigned int	thread_id= 0;
-		std::map<uint64_t,unsigned int>		group_map;
-		std::map<uint64_t,unsigned int>		thread_map;
-		for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
-			auto&	core= CoreList[ci];
-			{
-				const auto&	thread= thread_map.find( core.ThreadMask );
-				if( thread == thread_map.end() ){
-					thread_map[ core.ThreadMask ]= thread_id++;
-				}
-			}
-			{
-				const auto&	group= group_map.find( core.ClusterMask );
-				if( group == group_map.end() ){
-					group_map[ core.ClusterMask ]= group_id++;
-				}
-			}
-		}
-		PhysicalCoreCount= thread_id;
-		CoreGroupCount= group_id;
-		for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
-			auto&	core= CoreList[ci];
-			const auto&	thread= thread_map.find( core.ThreadMask );
-			core.PhysicalCoreID= thread->second;
-			const auto&	group= group_map.find( core.ClusterMask );
-			core.ClusterGroupID= group->second;
-		}
-	}
-
-	//DumpCpuGroup();
-}
-
-
-void SystemInfo::DecodeCpuTopology()
-{
-	unsigned int	present= GetCpuCount( "/sys/devices/system/cpu/present" );
-	{
-		unsigned int	offline= GetCpuCount( "/sys/devices/system/cpu/offline" );
-		if( offline == 0 ){
-			DecodeCpuTopologyImmediate();
-			return;
-		}
-	}
-	thread::Atomic<unsigned int>	ExitFlag( 0 );
-	util::FixedArrayPOD<thread::ThreadFunctionBase*>	ThreadArray( present );
-	for( unsigned int ti= 0 ; ti< present ; ti++ ){
-		auto*	thread= thread::CreateThreadFunction( [&ExitFlag](){
-					for(; ExitFlag.Get() == 0 ;){
-						math::Matrix4	m1, m2, m3;
-						m1.SetIdentity();
-						m2.SetIdentity();
-						m3.MulCopy( m1, m2 );
-					}
-				});
-		ThreadArray[ti]= thread;
-		thread->Run();
-	}
-	for(;;){
-		unsigned int	offline= GetCpuCount( "/sys/devices/system/cpu/offline" );
-		if( offline == 0 ){
-			DecodeCpuTopologyImmediate();
-			ExitFlag= 1;
-			break;
-		}
-		time::SleepMS( 50 );
-	}
-	for( unsigned int ti= 0 ; ti< present ; ti++ ){
-		auto*	thread= ThreadArray[ti];
-		thread->Join();
-		memory::SafeDelete( thread );
-		ThreadArray[ti]= nullptr;
-	}
-}
-
-
-void SystemInfo::DecodeCpuInfo()
-{
-	bool	info_feature= false;
-	bool	info_devname= false;
-	const int	MAX_LINE_BYTE= 1024 * 2;
-	char	linebuffer[MAX_LINE_BYTE+8];
-	FILE*	fp= fopen( "/proc/cpuinfo", "r" );
-	if( !fp ){
-		return;
-	}
-	for(; fgets( linebuffer, MAX_LINE_BYTE, fp ) ;){
-//FL_LOG( "[%s]\n", linebuffer );
-		if( !info_feature ){
-			if(
-#if flCPU_ARM6 || flCPU_ARM7 || flCPU_ARM64
-				!strncmp( linebuffer, "Features", 8 )
-#endif
-#if flCPU_X64 || flCPU_X86
-				!strncmp( linebuffer, "flags", 5 )
-#endif
-					){
-				char*	lp= SkipColon( linebuffer );
-				if( *lp ){
-					for(; *lp ;){
-						lp= SkipSpace( lp );
-						const char*	top= lp;
-						for(; *lp && !(*lp <= ' ' && *lp) ; lp++ );
-						if( *lp && *lp <= ' ' ){
-							*lp++= '\0';
-						}
-  //FL_LOG( "word=[%s]\n", top );
-#if flCPU_ARM7 || flCPU_ARM64
-						if( !strcmp( top, "neon" ) ){
-							SetInstructionSet( CPUFeature::ARM_NEON );
-						}else if( !strcmp( top, "vfpv4" ) ){
-							SetInstructionSet( CPUFeature::ARM_VFPV4 );
-						}else if( !strcmp( top, "asimd" ) ){
-							SetInstructionSet( CPUFeature::ARM_NEON );
-						}else if( !strcmp( top, "fphp" ) ){
-							SetInstructionSet( CPUFeature::ARM_FPHP );
-						}else if( !strcmp( top, "asimdhp" ) ){
-							SetInstructionSet( CPUFeature::ARM_SIMDHP );
-						}else if( !strcmp( top, "crc32" ) ){
-							SetInstructionSet( CPUFeature::ARM_CRC32 );
-						}else if( !strcmp( top, "sha1" ) ){
-							SetInstructionSet( CPUFeature::ARM_SHA1 );
-						}else if( !strcmp( top, "sha2" ) ){
-							SetInstructionSet( CPUFeature::ARM_SHA2 );
-						}else if( !strcmp( top, "aes" ) ){
-							SetInstructionSet( CPUFeature::ARM_AES );
-						}
-#else
-						if( !strcmp( top, "aes" ) ){
-						}
-#endif
-					}
-				}
-				info_feature= true;
-			}
-		}
-		if( !info_devname ){
-#if flCPU_ARM7 || flCPU_ARM64
-			if( !strncmp( linebuffer, "Hardware", 8 ) ){
-				char*	lp= SkipColon( linebuffer );
-				lp= SkipSpace( lp );
-				strcpy_s( DeviceName, DEVICE_NAME_BUFFER_SIZE-1, lp );
-				info_devname= true;
-			}
-#endif
-#if flCPU_X64 || flCPU_X86
-			if( !strncmp( linebuffer, "model name", 10 ) ){
-				char*	lp= SkipColon( linebuffer );
-				lp= SkipSpace( lp );
-				strcpy_s( DeviceName, DEVICE_NAME_BUFFER_SIZE-1, lp );
-				info_devname= true;
-			}
-#endif
-		}
-	}
-	fclose( fp );
-}
-
-
-//-----------------------------------------------------------------------------
-#endif
-//-----------------------------------------------------------------------------
-
-
-
-//-----------------------------------------------------------------------------
 #if flCPU_ARM6 || flCPU_ARM7 || flCPU_ARM64
 //-----------------------------------------------------------------------------
 
@@ -545,8 +706,11 @@ void	SystemInfo::GetCPUSpecification()
 //-----------------------------------------------------------------------------
 
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+
+
+//=============================================================================
+// Common
+//=============================================================================
 
 SystemInfo::SystemInfo() :
 			InstructionSet( 0 ),
@@ -569,8 +733,21 @@ void	SystemInfo::Init()
 		DecodeCpuInfo();
 		DecodeCpuTopology();
 #endif
+#if flOS_DARWIN
+		GetHWInfo();
+#endif
 	}
 	FL_LOG( "InstructionSet= %08x\n", InstructionSet );
+}
+
+void SystemInfo::DumpCpuGroup() const
+{
+	FL_LOG( "Total Core Cound : %d\n", TotalThreadCount );
+	unsigned int	core_count= TotalThreadCount;
+	for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
+		const auto&	core= CoreList[ci];
+		FL_PRINT( "%2d: P:%02d G:%02d %8dKHz G:%08llx T:%08llx\n", core.Index, core.PhysicalCoreID, core.ClusterGroupID, core.CoreClock, core.ClusterMask, core.ThreadMask );
+	}
 }
 
 unsigned int	SystemInfo::GetCoreClock( unsigned int group_index ) const
