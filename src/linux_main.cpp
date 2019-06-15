@@ -73,7 +73,7 @@ public:
 		switch( info_mode ){
 		case INFO_CPU:
 			PrintInfo();
-			Info.DumpCpuGroup();
+			Info.DumpSystemInfo();
 			break;
 		case INFO_BENCH: {
 				auto	bcount= BenchmarkInstance.GetBenchCount();

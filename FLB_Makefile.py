@@ -1,6 +1,19 @@
 # 2018 Hiroyuki Ogasawara
 # vim:ts=4 sw=4 et:
 
+# Linux, macOS
+#  $ flmake
+#  $ flmake run
+#  $ more output_log.txt
+#
+# Android + Termux
+#  $ flmake termux
+#  $ flmake run
+#  $ more output_log.txt
+#
+# Show CPU information
+#  $ ./vfpbench_*_Release -i
+
 #------------------------------------------------------------------------------
 
 src_list= [
@@ -62,10 +75,7 @@ env.addIncludePath( ['src'] )
 
 if env.getHostPlatform() == 'macOS':
     env.addCCFlags( ['-DflPRESET_OSX=1'] )
-    if env.getTargetPlatform() == 'macOS' or env.getTargetPlatform() == 'iOS':
-        env.addLinkFlags( '-framework Cocoa'.split() )
-
-if env.getHostPlatform() == 'Linux':
+elif env.getHostPlatform() == 'Linux':
     env.addCCFlags( ['-DflPRESET_LINUX=1'] )
 
 
@@ -88,6 +98,7 @@ def addCustomBuild( env, TargetName, src_list, is_termux= False ):
                     local_env.setTargetArch( 'x86' )
             if arch == 'arm64':
                 local_env.addCCFlags( ['-march=armv8a+fp16'] )
+                #local_env.addCCFlags( ['-march=armv8.2a+crypto+fp16+dotprod'] )
             if config != 'Release':
                 local_env.addCCFlags( ['-DDEBUG=1'] )
             local_env.refresh()

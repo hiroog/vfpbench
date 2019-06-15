@@ -302,12 +302,20 @@ void SystemInfo::DecodeCpuInfo()
 							SetInstructionSet( CPUFeature::ARM_FPHP );
 						}else if( !strcmp( top, "asimdhp" ) ){
 							SetInstructionSet( CPUFeature::ARM_SIMDHP );
+						}else if( !strcmp( top, "simddp" ) ){
+							SetInstructionSet( CPUFeature::ARM_SIMDDP );
+						}else if( !strcmp( top, "sve" ) ){
+							SetInstructionSet( CPUFeature::ARM_SVE );
 						}else if( !strcmp( top, "crc32" ) ){
 							SetInstructionSet( CPUFeature::ARM_CRC32 );
 						}else if( !strcmp( top, "sha1" ) ){
 							SetInstructionSet( CPUFeature::ARM_SHA1 );
 						}else if( !strcmp( top, "sha2" ) ){
 							SetInstructionSet( CPUFeature::ARM_SHA2 );
+						}else if( !strcmp( top, "sha3" ) ){
+							SetInstructionSet( CPUFeature::ARM_SHA3 );
+						}else if( !strcmp( top, "sha512" ) ){
+							SetInstructionSet( CPUFeature::ARM_SHA512 );
 						}else if( !strcmp( top, "aes" ) ){
 							SetInstructionSet( CPUFeature::ARM_AES );
 						}
@@ -558,8 +566,8 @@ enum {
 	CPUID_7_ECX_FEATURE_AVX512BITALG=	(1<<12),	//
 	CPUID_7_ECX_FEATURE_AVX512VPOPCNTDQ=(1<<14),	//
 	//-- id=7 EDX
-	CPUID_7_ECX_FEATURE_AVX5124VNNIW=	(1<< 2),	//
-	CPUID_7_ECX_FEATURE_AVX5124FMAPS=	(1<< 3),	//
+	CPUID_7_EDX_FEATURE_AVX5124VNNIW=	(1<< 2),	//
+	CPUID_7_EDX_FEATURE_AVX5124FMAPS=	(1<< 3),	//
 	//-- id=0x80000001 ECX
 	CPUID_80_ECX_FEATURE_SSE4A		=	(1<< 6),
 	CPUID_80_ECX_FEATURE_FMA4		=	(1<<16),
@@ -586,7 +594,7 @@ static void	GetCPUID( RegCPUID& reg, unsigned int index )
 	unsigned int	b= 0;
 	unsigned int	c= 0;
 	unsigned int	d= 0;
-	__cpuid( index, a, b, c, d );
+	__cpuid_count( index, 0, a, b, c, d );
 	reg.EAX= a;
 	reg.EBX= b;
 	reg.ECX= c;
@@ -604,6 +612,9 @@ void	SystemInfo::GetCPUSpecification()
 	GetCPUID( Feature07, 7 );
 	GetCPUID( Feature80, 0x80000001 );
 
+FL_LOG( "01: %08x %08x %08x %08x\n", Feature01.EAX, Feature01.EBX, Feature01.ECX, Feature01.EDX );
+FL_LOG( "07: %08x %08x %08x %08x\n", Feature07.EAX, Feature07.EBX, Feature07.ECX, Feature07.EDX );
+FL_LOG( "80: %08x %08x %08x %08x\n", Feature80.EAX, Feature80.EBX, Feature80.ECX, Feature80.EDX );
 
 	if( Feature01.ECX & CPUID_1_ECX_FEATURE_SSE3 ){
 		SetInstructionSet( CPUFeature::IA_SSE3 );
@@ -659,6 +670,9 @@ void	SystemInfo::GetCPUSpecification()
 	}
 
 
+	if( Feature80.ECX & CPUID_80_ECX_FEATURE_SSE4A ){
+		SetInstructionSet( CPUFeature::IA_SSE4A );
+	}
 	if( Feature80.ECX & CPUID_80_ECX_FEATURE_FMA4 ){
 		SetInstructionSet( CPUFeature::IA_FMA4 );
 	}
@@ -748,6 +762,83 @@ void SystemInfo::DumpCpuGroup() const
 		const auto&	core= CoreList[ci];
 		FL_PRINT( "%2d: P:%02d G:%02d %8dKHz G:%08llx T:%08llx\n", core.Index, core.PhysicalCoreID, core.ClusterGroupID, core.CoreClock, core.ClusterMask, core.ThreadMask );
 	}
+}
+
+#define	DEF_CPUFEATURE_NAME_IA(name)	{	#name, CPUFeature::IA_##name	}
+#define	DEF_CPUFEATURE_NAME_ARM(name)	{	#name, CPUFeature::ARM_##name	}
+#define	DEF_CPUFEATURE_NAME_MIPS(name)	{	#name, CPUFeature::MIPS_##name	}
+CPUFeatureNameTable	SystemInfo::FeatureNameTable[]= {
+DEF_CPUFEATURE_NAME_IA( SSE ),
+DEF_CPUFEATURE_NAME_IA( SSE2 ),
+DEF_CPUFEATURE_NAME_IA( SSE3 ),
+DEF_CPUFEATURE_NAME_IA( SSSE3 ),
+DEF_CPUFEATURE_NAME_IA( SSE41 ),
+DEF_CPUFEATURE_NAME_IA( SSE42 ),
+DEF_CPUFEATURE_NAME_IA( SSE4A ),
+DEF_CPUFEATURE_NAME_IA( AVX ),
+DEF_CPUFEATURE_NAME_IA( AVX2 ),
+DEF_CPUFEATURE_NAME_IA( AVX512F ),
+DEF_CPUFEATURE_NAME_IA( AVX512BW ),
+DEF_CPUFEATURE_NAME_IA( AVX512DQ ),
+DEF_CPUFEATURE_NAME_IA( AVX512VL ),
+DEF_CPUFEATURE_NAME_IA( AES ),
+DEF_CPUFEATURE_NAME_IA( FMA3 ),
+DEF_CPUFEATURE_NAME_IA( FMA4 ),
+DEF_CPUFEATURE_NAME_IA( SHA ),
+DEF_CPUFEATURE_NAME_IA( F16C ),
+DEF_CPUFEATURE_NAME_IA( X64 ),
+DEF_CPUFEATURE_NAME_ARM( NEON ),
+DEF_CPUFEATURE_NAME_ARM( VFPV4 ),
+DEF_CPUFEATURE_NAME_ARM( FPHP ),
+DEF_CPUFEATURE_NAME_ARM( SIMDHP ),
+DEF_CPUFEATURE_NAME_ARM( SIMDDP ),
+DEF_CPUFEATURE_NAME_ARM( SVE ),
+DEF_CPUFEATURE_NAME_ARM( CRC32 ),
+DEF_CPUFEATURE_NAME_ARM( SHA1 ),
+DEF_CPUFEATURE_NAME_ARM( SHA2 ),
+DEF_CPUFEATURE_NAME_ARM( SHA3 ),
+DEF_CPUFEATURE_NAME_ARM( SHA512 ),
+DEF_CPUFEATURE_NAME_ARM( AES ),
+DEF_CPUFEATURE_NAME_ARM( 64 ),
+DEF_CPUFEATURE_NAME_MIPS( MSA ),
+DEF_CPUFEATURE_NAME_MIPS( F64 ),
+DEF_CPUFEATURE_NAME_MIPS( PS ),
+};
+
+const char* SystemInfo::GetFeatureName( CPUFeature feature ) const
+{
+	flASSERT( sizeof(FeatureNameTable)/sizeof(CPUFeatureNameTable) == (int)CPUFeature::FEATURE_MAX );
+	if( feature < CPUFeature::FEATURE_MAX ){
+		unsigned int	index= (unsigned int)feature;
+		const auto&	name= FeatureNameTable[index];
+		flASSERT( name.Feature == feature );
+		return	name.FeatureName;
+	}
+	return	"Unknown";
+}
+
+void SystemInfo::GetCpuFeatureString( char* buffer, size_t buffer_size ) const
+{
+	char*	str= buffer;
+	char*	str_end= buffer + buffer_size;
+	for( unsigned int fi= 0 ; str < str_end && fi< (unsigned int)CPUFeature::FEATURE_MAX ; fi++ ){
+		if( HasInstructionSet( (CPUFeature)fi ) ){
+			const char*	ptr= GetFeatureName( (CPUFeature)fi );
+			strcpy_s( str, str_end - str, ptr );
+			str+= strlen(ptr);
+			*str++= ' ';
+		}
+	}
+	*str= '\0';
+}
+
+void SystemInfo::DumpSystemInfo() const
+{
+	DumpCpuGroup();
+	const int	CPU_FEATURE_BUFFER_SIZE= 512;
+	char	buffer[CPU_FEATURE_BUFFER_SIZE];
+	GetCpuFeatureString( buffer, CPU_FEATURE_BUFFER_SIZE );
+	FL_PRINT( "%s\n", buffer );
 }
 
 unsigned int	SystemInfo::GetCoreClock( unsigned int group_index ) const

@@ -127,6 +127,12 @@ void BenchApplication::ExportCPUInfo( util::BinaryBuffer32& buffer ) const
 		if( Info.HasInstructionSet( CPUFeature::ARM_SIMDHP ) ){
 			print( buffer, " ASIMDHP" );
 		}
+		if( Info.HasInstructionSet( CPUFeature::ARM_SIMDDP ) ){
+			print( buffer, " DOTPROD" );
+		}
+		if( Info.HasInstructionSet( CPUFeature::ARM_SVE ) ){
+			print( buffer, " SVE" );
+		}
 		print( buffer, "\n" );
 		break;
 	case CPUArch::CPU_X86:
@@ -200,10 +206,11 @@ void BenchApplication::ExportCPUInfo( util::BinaryBuffer32& buffer ) const
 	case CPUArch::CPU_ARM6:
 	case CPUArch::CPU_ARM7:
 	case CPUArch::CPU_ARM64:
-		print( buffer, "NEON  : %s\n", Info.HasInstructionSet( CPUFeature::ARM_NEON ) ? "yes" : "no" );
-		print( buffer, "FMA   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_VFPV4 ) ? "yes" : "no" );
-		print( buffer, "FPHP  : %s\n", Info.HasInstructionSet( CPUFeature::ARM_FPHP ) ? "yes" : "no" );
-		print( buffer, "SIMDHP: %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDHP ) ? "yes" : "no" );
+		print( buffer, "NEON   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_NEON ) ? "yes" : "no" );
+		print( buffer, "FMA    : %s\n", Info.HasInstructionSet( CPUFeature::ARM_VFPV4 ) ? "yes" : "no" );
+		print( buffer, "FPHP   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_FPHP ) ? "yes" : "no" );
+		print( buffer, "SIMDHP : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDHP ) ? "yes" : "no" );
+		print( buffer, "DotProd: %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDDP ) ? "yes" : "no" );
 		break;
 	case CPUArch::CPU_X86:
 	case CPUArch::CPU_X64:

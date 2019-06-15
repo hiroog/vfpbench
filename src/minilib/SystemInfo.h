@@ -31,6 +31,7 @@ enum class CPUFeature : unsigned int {
 	IA_SSSE3,
 	IA_SSE41,
 	IA_SSE42,
+	IA_SSE4A,
 	IA_AVX,
 	IA_AVX2,
 	IA_AVX512F,
@@ -48,9 +49,13 @@ enum class CPUFeature : unsigned int {
 	ARM_VFPV4,		// include fma/half
 	ARM_FPHP,
 	ARM_SIMDHP,
+	ARM_SIMDDP,
+	ARM_SVE,
+	ARM_CRC32,
 	ARM_SHA1,
 	ARM_SHA2,
-	ARM_CRC32,
+	ARM_SHA3,
+	ARM_SHA512,
 	ARM_AES,
 	ARM_64,
 	//--
@@ -59,6 +64,11 @@ enum class CPUFeature : unsigned int {
 	MIPS_PS,
 	//--
 	FEATURE_MAX,
+};
+
+struct CPUFeatureNameTable {
+	const char*	FeatureName;
+	CPUFeature	Feature;
 };
 
 struct CPUGroup {
@@ -85,6 +95,7 @@ private:
 	unsigned int	CoreGroupCount;
 	bool			Initialized;
 	char			DeviceName[DEVICE_NAME_BUFFER_SIZE];
+	static CPUFeatureNameTable	FeatureNameTable[];
 private:
 	void	DecodeCpuInfo();
 	void	DecodeCpuTopologyImmediate();
@@ -120,7 +131,11 @@ public:
 	CPUArch			GetArch() const;
 	const char* 	GetArchNameLong() const;
 	const char* 	GetArchNameShort() const;
+
+	const char*		GetFeatureName( CPUFeature feature ) const;
 	void			DumpCpuGroup() const;
+	void			GetCpuFeatureString( char* buffer, size_t buffer_size ) const;
+	void			DumpSystemInfo() const;
 };
 
 
