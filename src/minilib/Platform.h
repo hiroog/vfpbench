@@ -126,6 +126,9 @@
 #endif
 
 
+#ifdef __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
+# define	flCPU_FP16			1
+#endif
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -180,6 +183,9 @@
 #endif
 #ifndef	flCPU_VFPV4
 # define	flCPU_VFPV4			0
+#endif
+#ifndef flCPU_FP16
+# define	flCPU_FP16			0
 #endif
 
 

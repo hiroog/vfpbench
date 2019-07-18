@@ -23,7 +23,7 @@ $ git clone https://github.com/hiroog/FlatBuildTool
 $ export PATH=$PATH:$PWD/FlatBuildTool
 $ git clone https://github.com/hiroog/vfpbench
 $ cd vfpbench
-$ flmake termux
+$ flmake
 $ flmake run
 $ more output_log.txt
 ```

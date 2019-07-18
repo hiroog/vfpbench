@@ -17,6 +17,7 @@ using namespace flatlib;
 namespace VFP64HP {
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+#if flCPU_FP16
 
 
 #if flOS_ANDROID
@@ -1314,6 +1315,7 @@ static uint64_t NEON_V_IR12_##name( CounterType LoopCount, float answer ) \
 
 
 
+#endif
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
@@ -1443,6 +1445,7 @@ unsigned int FloatTest::GetProgressStep() const
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
+#if flCPU_FP16
 
 
 
@@ -1569,9 +1572,12 @@ NEON_V_IR12( fmla.8h, fmla_4s_ir12 );
 
 
 
+#endif
+
 
 void FloatTest::Run()
 {
+#if flCPU_FP16
 	ClearResult();
 	unsigned int	Loop= LoopCount;
 
@@ -1738,6 +1744,7 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 
 
 	DoneFlag= true;
+#endif
 }
 
 

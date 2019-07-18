@@ -1,18 +1,16 @@
 # 2018 Hiroyuki Ogasawara
 # vim:ts=4 sw=4 et:
 
-# Linux, macOS
 #  $ flmake
 #  $ flmake run
 #  $ more output_log.txt
 #
-# Android + Termux
-#  $ flmake termux
-#  $ flmake run
-#  $ more output_log.txt
+# debug build
+#  $ flamke debug
 #
 # Show CPU information
-#  $ ./vfpbench_*_Release -i
+#  $ ./vfpbench -i
+
 
 #------------------------------------------------------------------------------
 
@@ -63,6 +61,8 @@ addCleanTask( genv, 'clean' )
 
 
 def makeExeName( env, src_file ):
+    if env.getConfig() == 'Release':
+        return  src_file
     if src_file:
         return  env.getExeName( src_file + '_' + env.getTargetArch() + '_' + env.getConfig() )
     return  '.'
@@ -71,7 +71,7 @@ def makeExeName( env, src_file ):
 
 env= tool.createTargetEnvironment()
 env.EXE_NAME_FUNC= makeExeName
-env.addIncludePath( ['src'] )
+env.addIncludePaths( ['src'] )
 
 if env.getHostPlatform() == 'macOS':
     env.addCCFlags( ['-DflPRESET_OSX=1'] )
@@ -81,36 +81,38 @@ elif env.getHostPlatform() == 'Linux':
 
 env.refresh()
 
-def addCustomBuild( env, TargetName, src_list, is_termux= False ):
+def addCustomBuild( env, TargetName, src_list, config ):
+    is_termux= False
+    if env.getHostPlatform() == 'Linux':
+        is_termux= env.isTermux()
     tool= env.tool
     arch_list= env.getSupportArchList()
-    config_list= [ 'Debug', 'Release' ]
     task_list= []
-    for config in config_list:
-        for arch in arch_list:
-            local_env= env.clone()
-            local_env.setConfig( config )
-            local_env.setTargetArch( arch )
-            if is_termux:
-                if arch == 'arm7':
-                    local_env.addCCFlags( ['-mfpu=neon', '-mfloat-abi=softfp'] )
-                elif arch == 'x64':
-                    local_env.setTargetArch( 'x86' )
-            if arch == 'arm64':
-                local_env.addCCFlags( ['-march=armv8a+fp16'] )
-                #local_env.addCCFlags( ['-march=armv8.2a+crypto+fp16+dotprod'] )
-            if config != 'Release':
-                local_env.addCCFlags( ['-DDEBUG=1'] )
-            local_env.refresh()
-            task= tool.addExeTask( local_env, TargetName, src_list )
-            task_list.append( task )
+    for arch in arch_list:
+        local_env= env.clone()
+        local_env.setConfig( config )
+        local_env.setTargetArch( arch )
+        if is_termux:
+            if arch == 'arm7':
+                local_env.addCCFlags( ['-mfpu=neon', '-mfloat-abi=softfp'] )
+            elif arch == 'x64':
+                local_env.setTargetArch( 'x86' )
+        if arch == 'arm64':
+            #local_env.addCCFlags( ['-march=armv8a+fp16'] )
+            local_env.addCCFlags( ['-march=armv8a'] )
+            #local_env.addCCFlags( ['-march=armv8.2a+crypto+fp16+dotprod'] )
+        if config != 'Release':
+            local_env.addCCFlags( ['-DDEBUG=1'] )
+        local_env.refresh()
+        task= tool.addExeTask( local_env, TargetName, src_list )
+        task_list.append( task )
     return  task_list
 
-task_list= addCustomBuild( env, TargetName, src_list )
+task_list= addCustomBuild( env, TargetName, src_list, 'Release' )
 tool.addNamedTask( env, 'build', task_list )
 
-task_list= addCustomBuild( env, TargetName, src_list, True )
-tool.addNamedTask( env, 'termux', task_list )
+task_list= addCustomBuild( env, TargetName, src_list, 'Debug' )
+tool.addNamedTask( env, 'debug', task_list )
 
 
 #------------------------------------------------------------------------------
@@ -118,13 +120,9 @@ tool.addNamedTask( env, 'termux', task_list )
 
 def BenchRun( task ):
     import  subprocess
-    for root,dirs,files in os.walk( '.' ):
-        for file_name in files:
-            if file_name.startswith( 'vfpbench_' ):
-                if file_name.endswith( '_Release' ):
-                    proc= subprocess.Popen( ['./'+file_name] )
-                    proc.wait()
-                    return
+    if os.path.exists( 'vfpbench' ):
+        proc= subprocess.Popen( ['./vfpbench'] )
+        proc.wait()
 
 task= tool.addScriptTask( env, 'run', BenchRun )
 
