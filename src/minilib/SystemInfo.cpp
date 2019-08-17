@@ -148,6 +148,26 @@ static unsigned int GetCpuCount( const char* path )
 	return	0;
 }
 
+static uint64_t	GetCpuBitMask( const char* line )
+{
+	const int	MAX_MASK= 8;
+	uint64_t	mask_buffer[MAX_MASK];
+	unsigned int	mask_index= 0;
+	const char*	ptr= line;
+	for(; *ptr && mask_index < MAX_MASK ;){
+		auto	mask= strtoull( ptr, nullptr, 16 );
+		mask_buffer[mask_index++]= mask;
+		for(; *ptr && *ptr != ',' ; ptr++ );
+		if( *ptr == ',' ){
+			ptr++;
+		}
+	}
+	if( mask_index ){
+		return	mask_buffer[mask_index-1];
+	}
+	return	0;
+}
+
 
 //-----------------------------------------------------------------------------
 }
@@ -168,12 +188,14 @@ void SystemInfo::DecodeCpuTopologyImmediate()
 			core.Index= ci;
 			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/thread_siblings", ci );
 			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
-				core.ThreadMask= strtoull( line_buffer, nullptr, 16 );
+				//core.ThreadMask= strtoull( line_buffer, nullptr, 16 );
+				core.ThreadMask= GetCpuBitMask( line_buffer );
 			}
 
 			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/core_siblings", ci );
 			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
-				core.ClusterMask= strtoull( line_buffer, nullptr, 16 );
+				//core.ClusterMask= strtoull( line_buffer, nullptr, 16 );
+				core.ClusterMask= GetCpuBitMask( line_buffer );
 			}
 
 			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/cpufreq/cpuinfo_max_freq", ci );
@@ -222,12 +244,15 @@ void SystemInfo::DecodeCpuTopology()
 {
 	unsigned int	present= GetCpuCount( "/sys/devices/system/cpu/present" );
 	{
+		unsigned int	online= GetCpuCount( "/sys/devices/system/cpu/online" );
 		unsigned int	offline= GetCpuCount( "/sys/devices/system/cpu/offline" );
-		if( offline == 0 ){
+		if( offline == 0 || online >= present ){
 			DecodeCpuTopologyImmediate();
 			return;
 		}
 	}
+	time::TickTime	tick_time;
+	auto	start_time= tick_time.GetUS();
 	thread::Atomic<unsigned int>	ExitFlag( 0 );
 	util::FixedArrayPOD<thread::ThreadFunctionBase*>	ThreadArray( present );
 	for( unsigned int ti= 0 ; ti< present ; ti++ ){
@@ -243,8 +268,14 @@ void SystemInfo::DecodeCpuTopology()
 		thread->Run();
 	}
 	for(;;){
+		if( tick_time.GetUS() - start_time > 2000000 ){
+			DecodeCpuTopologyImmediate();
+			ExitFlag= 1;
+			break;
+		}
+		unsigned int	online= GetCpuCount( "/sys/devices/system/cpu/online" );
 		unsigned int	offline= GetCpuCount( "/sys/devices/system/cpu/offline" );
-		if( offline == 0 ){
+		if( offline == 0 || online >= present ){
 			DecodeCpuTopologyImmediate();
 			ExitFlag= 1;
 			break;
@@ -743,7 +774,11 @@ void	SystemInfo::Init()
 	if( !Initialized ){
 		Initialized= true;
 		GetCPUSpecification();
-#if flOS_LINUX
+#if flOS_PPO
+		CoreList[0].CoreClock= 2100000;
+		TotalThreadCount=  4;
+		PhysicalCoreCount= 2;
+#elif flOS_LINUX
 		DecodeCpuInfo();
 		DecodeCpuTopology();
 #endif

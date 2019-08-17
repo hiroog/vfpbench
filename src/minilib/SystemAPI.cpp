@@ -10,7 +10,9 @@
 # include	<sys/time.h>
 # if flOS_LINUX
 #  include	<sys/types.h>
-#  include	<sys/syscall.h>
+#  if !flOS_PPO
+#   include	<sys/syscall.h>
+#  endif
 #  include	<sched.h>
 #  include	<unistd.h>
 # endif
@@ -101,7 +103,9 @@ void	SetAffinityMask( uint64_t cpu_mask )
 	if( !cpu_mask ){
 		return;
 	}
-#if flOS_LINUX
+#if flOS_PPO
+	return;
+#elif flOS_LINUX
 	cpu_set_t	mask;
 
 	CPU_ZERO( &mask );
@@ -162,7 +166,9 @@ void	GetAffinityInfo()
 
 void	SetCpuAffinity( unsigned int cpu_index )
 {
-#if flOS_LINUX
+#if flOS_PPO
+	return;
+#elif flOS_LINUX
 	cpu_set_t	mask;
 
 	CPU_ZERO( &mask );

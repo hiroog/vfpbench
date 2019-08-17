@@ -18,3 +18,5 @@ output_log.txt
 .save.log
 ###
 .DS_Store
+*.prx
+*.user

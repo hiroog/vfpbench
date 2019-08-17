@@ -63,6 +63,11 @@
 //-----------------------------------------------------------------------------
 // Linux
 //-----------------------------------------------------------------------------
+#if defined(flPRESET_PPO) && flPRESET_PPO
+# define	flPRESET_LINUX	1
+# define	flOS_PPO		1
+#endif
+
 #if defined(flPRESET_LINUX) && flPRESET_LINUX
 # if defined(__x86_64__)
 #  define	flCPU_X64			1
@@ -89,8 +94,6 @@
 # endif
 # define	flSYSTEMTYPE_DEFINED
 #endif
-
-
 
 
 
@@ -212,6 +215,9 @@
 #endif
 #ifndef	flOS_IOS
 # define	flOS_IOS			0
+#endif
+#ifndef	flOS_PPO
+# define	flOS_PPO			0
 #endif
 
 
