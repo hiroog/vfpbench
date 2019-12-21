@@ -520,6 +520,184 @@ static uint64_t SSE_S_FMA_IR8_##name( CounterType LoopCount, double answer ) \
 
 
 
+//-----------------------------------------------------------------------------
+// Single Interleave 12 FMA
+//-----------------------------------------------------------------------------
+
+#define SSE_S_FMA_IR12_12(op) \
+			op " %%xmm9, %%xmm8, %%xmm0\n"		\
+			op " %%xmm9, %%xmm8, %%xmm1\n"		\
+			op " %%xmm9, %%xmm8, %%xmm2\n"		\
+			op " %%xmm9, %%xmm8, %%xmm3\n"		\
+			op " %%xmm9, %%xmm8, %%xmm4\n"		\
+			op " %%xmm9, %%xmm8, %%xmm5\n"		\
+			op " %%xmm9, %%xmm8, %%xmm6\n"		\
+			op " %%xmm9, %%xmm8, %%xmm7\n"		\
+			op " %%xmm9, %%xmm8, %%xmm10\n"		\
+			op " %%xmm9, %%xmm8, %%xmm11\n"		\
+			op " %%xmm9, %%xmm8, %%xmm12\n"		\
+			op " %%xmm9, %%xmm8, %%xmm13\n"
+
+
+
+#define SSE_S_FMA_IR12_0(op,name) \
+static uint64_t SSE_S_FMA_IR12_##name( CounterType LoopCount, double answer ) \
+{ \
+	double	ret0, ret1, ret2, ret3, ret4, ret5, ret6, ret7;	\
+	TimerClass	timer;			\
+	timer.Begin();				\
+	__asm__ __volatile__(		\
+		SSE_REG_CLEAR()			\
+		"mov		$1, %%eax\n"		\
+		"cvtsi2sd	%%eax, %%xmm8\n"	\
+		"shufpd		$0, %%xmm8, %%xmm8\n"	\
+		"movapd		%%xmm8, %%xmm2\n"	\
+		"movapd		%%xmm8, %%xmm4\n"	\
+		"movapd		%%xmm8, %%xmm6\n"	\
+		"mov		$2, %%eax\n"		\
+		"cvtsi2sd	%%eax, %%xmm9\n"	\
+		"shufpd		$0, %%xmm9, %%xmm9\n"	\
+		"movapd		%%xmm9, %%xmm3\n"	\
+		"movapd		%%xmm9, %%xmm5\n"	\
+		"movapd		%%xmm9, %%xmm7\n"	\
+		"mov	%[loop], %%rax\n"	\
+	"1:\n"	\
+		SSE_S_FMA_IR12_12( op )	\
+		SSE_S_FMA_IR12_12( op )	\
+		SSE_S_FMA_IR12_12( op )	\
+		SSE_S_FMA_IR12_12( op )	\
+		SSE_S_FMA_IR12_12( op )	\
+		"dec	%%rax\n"	\
+		"jne	1b\n"	 	\
+		"movsd	%%xmm0, %[o0]\n"	\
+		"movsd	%%xmm1, %[o1]\n"	\
+		"movsd	%%xmm2, %[o2]\n"	\
+		"movsd	%%xmm3, %[o3]\n"	\
+		"movsd	%%xmm4, %[o4]\n"	\
+		"movsd	%%xmm5, %[o5]\n"	\
+		"movsd	%%xmm6, %[o6]\n"	\
+		"movsd	%%xmm7, %[o7]\n"	\
+	:	[o0]"=m"(ret0),	\
+		[o1]"=m"(ret1),	\
+		[o2]"=m"(ret2),	\
+		[o3]"=m"(ret3),	\
+		[o4]"=m"(ret4),	\
+		[o5]"=m"(ret5),	\
+		[o6]"=m"(ret6),	\
+		[o7]"=m"(ret7)	\
+	: [loop]"r"(LoopCount)	\
+	: "cc","%rax",	\
+		"%xmm0","%xmm1","%xmm2","%xmm3","%xmm4","%xmm5","%xmm6","%xmm7",\
+		"%xmm8","%xmm9","%xmm10","%xmm11","%xmm12","%xmm13","%xmm14","%xmm15"\
+		); \
+\
+	timer.End();		\
+	timer.Dump( op );	\
+	/*check_result( ret0, answer );	\
+	check_result( ret1, answer );	\
+	check_result( ret2, answer );	\
+	check_result( ret3, answer );	\
+	check_result( ret4, answer );	\
+	check_result( ret5, answer );	\
+	check_result( ret6, answer );	\
+	check_result( ret7, answer );*/	\
+	return	timer.Result();	\
+}
+
+#define SSE_S_FMA_IR12(op,name) SSE_S_FMA_IR12_0(#op,name)
+
+
+
+
+//-----------------------------------------------------------------------------
+// Single Interleave 12 FMA+SSE
+//-----------------------------------------------------------------------------
+
+#define SSE_M_FMA_IR12_12(op1,op2) \
+			op1 " %%xmm9, %%xmm8, %%xmm0\n"		\
+			op2 " %%xmm9, %%xmm1\n"		\
+			op1 " %%xmm9, %%xmm8, %%xmm2\n"		\
+			op2 " %%xmm9, %%xmm3\n"		\
+			op1 " %%xmm9, %%xmm8, %%xmm4\n"		\
+			op2 " %%xmm9, %%xmm5\n"		\
+			op1 " %%xmm9, %%xmm8, %%xmm6\n"		\
+			op2 " %%xmm9, %%xmm7\n"		\
+			op1 " %%xmm9, %%xmm8, %%xmm10\n"		\
+			op2 " %%xmm9, %%xmm11\n"		\
+			op1 " %%xmm9, %%xmm8, %%xmm12\n"		\
+			op2 " %%xmm9, %%xmm13\n"
+
+
+
+#define SSE_M_FMA_IR12_0(op1,op2,name) \
+static uint64_t SSE_M_FMA_IR12_##name( CounterType LoopCount, double answer ) \
+{ \
+	double	ret0, ret1, ret2, ret3, ret4, ret5, ret6, ret7;	\
+	TimerClass	timer;			\
+	timer.Begin();				\
+	__asm__ __volatile__(		\
+		SSE_REG_CLEAR()			\
+		"mov		$1, %%eax\n"		\
+		"cvtsi2sd	%%eax, %%xmm8\n"	\
+		"shufpd		$0, %%xmm8, %%xmm8\n"	\
+		"movapd		%%xmm8, %%xmm2\n"	\
+		"movapd		%%xmm8, %%xmm4\n"	\
+		"movapd		%%xmm8, %%xmm6\n"	\
+		"mov		$2, %%eax\n"		\
+		"cvtsi2sd	%%eax, %%xmm9\n"	\
+		"shufpd		$0, %%xmm9, %%xmm9\n"	\
+		"movapd		%%xmm9, %%xmm3\n"	\
+		"movapd		%%xmm9, %%xmm5\n"	\
+		"movapd		%%xmm9, %%xmm7\n"	\
+		"mov	%[loop], %%rax\n"	\
+	"1:\n"	\
+		SSE_M_FMA_IR12_12( op1, op2 )	\
+		SSE_M_FMA_IR12_12( op1, op2 )	\
+		SSE_M_FMA_IR12_12( op1, op2 )	\
+		SSE_M_FMA_IR12_12( op1, op2 )	\
+		SSE_M_FMA_IR12_12( op1, op2 )	\
+		"dec	%%rax\n"	\
+		"jne	1b\n"	 	\
+		"movsd	%%xmm0, %[o0]\n"	\
+		"movsd	%%xmm1, %[o1]\n"	\
+		"movsd	%%xmm2, %[o2]\n"	\
+		"movsd	%%xmm3, %[o3]\n"	\
+		"movsd	%%xmm4, %[o4]\n"	\
+		"movsd	%%xmm5, %[o5]\n"	\
+		"movsd	%%xmm6, %[o6]\n"	\
+		"movsd	%%xmm7, %[o7]\n"	\
+	:	[o0]"=m"(ret0),	\
+		[o1]"=m"(ret1),	\
+		[o2]"=m"(ret2),	\
+		[o3]"=m"(ret3),	\
+		[o4]"=m"(ret4),	\
+		[o5]"=m"(ret5),	\
+		[o6]"=m"(ret6),	\
+		[o7]"=m"(ret7)	\
+	: [loop]"r"(LoopCount)	\
+	: "cc","%rax",	\
+		"%xmm0","%xmm1","%xmm2","%xmm3","%xmm4","%xmm5","%xmm6","%xmm7",\
+		"%xmm8","%xmm9","%xmm10","%xmm11","%xmm12","%xmm13","%xmm14","%xmm15"\
+		); \
+\
+	timer.End();		\
+	timer.Dump( op1 );	\
+	/*check_result( ret0, answer );	\
+	check_result( ret1, answer );	\
+	check_result( ret2, answer );	\
+	check_result( ret3, answer );	\
+	check_result( ret4, answer );	\
+	check_result( ret5, answer );	\
+	check_result( ret6, answer );	\
+	check_result( ret7, answer );*/	\
+	return	timer.Result();	\
+}
+
+#define SSE_M_FMA_IR12(op1,op2,name) SSE_M_FMA_IR12_0(#op1,#op2,name)
+
+
+
+
 
 
 
@@ -613,8 +791,8 @@ static uint64_t AVX_S_IR8_##name( CounterType LoopCount, double answer ) \
 		[o3]"=m"(ret3)	\
 	: [loop]"r"(LoopCount)	\
 	: "cc","%rax",	\
-		"%xmm0","%xmm1","%xmm2","%xmm3","%xmm4","%xmm5","%xmm6","%xmm7",\
-		"%xmm8","%xmm9","%xmm10","%xmm11","%xmm12","%xmm13","%xmm14","%xmm15"\
+		"%ymm0","%ymm1","%ymm2","%ymm3","%ymm4","%ymm5","%ymm6","%ymm7",\
+		"%ymm8","%ymm9","%ymm10","%ymm11","%ymm12","%ymm13","%ymm14","%ymm15"\
 		); \
 \
 	timer.End();		\
@@ -685,8 +863,8 @@ static uint64_t AVX_M_IR8_##name( CounterType LoopCount, double answer ) \
 		[o3]"=m"(ret3)	\
 	: [loop]"r"(LoopCount)	\
 	: "cc","%rax",	\
-		"%xmm0","%xmm1","%xmm2","%xmm3","%xmm4","%xmm5","%xmm6","%xmm7",\
-		"%xmm8","%xmm9","%xmm10","%xmm11","%xmm12","%xmm13","%xmm14","%xmm15"\
+		"%ymm0","%ymm1","%ymm2","%ymm3","%ymm4","%ymm5","%ymm6","%ymm7",\
+		"%ymm8","%ymm9","%ymm10","%ymm11","%ymm12","%ymm13","%ymm14","%ymm15"\
 		); \
 \
 	timer.End();		\
@@ -757,8 +935,8 @@ static uint64_t AVX_M_IR9_##name( CounterType LoopCount, double answer ) \
 		[o3]"=m"(ret3)	\
 	: [loop]"r"(LoopCount)	\
 	: "cc","%rax",	\
-		"%xmm0","%xmm1","%xmm2","%xmm3","%xmm4","%xmm5","%xmm6","%xmm7",\
-		"%xmm8","%xmm9","%xmm10","%xmm11","%xmm12","%xmm13","%xmm14","%xmm15"\
+		"%ymm0","%ymm1","%ymm2","%ymm3","%ymm4","%ymm5","%ymm6","%ymm7",\
+		"%ymm8","%ymm9","%ymm10","%ymm11","%ymm12","%ymm13","%ymm14","%ymm15"\
 		); \
 \
 	timer.End();		\
@@ -827,8 +1005,8 @@ static uint64_t AVX_S_FMA_IR8_##name( CounterType LoopCount, double answer ) \
 		[o3]"=m"(ret3)	\
 	: [loop]"r"(LoopCount)	\
 	: "cc","%rax",	\
-		"%xmm0","%xmm1","%xmm2","%xmm3","%xmm4","%xmm5","%xmm6","%xmm7",\
-		"%xmm8","%xmm9","%xmm10","%xmm11","%xmm12","%xmm13","%xmm14","%xmm15"\
+		"%ymm0","%ymm1","%ymm2","%ymm3","%ymm4","%ymm5","%ymm6","%ymm7",\
+		"%ymm8","%ymm9","%ymm10","%ymm11","%ymm12","%ymm13","%ymm14","%ymm15"\
 		); \
 \
 	timer.End();		\
@@ -844,6 +1022,148 @@ static uint64_t AVX_S_FMA_IR8_##name( CounterType LoopCount, double answer ) \
 
 
 
+//-----------------------------------------------------------------------------
+// Single Interleave Register 12 FMA
+//-----------------------------------------------------------------------------
+
+#define AVX_S_FMA_IR12_12(op) \
+			op " %%ymm9, %%ymm8, %%ymm0\n"		\
+			op " %%ymm9, %%ymm8, %%ymm1\n"		\
+			op " %%ymm9, %%ymm8, %%ymm2\n"		\
+			op " %%ymm9, %%ymm8, %%ymm3\n"		\
+			op " %%ymm9, %%ymm8, %%ymm4\n"		\
+			op " %%ymm9, %%ymm8, %%ymm5\n"		\
+			op " %%ymm9, %%ymm8, %%ymm6\n"		\
+			op " %%ymm9, %%ymm8, %%ymm7\n"		\
+			op " %%ymm9, %%ymm8, %%ymm10\n"		\
+			op " %%ymm9, %%ymm8, %%ymm11\n"		\
+			op " %%ymm9, %%ymm8, %%ymm12\n"		\
+			op " %%ymm9, %%ymm8, %%ymm13\n"
+
+
+
+#define AVX_S_FMA_IR12_0(op,name) \
+static uint64_t AVX_S_FMA_IR12_##name( CounterType LoopCount, double answer ) \
+{ \
+	double	ret0, ret1, ret2, ret3;	\
+	TimerClass	timer;			\
+	timer.Begin();				\
+	__asm__ __volatile__(		\
+		AVX_REG_CLEAR()			\
+		"mov		$2, %%eax\n"		\
+		"cvtsi2sd	%%eax, %%xmm8\n"	\
+		"shufpd		$0, %%xmm8, %%xmm8\n"	\
+		"vperm2f128	$0, %%ymm8, %%ymm8, %%ymm8\n"	\
+		"mov		$5, %%eax\n"		\
+		"cvtsi2sd	%%eax, %%xmm9\n"	\
+		"shufpd		$0, %%xmm9, %%xmm9\n"	\
+		"vperm2f128	$0, %%ymm9, %%ymm9, %%ymm9\n"	\
+		"mov	%[loop], %%rax\n"	\
+	"1:\n"	\
+		AVX_S_FMA_IR12_12( op )	\
+		AVX_S_FMA_IR12_12( op )	\
+		AVX_S_FMA_IR12_12( op )	\
+		AVX_S_FMA_IR12_12( op )	\
+		AVX_S_FMA_IR12_12( op )	\
+		"dec	%%rax\n"	\
+		"jne	1b\n"	 	\
+		"movsd	%%xmm0, %[o0]\n"	\
+		"movsd	%%xmm1, %[o1]\n"	\
+		"movsd	%%xmm2, %[o2]\n"	\
+		"movsd	%%xmm3, %[o3]\n"	\
+	:	[o0]"=m"(ret0),	\
+		[o1]"=m"(ret1),	\
+		[o2]"=m"(ret2),	\
+		[o3]"=m"(ret3)	\
+	: [loop]"r"(LoopCount)	\
+	: "cc","%rax",	\
+		"%ymm0","%ymm1","%ymm2","%ymm3","%ymm4","%ymm5","%ymm6","%ymm7",\
+		"%ymm8","%ymm9","%ymm10","%ymm11","%ymm12","%ymm13","%ymm14","%ymm15"\
+		); \
+\
+	timer.End();		\
+	timer.Dump( op );	\
+	/*check_result( ret0, answer );	\
+	check_result( ret1, answer );	\
+	check_result( ret2, answer );	\
+	check_result( ret3, answer );*/	\
+	return	timer.Result();	\
+}
+
+#define AVX_S_FMA_IR12(op,name) AVX_S_FMA_IR12_0(#op,name)
+
+
+
+
+//-----------------------------------------------------------------------------
+// Single Interleave Register 12 FMA+AVX
+//-----------------------------------------------------------------------------
+
+#define AVX_M_FMA_IR12_12(op1,op2) \
+			op1 " %%ymm9, %%ymm8, %%ymm0\n"		\
+			op2 " %%ymm9, %%ymm8, %%ymm1\n"		\
+			op1 " %%ymm9, %%ymm8, %%ymm2\n"		\
+			op2 " %%ymm9, %%ymm8, %%ymm3\n"		\
+			op1 " %%ymm9, %%ymm8, %%ymm4\n"		\
+			op2 " %%ymm9, %%ymm8, %%ymm5\n"		\
+			op1 " %%ymm9, %%ymm8, %%ymm6\n"		\
+			op2 " %%ymm9, %%ymm8, %%ymm7\n"		\
+			op1 " %%ymm9, %%ymm8, %%ymm10\n"		\
+			op2 " %%ymm9, %%ymm8, %%ymm11\n"		\
+			op1 " %%ymm9, %%ymm8, %%ymm12\n"		\
+			op2 " %%ymm9, %%ymm8, %%ymm13\n"
+
+
+
+#define AVX_M_FMA_IR12_0(op1,op2,name) \
+static uint64_t AVX_M_FMA_IR12_##name( CounterType LoopCount, double answer ) \
+{ \
+	double	ret0, ret1, ret2, ret3;	\
+	TimerClass	timer;			\
+	timer.Begin();				\
+	__asm__ __volatile__(		\
+		AVX_REG_CLEAR()			\
+		"mov		$2, %%eax\n"		\
+		"cvtsi2sd	%%eax, %%xmm8\n"	\
+		"shufpd		$0, %%xmm8, %%xmm8\n"	\
+		"vperm2f128	$0, %%ymm8, %%ymm8, %%ymm8\n"	\
+		"mov		$5, %%eax\n"		\
+		"cvtsi2sd	%%eax, %%xmm9\n"	\
+		"shufpd		$0, %%xmm9, %%xmm9\n"	\
+		"vperm2f128	$0, %%ymm9, %%ymm9, %%ymm9\n"	\
+		"mov	%[loop], %%rax\n"	\
+	"1:\n"	\
+		AVX_M_FMA_IR12_12( op1, op2 )	\
+		AVX_M_FMA_IR12_12( op1, op2 )	\
+		AVX_M_FMA_IR12_12( op1, op2 )	\
+		AVX_M_FMA_IR12_12( op1, op2 )	\
+		AVX_M_FMA_IR12_12( op1, op2 )	\
+		"dec	%%rax\n"	\
+		"jne	1b\n"	 	\
+		"movsd	%%xmm0, %[o0]\n"	\
+		"movsd	%%xmm1, %[o1]\n"	\
+		"movsd	%%xmm2, %[o2]\n"	\
+		"movsd	%%xmm3, %[o3]\n"	\
+	:	[o0]"=m"(ret0),	\
+		[o1]"=m"(ret1),	\
+		[o2]"=m"(ret2),	\
+		[o3]"=m"(ret3)	\
+	: [loop]"r"(LoopCount)	\
+	: "cc","%rax",	\
+		"%ymm0","%ymm1","%ymm2","%ymm3","%ymm4","%ymm5","%ymm6","%ymm7",\
+		"%ymm8","%ymm9","%ymm10","%ymm11","%ymm12","%ymm13","%ymm14","%ymm15"\
+		); \
+\
+	timer.End();		\
+	timer.Dump( op1 );	\
+	/*check_result( ret0, answer );	\
+	check_result( ret1, answer );	\
+	check_result( ret2, answer );	\
+	check_result( ret3, answer );*/	\
+	return	timer.Result();	\
+}
+
+#define AVX_M_FMA_IR12(op1,op2,name) AVX_M_FMA_IR12_0(#op1,#op2,name)
 
 
 //-----------------------------------------------------------------------------
@@ -862,13 +1182,21 @@ static const char*	Instruction_Title[]= {
 	"SSE2 mulsd (64bit x1) n8",
 	"SSE2 addsd (64bit x1) n8",
 	"FMA  vfmaddsd (64bit x1) n8",
+	"FMA  vfmaddsd (64bit x1) n12",
+	"FMA  vfma+mlsd (64bit x1) n12",
+	"FMA  vfma+adsd (64bit x1) n12",
 
 	"SSE2 mulpd (64bit x2) n8",
 	"SSE2 addpd (64bit x2) n8",
 	"SSE2 mul+addpd (64bit x2) n8",
-	"FMA  vfmaddsd (64bit x2) n8",
+	"FMA  vfmaddpd (64bit x2) n8",
+	"FMA  vfmaddpd (64bit x2) n12",
+	"FMA  vfma+mlpd (64bit x2) n12",
+	"FMA  vfma+adpd (64bit x2) n12",
 
-	"SSE2 ml+ad+dpd (64bit x2) n6",
+
+	"SSE2 ml+ad+dpd (64bit x2) n9",
+
 
 	"SSE2 mulsd (64bit x1) ns4",
 	"SSE2 addsd (64bit x1) ns4",
@@ -876,12 +1204,17 @@ static const char*	Instruction_Title[]= {
 	"SSE2 mulpd (64bit x2) ns4",
 	"SSE2 addpd (64bit x2) ns4",
 
+
 	"AVX vmulpd (64bit x4) n8",
 	"AVX vaddpd (64bit x4) n8",
 	"AVX vmul+addpd (64bit x4) n8",
 	"FMA vfmaddpd (64bit x4) n8",
+	"FMA vfmaddpd (64bit x4) n12",
 
-	"AVX vml_ad_adpd (64bit x4) n6",
+	"FMA vfma+mlpd (64bit x4) n12",
+	"FMA vfma+adpd (64bit x4) n12",
+
+	"AVX vml_ad_adpd (64bit x4) n9",
 };
 
 
@@ -903,16 +1236,20 @@ FloatTest::FloatTest()
 	SetOp( RESULT_SSE_MULSD_IR8,		PER_LOOP_INST * 1, 1	);
 	SetOp( RESULT_SSE_ADDSD_IR8,		PER_LOOP_INST * 1, 1	);
 	SetOp( RESULT_SSE_FMADDSD_IR8,		PER_LOOP_INST * 2, 2	);
+	SetOp( RESULT_SSE_FMADDSD_IR12,		PER_LOOP_INST_12 * 2, 2	);
+	SetOp2f( RESULT_SSE_FMA_MULSD_IR12,	PER_LOOP_INST_12, (2+1)/2.0f	);
+	SetOp2f( RESULT_SSE_FMA_ADDSD_IR12,	PER_LOOP_INST_12, (2+1)/2.0f	);
 
 	SetOp( RESULT_SSE_MULPD_IR8,		PER_LOOP_INST * 2, 2	);
 	SetOp( RESULT_SSE_ADDPD_IR8,		PER_LOOP_INST * 2, 2	);
 	SetOp( RESULT_SSE_MULPD_ADDPD_IR8,	PER_LOOP_INST * 2, 2	);
 	SetOp( RESULT_SSE_FMADDPD_IR8,		PER_LOOP_INST * 4, 4	);
+	SetOp( RESULT_SSE_FMADDPD_IR12,		PER_LOOP_INST_12 * 4, 4	);
+	SetOp2f( RESULT_SSE_FMA_MULPD_IR12,	PER_LOOP_INST_12, (4+2)/2.0f	);
+	SetOp2f( RESULT_SSE_FMA_ADDPD_IR12,	PER_LOOP_INST_12, (4+2)/2.0f	);
 
 
 	SetOp( RESULT_SSE_ML_AD_ADDPD_IR9,	PER_LOOP_INST_9 * 2, 2	);
-
-
 
 
 	SetOp( RESULT_SSE_MULSD_IRS4,		PER_LOOP_INST * 1, 1	);
@@ -922,12 +1259,14 @@ FloatTest::FloatTest()
 	SetOp( RESULT_SSE_ADDPD_IRS4,		PER_LOOP_INST * 2, 2	);
 
 
-
-
 	SetOp( RESULT_AVX_VMULPD_IR8,		PER_LOOP_INST * 4, 4	);
 	SetOp( RESULT_AVX_VADDPD_IR8,		PER_LOOP_INST * 4, 4	);
 	SetOp( RESULT_AVX_VMULPD_VADDPD_IR8,PER_LOOP_INST * 4, 4	);
 	SetOp( RESULT_AVX_VFMADDPD_IR8,		PER_LOOP_INST * 8, 8	);
+	SetOp( RESULT_AVX_VFMADDPD_IR12,	PER_LOOP_INST_12 * 8, 8	);
+
+	SetOp2f( RESULT_AVX_FMA_MUL_IR12,	PER_LOOP_INST_12, (8+4)/2.0f	);
+	SetOp2f( RESULT_AVX_FMA_ADD_IR12,	PER_LOOP_INST_12, (8+4)/2.0f	);
 
 
 	SetOp( RESULT_AVX_VML_AD_VADDPD_IR9,PER_LOOP_INST_9 * 4, 4	);
@@ -948,16 +1287,21 @@ FloatTest::FloatTest()
 
 SSE_S_IR8( mulsd,  mulsd_ir8 );
 SSE_S_IR8( addsd,  addsd_ir8 );
-SSE_S_FMA_IR8( vfmadd213sd,  fmaddsd_ir8 );
+SSE_S_FMA_IR8( vfmadd231sd,  fmaddsd_ir8 );
+SSE_S_FMA_IR12( vfmadd231sd,  fmaddsd_ir12 );
+SSE_M_FMA_IR12( vfmadd231sd,  mulsd,	fmaddsd_mulsd_ir12 );
+SSE_M_FMA_IR12( vfmadd231sd,  addsd,	fmaddsd_addsd_ir12 );
 
 SSE_S_IR8( mulpd,  mulpd_ir8 );
 SSE_S_IR8( addpd,  addpd_ir8 );
 SSE_M_IR8( mulpd, addpd,  mulpd_addpd_ir8 );
-SSE_S_FMA_IR8( vfmadd213pd,  fmaddpd_ir8 );
+SSE_S_FMA_IR8( vfmadd231pd,  fmaddpd_ir8 );
+SSE_S_FMA_IR12( vfmadd231pd,  fmaddpd_ir12 );
+SSE_M_FMA_IR12( vfmadd231pd,  mulpd,	fmaddpd_mulpd_ir12 );
+SSE_M_FMA_IR12( vfmadd231pd,  addpd,	fmaddpd_addpd_ir12 );
 
 
 SSE_M_IR9( mulpd, addpd, addpd, ml_ad_addpd_ir9 );
-
 
 
 SSE_S_IRS4( mulsd,  mulsd_irs4 );
@@ -967,13 +1311,14 @@ SSE_S_IRS4( mulpd,  mulpd_irs4 );
 SSE_S_IRS4( addpd,  addpd_irs4 );
 
 
-
 AVX_S_IR8( vmulpd,  vmulpd_ir8 );
 AVX_S_IR8( vaddpd,  vaddpd_ir8 );
 AVX_M_IR8( vmulpd, vaddpd,  vmulpd_vaddpd_ir8 );
-AVX_S_FMA_IR8( vfmadd213pd,  vfmaddpd_ir8 );
+AVX_S_FMA_IR8( vfmadd231pd,  vfmaddpd_ir8 );
+AVX_S_FMA_IR12( vfmadd231pd,  vfmaddpd_ir12 );
 
-
+AVX_M_FMA_IR12( vfmadd231pd,  vmulpd,	vfmaddpd_vmulpd_ir12 );
+AVX_M_FMA_IR12( vfmadd231pd,  vaddpd,	vfmaddpd_vaddpd_ir12 );
 
 AVX_M_IR9( vmulpd, vaddpd, vaddpd, vml_ad_vaddpd_ir9 );
 
@@ -1012,7 +1357,19 @@ FL_LOG( "SSE loop=%d\n", Loop );
 		SetResult( RESULT_SSE_FMADDSD_IR8,	SSE_S_FMA_IR8_fmaddsd_ir8( Loop, 10.0f		) );
 		Progress++;
 
+		SetResult( RESULT_SSE_FMADDSD_IR12,	SSE_S_FMA_IR12_fmaddsd_ir12( Loop, 10.0f		) );
+		Progress++;
+
+		SetResult( RESULT_SSE_FMA_MULSD_IR12,	SSE_M_FMA_IR12_fmaddsd_mulsd_ir12( Loop, 10.0f		) );
+		Progress++;
+
+		SetResult( RESULT_SSE_FMA_ADDSD_IR12,	SSE_M_FMA_IR12_fmaddsd_addsd_ir12( Loop, 10.0f		) );
+		Progress++;
+
 	}else{
+		Progress++;
+		Progress++;
+		Progress++;
 		Progress++;
 	}
 
@@ -1035,7 +1392,19 @@ FL_LOG( "SSE loop=%d\n", Loop );
 		SetResult( RESULT_SSE_FMADDPD_IR8,	SSE_S_FMA_IR8_fmaddpd_ir8( Loop, 10.0f		) );
 		Progress++;
 
+		SetResult( RESULT_SSE_FMADDPD_IR12,	SSE_S_FMA_IR12_fmaddpd_ir12( Loop, 10.0f		) );
+		Progress++;
+
+		SetResult( RESULT_SSE_FMA_MULPD_IR12,	SSE_M_FMA_IR12_fmaddpd_mulpd_ir12( Loop, 10.0f		) );
+		Progress++;
+
+		SetResult( RESULT_SSE_FMA_ADDPD_IR12,	SSE_M_FMA_IR12_fmaddpd_addpd_ir12( Loop, 10.0f		) );
+		Progress++;
+
 	}else{
+		Progress++;
+		Progress++;
+		Progress++;
 		Progress++;
 	}
 
@@ -1101,7 +1470,19 @@ FL_LOG( "SSE loop=%d\n", Loop );
 			SetResult( RESULT_AVX_VFMADDPD_IR8,	AVX_S_FMA_IR8_vfmaddpd_ir8( Loop, 10.0f		) );	// **!!!** 15
 			Progress++;
 
+			SetResult( RESULT_AVX_VFMADDPD_IR12,	AVX_S_FMA_IR12_vfmaddpd_ir12( Loop, 10.0f		) );
+			Progress++;
+
+			SetResult( RESULT_AVX_FMA_MUL_IR12,	AVX_M_FMA_IR12_vfmaddpd_vmulpd_ir12( Loop, 10.0f		) );
+			Progress++;
+
+			SetResult( RESULT_AVX_FMA_ADD_IR12,	AVX_M_FMA_IR12_vfmaddpd_vaddpd_ir12( Loop, 10.0f		) );
+			Progress++;
+
 		}else{
+			Progress++;
+			Progress++;
+			Progress++;
 			Progress++;
 		}
 

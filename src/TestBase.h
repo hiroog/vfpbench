@@ -22,7 +22,7 @@ enum LoopType : unsigned int {
 struct ResultTable {
 	uint64_t		Time;
 	unsigned int	Lop;	// Fop per loop
-	unsigned int	Fop;	// Fop per instruction
+	float			Fop;	// Fop per instruction
 };
 
 class ITestBase {
@@ -48,7 +48,7 @@ public:
 
 	virtual unsigned int			GetResult( unsigned int result_index ) const= 0;
 	virtual unsigned int			GetLoopOp( unsigned int result_index ) const= 0;
-	virtual unsigned int			GetInstFop( unsigned int result_index ) const= 0;
+	virtual float					GetInstFop( unsigned int result_index ) const= 0;
 
 	virtual const char*				GetTestName() const
 	{
@@ -101,6 +101,7 @@ protected:
 protected:
 	void	SetOp( unsigned int index, unsigned int lop, unsigned int fop );
 	void	SetOp2( unsigned int index, unsigned int ipl, unsigned int fop );
+	void	SetOp2f( unsigned int index, unsigned int ipl, float fop );
 	void	SetResult( unsigned int index, uint64_t time );
 	void	InitClear();
 	void	ClearResult();
@@ -117,7 +118,7 @@ public:
 
 	virtual unsigned int			GetResult( unsigned int result_index ) const override;
 	virtual unsigned int			GetLoopOp( unsigned int result_index ) const override;
-	virtual unsigned int			GetInstFop( unsigned int result_index ) const override;
+	virtual float					GetInstFop( unsigned int result_index ) const override;
 
 
 };

@@ -832,7 +832,7 @@ static const char*	Instruction_Title[]= {
 	"SSE2 mulpd (64bit x2) n8",
 	"SSE2 addpd (64bit x2) n8",
 	"SSE2 mul+addpd (64bit x2) n8",
-	"FMA  vfmaddsd (64bit x2) n8",
+	"FMA  vfmaddpd (64bit x2) n8",
 
 	"SSE2 ml+ad+dpd (64bit x2) n6",
 
@@ -917,12 +917,12 @@ FloatTest::FloatTest()
 
 SSE_S_IR8( mulsd,  mulsd_ir8 );
 SSE_S_IR8( addsd,  addsd_ir8 );
-SSE_S_FMA_IR8( vfmadd213sd,  fmaddsd_ir8 );	// FMA3
+SSE_S_FMA_IR8( vfmadd231sd,  fmaddsd_ir8 );	// FMA3
 
 SSE_S_IR8( mulpd,  mulpd_ir8 );
 SSE_S_IR8( addpd,  addpd_ir8 );
 SSE_M_IR8( mulpd, addpd,  mulpd_addpd_ir8 );
-SSE_S_FMA_IR8( vfmadd213pd,  fmaddpd_ir8 );	// FMA3
+SSE_S_FMA_IR8( vfmadd231pd,  fmaddpd_ir8 );	// FMA3
 
 
 SSE_M_IR6( mulpd, addpd, addpd, ml_ad_addpd_ir6 );
@@ -940,7 +940,7 @@ SSE_S_IRS4( addpd,  addpd_irs4 );
 AVX_S_IR4( vmulpd,  vmulpd_ir4 );
 AVX_S_IR4( vaddpd,  vaddpd_ir4 );
 AVX_M_IR4( vmulpd, vaddpd,  vmulpd_vaddpd_ir4 );
-AVX_S_FMA_IR4( vfmadd213pd,  vfmaddpd_ir4 );	// FMA3
+AVX_S_FMA_IR4( vfmadd231pd,  vfmaddpd_ir4 );	// FMA3
 
 
 AVX_M_IR6( vmulpd, vaddpd, vaddpd, vml_ad_vaddpd_ir6 );

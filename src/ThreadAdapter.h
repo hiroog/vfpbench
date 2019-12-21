@@ -90,7 +90,7 @@ public:
 	{
 		return	Instance.GetLoopOp( index );
 	}
-	unsigned int	GetInstFop( unsigned int index ) const override
+	float	GetInstFop( unsigned int index ) const override
 	{
 		return	Instance.GetInstFop( index );
 	}

@@ -8,6 +8,7 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 
+#define	USE_MAX_EXPORT	0
 
 using namespace flatlib;
 
@@ -263,7 +264,8 @@ void BenchApplication::ExportFlops( util::BinaryBuffer32& buffer ) const
 void	BenchApplication::ExportLine( util::BinaryBuffer32& buffer, const ResultLine& line )
 {
 	if( line.IsActive() ){
-		print( buffer, "%-30s: %8.3f  %9.1f  %9.1f (%3.0f %3.1f) %9.1f\n",
+#if USE_MAX_EXPORT
+		print( buffer, "%-30s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f) %9.1f\n",
 				line.Title,
 				line.Time,
 				line.Flops,
@@ -272,8 +274,22 @@ void	BenchApplication::ExportLine( util::BinaryBuffer32& buffer, const ResultLin
 				line.Ipc,
 				line.Max
 			);
+#else
+		print( buffer, "%-30s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f)\n",
+				line.Title,
+				line.Time,
+				line.Flops,
+				line.Ops,
+				line.Fop,
+				line.Ipc
+			);
+#endif
 	}else{
-		print( buffer, "%-30s:        -          -          -    -          -\n", line.Title );
+#if USE_MAX_EXPORT
+		print( buffer, "%-30s:        -          -          -       -   -          -\n", line.Title );
+#else
+		print( buffer, "%-30s:        -          -          -       -   -\n", line.Title );
+#endif
 	}
 }
 
@@ -285,7 +301,11 @@ void	BenchApplication::ExportData( util::BinaryBuffer32& buffer, const ResultDat
 	print( buffer, "\n* Group %d:  Thread=%d  Clock=%f GHz  (mask:%llx)\n", group, data.IsMultithread() ? Info.GetThreadCount( group ) : 1, Info.GetCoreClock( group )/1000000.0, Info.GetAffinityMask( group ) );
 	print( buffer, "* %s\n", data.GetTitle() );
 	//				012345678901234567890123456789: ________  _________  _________ (___ ___) _________
-	print( buffer, "                                  TIME(s)   MFLOPS      MOPS    FOP IPC  max MFLOPS\n" );
+#if USE_MAX_EXPORT
+	print( buffer, "                                  TIME(s)   MFLOPS      MOPS     FOP   IPC  max MFLOPS\n" );
+#else
+	print( buffer, "                                  TIME(s)   MFLOPS      MOPS     FOP   IPC\n" );
+#endif
 	for( unsigned int ci= 0 ; ci< count ; ci++ ){
 		ExportLine( buffer, data.Get( ci ) );
 	}

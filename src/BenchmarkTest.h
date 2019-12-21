@@ -10,6 +10,7 @@
 #include	<minilib/FixedArray.h>
 #include	<minilib/SystemInfo.h>
 
+#define	USE_MATRIX_TEST		0
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -48,15 +49,18 @@ public:
 
 # include	"VFP32SP_Test.h"
 # include	"VFP32DP_Test.h"
-# include	"MatrixTest_VFP32SP.h"
 typedef	VFP32SP::FloatTest		FPU_SP_Test;
 typedef	VFP32DP::FloatTest		FPU_DP_Test;
+#if USE_MATRIX_TEST
+# include	"MatrixTest_VFP32SP.h"
 typedef	VFP32SP::MatrixTest		MatrixTest;
+#endif
 
 class BenchmarkTest : public BenchmarkTestBase {
 public:
 	BenchmarkTest()
 	{
+#if USE_MATRIX_TEST
 		unsigned int	group_count= Init( 6 );
 		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
 			AddBenchSingle<FPU_SP_Test>( gi );
@@ -66,6 +70,15 @@ public:
 			AddBenchMulti<FPU_DP_Test>( gi );
 			AddBenchMulti<MatrixTest>( gi );
 		}
+#else
+		unsigned int	group_count= Init( 4 );
+		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
+			AddBenchSingle<FPU_SP_Test>( gi );
+			AddBenchSingle<FPU_DP_Test>( gi );
+			AddBenchMulti<FPU_SP_Test>( gi );
+			AddBenchMulti<FPU_DP_Test>( gi );
+		}
+#endif
 	}
 };
 
@@ -79,17 +92,23 @@ public:
 # include	"VFP64HP_Test.h"
 # include	"VFP64SP_Test.h"
 # include	"VFP64DP_Test.h"
-# include	"MatrixTest_VFP64SP.h"
 typedef	VFP64HP::FloatTest	FPU_HP_Test;
 typedef	VFP64SP::FloatTest	FPU_SP_Test;
 typedef	VFP64DP::FloatTest	FPU_DP_Test;
+#if USE_MATRIX_TEST
+# include	"MatrixTest_VFP64SP.h"
 typedef	VFP64SP::MatrixTest	MatrixTest;
+#endif
 
 class BenchmarkTest : public BenchmarkTestBase {
 public:
 	BenchmarkTest()
 	{
+#if USE_MATRIX_TEST
 		unsigned int	test_count= 6;
+#else
+		unsigned int	test_count= 4;
+#endif
 		bool	half= flatlib::Info.HasInstructionSet( flatlib::CPUFeature::ARM_FPHP );
 		if( half ){
 			test_count+= 2;
@@ -101,13 +120,17 @@ public:
 			}
 			AddBenchSingle<FPU_SP_Test>( gi );
 			AddBenchSingle<FPU_DP_Test>( gi );
+#if USE_MATRIX_TEST
 			AddBenchSingle<MatrixTest>( gi );
+#endif
 			if( half ){
 				AddBenchMulti<FPU_HP_Test>( gi );
 			}
 			AddBenchMulti<FPU_SP_Test>( gi );
 			AddBenchMulti<FPU_DP_Test>( gi );
+#if USE_MATRIX_TEST
 			AddBenchMulti<MatrixTest>( gi );
+#endif
 		}
 	}
 };
@@ -121,15 +144,18 @@ public:
 
 # include	"SSE32SP_Test.h"
 # include	"SSE32DP_Test.h"
-# include	"MatrixTest_SSESP.h"
 typedef	SSE32SP::FloatTest		FPU_SP_Test;
 typedef	SSE32DP::FloatTest		FPU_DP_Test;
+#if USE_MATRIX_TEST
+# include	"MatrixTest_SSESP.h"
 typedef	SSESP::MatrixTest		MatrixTest;
+#endif
 
 class BenchmarkTest : public BenchmarkTestBase {
 public:
 	BenchmarkTest()
 	{
+#if USE_MATRIX_TEST
 		unsigned int	group_count= Init( 6 );
 		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
 			AddBenchSingle<FPU_SP_Test>( gi );
@@ -139,6 +165,15 @@ public:
 			AddBenchMulti<FPU_DP_Test>( gi );
 			AddBenchMulti<MatrixTest>( gi );
 		}
+#else
+		unsigned int	group_count= Init( 4 );
+		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
+			AddBenchSingle<FPU_SP_Test>( gi );
+			AddBenchSingle<FPU_DP_Test>( gi );
+			AddBenchMulti<FPU_SP_Test>( gi );
+			AddBenchMulti<FPU_DP_Test>( gi );
+		}
+#endif
 	}
 };
 
@@ -151,15 +186,18 @@ public:
 
 # include	"SSE64SP_Test.h"
 # include	"SSE64DP_Test.h"
-# include	"MatrixTest_SSESP.h"
 typedef	SSE64SP::FloatTest	FPU_SP_Test;
 typedef	SSE64DP::FloatTest	FPU_DP_Test;
+#if USE_MATRIX_TEST
+# include	"MatrixTest_SSESP.h"
 typedef	SSESP::MatrixTest	MatrixTest;
+#endif
 
 class BenchmarkTest : public BenchmarkTestBase {
 public:
 	BenchmarkTest()
 	{
+#if USE_MATRIX_TEST
 		unsigned int	group_count= Init( 6 );
 		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
 			AddBenchSingle<FPU_SP_Test>( gi );
@@ -169,6 +207,15 @@ public:
 			AddBenchMulti<FPU_DP_Test>( gi );
 			AddBenchMulti<MatrixTest>( gi );
 		}
+#else
+		unsigned int	group_count= Init( 4 );
+		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
+			AddBenchSingle<FPU_SP_Test>( gi );
+			AddBenchSingle<FPU_DP_Test>( gi );
+			AddBenchMulti<FPU_SP_Test>( gi );
+			AddBenchMulti<FPU_DP_Test>( gi );
+		}
+#endif
 	}
 };
 

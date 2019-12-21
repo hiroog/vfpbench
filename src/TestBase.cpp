@@ -87,6 +87,14 @@ void	TestBase::SetOp2( unsigned int index, unsigned int ipl, unsigned int fop )
 	result.Fop= fop;
 }
 
+void	TestBase::SetOp2f( unsigned int index, unsigned int ipl, float fop )
+{
+	flASSERT( index < RESULT_BUFFER_MAX );
+	auto&	result= TestResult[index];
+	result.Lop= static_cast<unsigned int>( ipl * fop );
+	result.Fop= fop;
+}
+
 void	TestBase::SetResult( unsigned int index, uint64_t time )
 {
 	flASSERT( index < RESULT_BUFFER_MAX );
@@ -106,7 +114,7 @@ unsigned int	TestBase::GetLoopOp( unsigned int index ) const
 	flASSERT( index < RESULT_BUFFER_MAX );
 	return	TestResult[index].Lop;
 }
-unsigned int	TestBase::GetInstFop( unsigned int index ) const
+float	TestBase::GetInstFop( unsigned int index ) const
 {
 	flASSERT( index < RESULT_BUFFER_MAX );
 	return	TestResult[index].Fop;

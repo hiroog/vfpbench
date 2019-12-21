@@ -45,10 +45,10 @@ public:
 		flASSERT( index < RESULT_MAX );
 		return	FLOAT_OP_ONE;
 	}
-	unsigned int	GetInstFop( unsigned int index ) const override
+	float	GetInstFop( unsigned int index ) const override
 	{
 		flASSERT( index < RESULT_MAX );
-		return	1;
+		return	1.0f;
 	}
 	unsigned int	GetResultInfo( InfoType index ) const override
 	{

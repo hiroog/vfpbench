@@ -133,7 +133,7 @@ public:
 		}
 		return	total_op;
 	}
-	unsigned int	GetInstFop( unsigned int index ) const override
+	float	GetInstFop( unsigned int index ) const override
 	{
 		unsigned int	thread_count= InstanceArray.GetSize();
 		unsigned int	total_op= 0;
