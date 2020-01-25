@@ -17,9 +17,6 @@
 src_list= [
         'src/linux_main.cpp',
         'src/TestBase.cpp',
-        'src/MatrixTest_SSESP.cpp',
-        'src/MatrixTest_VFP32SP.cpp',
-        'src/MatrixTest_VFP64SP.cpp',
         'src/SSE32SP_Test.cpp',
         'src/SSE32DP_Test.cpp',
         'src/SSE64SP_Test.cpp',
@@ -44,6 +41,9 @@ src_list= [
         'src/minilib/PlatformString.cpp',
     ]
 
+#        'src/MatrixTest_SSESP.cpp',
+#        'src/MatrixTest_VFP32SP.cpp',
+#        'src/MatrixTest_VFP64SP.cpp',
 
 TargetName= 'vfpbench'
 
