@@ -1,0 +1,162 @@
+ARCH: x64 (x86_64)
+FPU : SSE SSE2 SSSE3 SSE4.1 SSE4.2 AVX AVX2 FMA3 F16C
+Name: Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+
+CPU Thread:  8
+CPU Core  :  4
+CPU Group :  1
+  Group 0: Thread= 8  Clock=4.200000 GHz  (mask:ff)
+SSE   : yes
+AVX   : yes
+FMA   : yes
+F16C  : yes
+AVX512: no
+
+Total:
+SingleThread HP max: -
+SingleThread SP max:  135.532 GFLOPS
+SingleThread DP max:   67.709 GFLOPS
+MultiThread  HP max: -
+MultiThread  SP max:  537.822 GFLOPS
+MultiThread  DP max:  271.106 GFLOPS
+
+Group 0:  Thread=8  Clock=4.200000 GHz  (mask:ff)
+  SingleThread HP max: -
+  SingleThread SP max:  135.532 GFLOPS
+  SingleThread DP max:   67.709 GFLOPS
+  MultiThread  HP max: -
+  MultiThread  SP max:  537.822 GFLOPS
+  MultiThread  DP max:  271.106 GFLOPS
+
+
+* Group 0:  Thread=1  Clock=4.200000 GHz  (mask:ff)
+* SSE/AVX (SP fp)
+                                  TIME(s)   MFLOPS      MOPS     FOP   IPC
+SSE mulss (32bit x1) n8       :    0.314     8036.7     8036.7  (  1.0 1.9)
+SSE addss (32bit x1) n8       :    0.299     8435.2     8435.2  (  1.0 2.0)
+FMA vfmaddss (32bit x1) n8    :    0.298    16933.9     8466.9  (  2.0 2.0)
+FMA vfmaddss (32bit x1) n12   :    0.451    16747.6     8373.8  (  2.0 2.0)
+FMA vfma+mlss (32bit x1) n12  :    0.452    12544.3     8362.9  (  1.5 2.0)
+FMA vfma+adss (32bit x1) n12  :    0.446    12702.3     8468.2  (  1.5 2.0)
+SSE mulps (32bit x4) n8       :    0.299    33723.0     8430.7  (  4.0 2.0)
+SSE addps (32bit x4) n8       :    0.298    33872.9     8468.2  (  4.0 2.0)
+SSE mul+addps (32bit x4) n8   :    0.298    33872.0     8468.0  (  4.0 2.0)
+FMA vfmaddps (32bit x4) n8    :    0.298    67741.0     8467.6  (  8.0 2.0)
+FMA vfmaddps (32bit x4) n12   :    0.446    67744.5     8468.1  (  8.0 2.0)
+FMA vfma+mlps (32bit x4) n12  :    0.446    50806.3     8467.7  (  6.0 2.0)
+FMA vfma+adps (32bit x4) n12  :    0.449    50565.6     8427.6  (  6.0 2.0)
+SSE ml+ad+adps (32bit x4) n9  :    0.340    33329.9     8332.5  (  4.0 2.0)
+SSE mulss (32bit x1) ns4      :    0.595     4235.6     4235.6  (  1.0 1.0)
+SSE addss (32bit x1) ns4      :    0.595     4235.7     4235.7  (  1.0 1.0)
+SSE mulps (32bit x4) ns4      :    0.595    16943.0     4235.7  (  4.0 1.0)
+SSE addps (32bit x4) ns4      :    0.595    16942.1     4235.5  (  4.0 1.0)
+AVX vmulps (32bit x8) n8      :    0.297    67769.0     8471.1  (  8.0 2.0)
+AVX vaddps (32bit x8) n8      :    0.297    67770.9     8471.4  (  8.0 2.0)
+AVX vmul+addps (32bit x8) n8  :    0.297    67772.0     8471.5  (  8.0 2.0)
+FMA vfmaddps (32bit x8) n8    :    0.297   135532.1     8470.8  ( 16.0 2.0)
+FMA vfmaddps (32bit x8) n12   :    0.446   135460.8     8466.3  ( 16.0 2.0)
+FMA vfma+mlps (32bit x8) n12  :    0.447   101582.0     8465.2  ( 12.0 2.0)
+FMA vfma+adps (32bit x8) n12  :    0.451   100600.8     8383.4  ( 12.0 2.0)
+AVX vml+ad+adps (32bit x8) n9 :    0.572    39625.7     4953.2  (  8.0 1.2)
+Average                       :    0.408    46366.3     7645.0  (  5.8 1.8)
+Highest                       :    0.297   135532.1     8471.5  ( 16.0 2.0)
+
+
+* Group 0:  Thread=1  Clock=4.200000 GHz  (mask:ff)
+* SSE/AVX (DP fp)
+                                  TIME(s)   MFLOPS      MOPS     FOP   IPC
+SSE2 mulsd (64bit x1) n8      :    0.319     7889.1     7889.1  (  1.0 1.9)
+SSE2 addsd (64bit x1) n8      :    0.298     8467.0     8467.0  (  1.0 2.0)
+FMA  vfmaddsd (64bit x1) n8   :    0.298    16935.1     8467.5  (  2.0 2.0)
+FMA  vfmaddsd (64bit x1) n12  :    0.446    16935.3     8467.6  (  2.0 2.0)
+FMA  vfma+mlsd (64bit x1) n12 :    0.449    12618.1     8412.1  (  1.5 2.0)
+FMA  vfma+adsd (64bit x1) n12 :    0.449    12642.0     8428.0  (  1.5 2.0)
+SSE2 mulpd (64bit x2) n8      :    0.297    16941.6     8470.8  (  2.0 2.0)
+SSE2 addpd (64bit x2) n8      :    0.298    16936.1     8468.0  (  2.0 2.0)
+SSE2 mul+addpd (64bit x2) n8  :    0.298    16938.0     8469.0  (  2.0 2.0)
+FMA  vfmaddpd (64bit x2) n8   :    0.297    33884.5     8471.1  (  4.0 2.0)
+FMA  vfmaddpd (64bit x2) n12  :    0.446    33874.7     8468.7  (  4.0 2.0)
+FMA  vfma+mlpd (64bit x2) n12 :    0.446    25399.5     8466.5  (  3.0 2.0)
+FMA  vfma+adpd (64bit x2) n12 :    0.446    25413.5     8471.2  (  3.0 2.0)
+SSE2 ml+ad+dpd (64bit x2) n9  :    0.338    16780.8     8390.4  (  2.0 2.0)
+SSE2 mulsd (64bit x1) ns4     :    0.595     4235.5     4235.5  (  1.0 1.0)
+SSE2 addsd (64bit x1) ns4     :    0.598     4217.4     4217.4  (  1.0 1.0)
+SSE2 mulpd (64bit x2) ns4     :    0.598     8425.7     4212.8  (  2.0 1.0)
+SSE2 addpd (64bit x2) ns4     :    0.596     8458.3     4229.1  (  2.0 1.0)
+AVX vmulpd (64bit x4) n8      :    0.298    33863.8     8465.9  (  4.0 2.0)
+AVX vaddpd (64bit x4) n8      :    0.298    33858.0     8464.5  (  4.0 2.0)
+AVX vmul+addpd (64bit x4) n8  :    0.298    33836.1     8459.0  (  4.0 2.0)
+FMA vfmaddpd (64bit x4) n8    :    0.298    67611.8     8451.5  (  8.0 2.0)
+FMA vfmaddpd (64bit x4) n12   :    0.447    67709.0     8463.6  (  8.0 2.0)
+FMA vfma+mlpd (64bit x4) n12  :    0.447    50713.3     8452.2  (  6.0 2.0)
+FMA vfma+adpd (64bit x4) n12  :    0.446    50820.7     8470.1  (  6.0 2.0)
+AVX vml_ad_adpd (64bit x4) n9 :    0.335    33858.6     8464.7  (  4.0 2.0)
+Average                       :    0.399    25356.3     7784.4  (  3.1 1.9)
+Highest                       :    0.297    67709.0     8471.2  (  8.0 2.0)
+
+
+* Group 0:  Thread=8  Clock=4.200000 GHz  (mask:ff)
+* SSE/AVX (SP fp) multi-thread
+                                  TIME(s)   MFLOPS      MOPS     FOP   IPC
+SSE mulss (32bit x1) n8       :    0.620    32507.6     4063.5  (  8.0 1.0)
+SSE addss (32bit x1) n8       :    0.610    33023.8     4128.0  (  8.0 1.0)
+FMA vfmaddss (32bit x1) n8    :    0.608    66343.1     4146.4  ( 16.0 1.0)
+FMA vfmaddss (32bit x1) n12   :    0.863    70101.2     4381.3  ( 16.0 1.0)
+FMA vfma+mlss (32bit x1) n12  :    0.928    48899.6     6112.4  (  8.0 1.5)
+FMA vfma+adss (32bit x1) n12  :    0.910    49837.6     6229.7  (  8.0 1.5)
+SSE mulps (32bit x4) n8       :    0.589   136993.1     4281.0  ( 32.0 1.0)
+SSE addps (32bit x4) n8       :    0.589   136852.2     4276.6  ( 32.0 1.0)
+SSE mul+addps (32bit x4) n8   :    0.614   131362.0     4105.1  ( 32.0 1.0)
+FMA vfmaddps (32bit x4) n8    :    0.599   269163.4     4205.7  ( 64.0 1.0)
+FMA vfmaddps (32bit x4) n12   :    0.900   268670.1     4198.0  ( 64.0 1.0)
+FMA vfma+mlps (32bit x4) n12  :    0.898   202043.6     4209.2  ( 48.0 1.0)
+FMA vfma+adps (32bit x4) n12  :    0.898   201969.6     4207.7  ( 48.0 1.0)
+SSE ml+ad+adps (32bit x4) n9  :    0.671   135199.8     4225.0  ( 32.0 1.0)
+SSE mulss (32bit x1) ns4      :    0.705    28580.7     3572.6  (  8.0 0.9)
+SSE addss (32bit x1) ns4      :    0.696    28953.7     3619.2  (  8.0 0.9)
+SSE mulps (32bit x4) ns4      :    0.620   129990.7     4062.2  ( 32.0 1.0)
+SSE addps (32bit x4) ns4      :    0.635   127070.8     3971.0  ( 32.0 0.9)
+AVX vmulps (32bit x8) n8      :    0.622   259114.7     4048.7  ( 64.0 1.0)
+AVX vaddps (32bit x8) n8      :    0.577   279698.0     4370.3  ( 64.0 1.0)
+AVX vmul+addps (32bit x8) n8  :    0.594   271449.8     4241.4  ( 64.0 1.0)
+FMA vfmaddps (32bit x8) n8    :    0.600   537822.3     4201.7  (128.0 1.0)
+FMA vfmaddps (32bit x8) n12   :    0.902   536249.8     4189.5  (128.0 1.0)
+FMA vfma+mlps (32bit x8) n12  :    0.892   406643.8     4235.9  ( 96.0 1.0)
+FMA vfma+adps (32bit x8) n12  :    0.860   421872.1     4394.5  ( 96.0 1.0)
+AVX vml+ad+adps (32bit x8) n9 :    0.650   279223.9     4362.9  ( 64.0 1.0)
+Average                       :    0.717   195755.3     4309.2  ( 46.2 1.0)
+Highest                       :    0.577   537822.3     6229.7  (128.0 1.5)
+
+
+* Group 0:  Thread=8  Clock=4.200000 GHz  (mask:ff)
+* SSE/AVX (DP fp) multi-thread
+                                  TIME(s)   MFLOPS      MOPS     FOP   IPC
+SSE2 mulsd (64bit x1) n8      :    0.596    33802.4     4225.3  (  8.0 1.0)
+SSE2 addsd (64bit x1) n8      :    0.595    33885.9     4235.7  (  8.0 1.0)
+FMA  vfmaddsd (64bit x1) n8   :    0.595    67767.2     4235.5  ( 16.0 1.0)
+FMA  vfmaddsd (64bit x1) n12  :    0.893    67747.1     4234.2  ( 16.0 1.0)
+FMA  vfma+mlsd (64bit x1) n12 :    0.892    50829.3     6353.7  (  8.0 1.5)
+FMA  vfma+adsd (64bit x1) n12 :    0.892    50831.7     6354.0  (  8.0 1.5)
+SSE2 mulpd (64bit x2) n8      :    0.595    67767.3     4235.5  ( 16.0 1.0)
+SSE2 addpd (64bit x2) n8      :    0.595    67771.9     4235.7  ( 16.0 1.0)
+SSE2 mul+addpd (64bit x2) n8  :    0.595    67772.2     4235.8  ( 16.0 1.0)
+FMA  vfmaddpd (64bit x2) n8   :    0.595   135534.4     4235.5  ( 32.0 1.0)
+FMA  vfmaddpd (64bit x2) n12  :    0.892   135552.5     4236.0  ( 32.0 1.0)
+FMA  vfma+mlpd (64bit x2) n12 :    0.892   101658.3     4235.8  ( 24.0 1.0)
+FMA  vfma+adpd (64bit x2) n12 :    0.892   101663.5     4236.0  ( 24.0 1.0)
+SSE2 ml+ad+dpd (64bit x2) n9  :    0.668    67866.5     4241.7  ( 16.0 1.0)
+SSE2 mulsd (64bit x1) ns4     :    0.596    33826.1     4228.3  (  8.0 1.0)
+SSE2 addsd (64bit x1) ns4     :    0.595    33881.8     4235.2  (  8.0 1.0)
+SSE2 mulpd (64bit x2) ns4     :    0.595    67764.5     4235.3  ( 16.0 1.0)
+SSE2 addpd (64bit x2) ns4     :    0.597    67507.8     4219.2  ( 16.0 1.0)
+AVX vmulpd (64bit x4) n8      :    0.594   135789.8     4243.4  ( 32.0 1.0)
+AVX vaddpd (64bit x4) n8      :    0.595   135544.9     4235.8  ( 32.0 1.0)
+AVX vmul+addpd (64bit x4) n8  :    0.595   135546.5     4235.8  ( 32.0 1.0)
+FMA vfmaddpd (64bit x4) n8    :    0.595   271062.5     4235.4  ( 64.0 1.0)
+FMA vfmaddpd (64bit x4) n12   :    0.892   271105.6     4236.0  ( 64.0 1.0)
+FMA vfma+mlpd (64bit x4) n12  :    0.892   203317.4     4235.8  ( 48.0 1.0)
+FMA vfma+adpd (64bit x4) n12  :    0.892   203325.8     4236.0  ( 48.0 1.0)
+AVX vml_ad_adpd (64bit x4) n9 :    0.661   137169.6     4286.6  ( 32.0 1.0)
+Average                       :    0.703   105626.6     4399.7  ( 24.6 1.0)
+Highest                       :    0.594   271105.6     6354.0  ( 64.0 1.5)
+
