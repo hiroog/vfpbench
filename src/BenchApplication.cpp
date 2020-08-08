@@ -236,9 +236,9 @@ void BenchApplication::ExportCPUInfo( util::BinaryBuffer32& buffer ) const
 void BenchApplication::ExportFlops( util::BinaryBuffer32& buffer ) const
 {
 	print( buffer, "\nTotal:\n" );
-	format_GFLOPS( buffer, "SingleThread HP max", GetTotalMFLOPS( LOOPTYPE_HP, false ) );
-	format_GFLOPS( buffer, "SingleThread SP max", GetTotalMFLOPS( LOOPTYPE_SP, false ) );
-	format_GFLOPS( buffer, "SingleThread DP max", GetTotalMFLOPS( LOOPTYPE_DP, false ) );
+	format_GFLOPS( buffer, "SingleThread HP max", GetMaxMFLOPS( LOOPTYPE_HP, false ) );
+	format_GFLOPS( buffer, "SingleThread SP max", GetMaxMFLOPS( LOOPTYPE_SP, false ) );
+	format_GFLOPS( buffer, "SingleThread DP max", GetMaxMFLOPS( LOOPTYPE_DP, false ) );
 	format_GFLOPS( buffer, "MultiThread  HP max", GetTotalMFLOPS( LOOPTYPE_HP, true  ) );
 	format_GFLOPS( buffer, "MultiThread  SP max", GetTotalMFLOPS( LOOPTYPE_SP, true  ) );
 	format_GFLOPS( buffer, "MultiThread  DP max", GetTotalMFLOPS( LOOPTYPE_DP, true  ) );
@@ -493,6 +493,25 @@ double	BenchApplication::GetTotalMFLOPS( unsigned int loop_type, bool multithrea
 	}
 	return	total;
 }
+
+double	BenchApplication::GetMaxMFLOPS( unsigned int loop_type, bool multithread ) const
+{
+	double	max_flops= 0.0f;
+	unsigned int	data_count= GetDataCount();
+	for( unsigned int di= 0 ; di< data_count ; di++ ){
+		const auto&	data= GetData( di );
+		if( data.IsMultithread() == multithread && data.GetLoopType() == loop_type ){
+			const auto&	line= data.GetHighest();
+			if( line.IsActive() ){
+				if( line.Max > max_flops ){
+					max_flops= line.Max;
+				}
+			}
+		}
+	}
+	return	max_flops;
+}
+
 
 
 void BenchApplication::UpdateResult( unsigned int btype, ITestBase* bench )

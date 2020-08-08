@@ -70,6 +70,7 @@ public:
 
 	double	GetMFLOPS( unsigned int loop_type, bool multithread, unsigned int group ) const;
 	double	GetTotalMFLOPS( unsigned int loop_type, bool multithread ) const;
+	double	GetMaxMFLOPS( unsigned int loop_type, bool multithread ) const;
 
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------

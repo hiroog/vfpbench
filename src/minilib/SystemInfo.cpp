@@ -188,13 +188,11 @@ void SystemInfo::DecodeCpuTopologyImmediate()
 			core.Index= ci;
 			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/thread_siblings", ci );
 			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
-				//core.ThreadMask= strtoull( line_buffer, nullptr, 16 );
 				core.ThreadMask= GetCpuBitMask( line_buffer );
 			}
 
 			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/topology/core_siblings", ci );
 			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
-				//core.ClusterMask= strtoull( line_buffer, nullptr, 16 );
 				core.ClusterMask= GetCpuBitMask( line_buffer );
 			}
 
