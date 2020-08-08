@@ -15,8 +15,8 @@ DotProd: no
 
 Total:
 SingleThread HP max: -
-SingleThread SP max:   31.127 GFLOPS
-SingleThread DP max:   14.381 GFLOPS
+SingleThread SP max:   15.868 GFLOPS
+SingleThread DP max:    7.305 GFLOPS
 MultiThread  HP max: -
 MultiThread  SP max:  125.541 GFLOPS
 MultiThread  DP max:   57.218 GFLOPS
