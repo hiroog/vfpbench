@@ -302,9 +302,9 @@ void	BenchApplication::ExportLine( util::BinaryBuffer32& buffer, const ResultLin
 #endif
 	}else{
 #if USE_MAX_EXPORT
-		print( buffer, "%-30s:        -          -          -       -   -          -\n", line.Title );
+		print( buffer, "%-34s:        -          -          -       -   -          -\n", line.Title );
 #else
-		print( buffer, "%-30s:        -          -          -       -   -\n", line.Title );
+		print( buffer, "%-34s:        -          -          -       -   -\n", line.Title );
 #endif
 	}
 }

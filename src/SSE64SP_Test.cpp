@@ -10,6 +10,11 @@
 //-----------------------------------------------------------------------------
 #if flCPU_X64
 //-----------------------------------------------------------------------------
+#if defined(__AVX512F__) && __AVX512F__
+# define	ENABLE_AVX512	1
+#else
+# define	ENABLE_AVX512	0
+#endif
 
 using namespace flatlib;
 
@@ -1257,6 +1262,7 @@ static uint64_t AVX_M_FMA_IR12_##name( CounterType LoopCount, float answer ) \
 // AVX512
 //=============================================================================
 
+#if ENABLE_AVX512
 
 
 #define AVX512_REG_CLEAR() \
@@ -1470,11 +1476,7 @@ static uint64_t AVX512_M_IR12_##name( CounterType LoopCount, float answer ) \
 
 
 
-
-
-
-
-
+#endif
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -1704,11 +1706,13 @@ AVX_M_IR9( vmulps, vaddps, vaddps, vml_ad_vaddps_ir9 );
 AVX_M_IR9( vfmadd231ps, vmulps, vaddps, vfma_ml_vaddps_ir9 );		// FMA3
 #endif
 
+#if ENABLE_AVX512
 AVX512_S_IR12( vmulps,  vmulps_ir12 );
 AVX512_S_IR12( vaddps,  vaddps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vfmadd231ps,	vfmaddps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vmulps,		vfmaddps_vmulps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vaddps,		vfmaddps_vaddps_ir12 );
+#endif
 
 
 
@@ -1897,6 +1901,7 @@ return;
 	// AVX512
 	//------------------------------------------------------
 
+#if ENABLE_AVX512
 	if( Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ){
 
 		SetResult( RESULT_AVX512_VMULPS_IR12,	AVX512_S_IR12_vmulps_ir12( Loop, 0.0f		) );
@@ -1914,7 +1919,9 @@ return;
 		SetResult( RESULT_AVX512_FMA_ADD_IR12,	AVX512_M_IR12_vfmaddps_vaddps_ir12( Loop, 0.0f		) );
 		Progress++;
 
-	}else{
+	}else
+#endif
+	{
 		Progress+= 5;
 	}
 
