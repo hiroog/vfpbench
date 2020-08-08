@@ -1,6 +1,6 @@
 ARCH: ARMv7A
 FPU : VFPv4-D32 NEON
-Name: MT8135
+Name: MT8135 FireHD6(2014)
 
 CPU Thread:  4
 CPU Core  :  4
@@ -15,8 +15,8 @@ DotProd: no
 
 Total:
 SingleThread HP max: -
-SingleThread SP max:   14.405 GFLOPS
-SingleThread DP max:    3.578 GFLOPS
+SingleThread SP max:   12.001 GFLOPS
+SingleThread DP max:    2.400 GFLOPS
 MultiThread  HP max: -
 MultiThread  SP max:   28.816 GFLOPS
 MultiThread  DP max:    7.135 GFLOPS
