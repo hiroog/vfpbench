@@ -1,6 +1,6 @@
 ARCH: ARMv8.2A AArch64
 FPU : ASIMD(AArch64 NEON) FPHP ASIMDHP
-Name: Qualcomm Technologies, Inc SDM845
+Name: Qualcomm Technologies, Inc SDM845 Pixel3
 
 CPU Thread:  8
 CPU Core  :  8
@@ -14,9 +14,9 @@ SIMDHP : yes
 DotProd: no
 
 Total:
-SingleThread HP max:   71.788 GFLOPS
-SingleThread SP max:   36.005 GFLOPS
-SingleThread DP max:   18.011 GFLOPS
+SingleThread HP max:   44.356 GFLOPS
+SingleThread SP max:   22.274 GFLOPS
+SingleThread DP max:   11.150 GFLOPS
 MultiThread  HP max:  278.633 GFLOPS
 MultiThread  SP max:  139.238 GFLOPS
 MultiThread  DP max:   69.642 GFLOPS
