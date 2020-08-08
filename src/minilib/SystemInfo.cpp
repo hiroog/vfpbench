@@ -575,7 +575,7 @@ enum {
 	CPUID_1_EDX_FEATURE_SSE			=	(1<<25),
 	CPUID_1_EDX_FEATURE_SSE2		=	(1<<26),
 	CPUID_1_EDX_FEATURE_HT			=	(1<<28),
-	//-- id=7 EBX
+	//-- id=7,0 EBX
 	CPUID_7_EBX_FEATURE_AVX2		=	(1<< 5),
 	CPUID_7_EBX_FEATURE_AVX512F		=	(1<<16),	// Foundation
 	CPUID_7_EBX_FEATURE_AVX512DQ	=	(1<<17),	// Doubleword and Quadword instructions
@@ -586,7 +586,7 @@ enum {
 	CPUID_7_EBX_FEATURE_SHA			=	(1<<29),
 	CPUID_7_EBX_FEATURE_AVX512BW	=	(1<<30),	// Byte and Word instructions
 	CPUID_7_EBX_FEATURE_AVX512VL	=	(1<<31),	// Vector Length extensions
-	//-- id=7 ECX
+	//-- id=7,0 ECX
 	CPUID_7_ECX_FEATURE_AVX512VBMI	=	(1<< 1),	//
 	CPUID_7_ECX_FEATURE_AVX512VBMI2	=	(1<< 6),	//
 	CPUID_7_ECX_FEATURE_GFNI		=	(1<< 8),	//
@@ -594,9 +594,12 @@ enum {
 	CPUID_7_ECX_FEATURE_AVX512VNNI	=	(1<<11),	// Neural Network Instructions
 	CPUID_7_ECX_FEATURE_AVX512BITALG=	(1<<12),	//
 	CPUID_7_ECX_FEATURE_AVX512VPOPCNTDQ=(1<<14),	//
-	//-- id=7 EDX
+	//-- id=7,0 EDX
 	CPUID_7_EDX_FEATURE_AVX5124VNNIW=	(1<< 2),	//
 	CPUID_7_EDX_FEATURE_AVX5124FMAPS=	(1<< 3),	//
+	CPUID_7_EDX_FEATURE_AVX512VP2INTERSECT=	(1<< 8),	//
+	//-- id=7,1 EAX
+	CPUID_7_1_EAX_FEATURE_AVX512BFLOAT16=	(1<< 5),	// BFloat16
 	//-- id=0x80000001 ECX
 	CPUID_80_ECX_FEATURE_SSE4A		=	(1<< 6),
 	CPUID_80_ECX_FEATURE_FMA4		=	(1<<16),
@@ -613,17 +616,18 @@ struct RegCPUID {
 	unsigned int	EDX;
 };
 
-static void	GetCPUID( RegCPUID& reg, unsigned int index )
+static void	GetCPUID( RegCPUID& reg, unsigned int index, unsigned int subindex= 0 )
 {
 #if flCC_VC
-	__cpuid( reinterpret_cast<int*>(&reg.EAX), index );
+//	__cpuid( reinterpret_cast<int*>(&reg.EAX), index );
+	__cpuidex( reinterpret_cast<int*>(&reg.EAX), index, subindex );
 #endif
 #if flCC_CLANG || flCC_GCC
 	unsigned int	a= 0;
 	unsigned int	b= 0;
 	unsigned int	c= 0;
 	unsigned int	d= 0;
-	__cpuid_count( index, 0, a, b, c, d );
+	__cpuid_count( index, subindex, a, b, c, d );
 	reg.EAX= a;
 	reg.EBX= b;
 	reg.ECX= c;
@@ -635,14 +639,17 @@ void	SystemInfo::GetCPUSpecification()
 {
 	RegCPUID	Feature01;
 	RegCPUID	Feature07;
+	RegCPUID	Feature07_01;
 	RegCPUID	Feature80;
 
 	GetCPUID( Feature01, 1 );
 	GetCPUID( Feature07, 7 );
+	GetCPUID( Feature07_01, 7, 1 );
 	GetCPUID( Feature80, 0x80000001 );
 
 FL_LOG( "01: %08x %08x %08x %08x\n", Feature01.EAX, Feature01.EBX, Feature01.ECX, Feature01.EDX );
 FL_LOG( "07: %08x %08x %08x %08x\n", Feature07.EAX, Feature07.EBX, Feature07.ECX, Feature07.EDX );
+FL_LOG( "071 %08x %08x %08x %08x\n", Feature07_01.EAX, Feature07_01.EBX, Feature07_01.ECX, Feature07_01.EDX );
 FL_LOG( "80: %08x %08x %08x %08x\n", Feature80.EAX, Feature80.EBX, Feature80.ECX, Feature80.EDX );
 
 	if( Feature01.ECX & CPUID_1_ECX_FEATURE_SSE3 ){
@@ -698,6 +705,13 @@ FL_LOG( "80: %08x %08x %08x %08x\n", Feature80.EAX, Feature80.EBX, Feature80.ECX
 		SetInstructionSet( CPUFeature::IA_AVX512VL );
 	}
 
+	if( Feature07.ECX & CPUID_7_ECX_FEATURE_AVX512VNNI ){
+		SetInstructionSet( CPUFeature::IA_AVX512VNNI );
+	}
+
+	if( Feature07_01.EAX & CPUID_7_1_EAX_FEATURE_AVX512BFLOAT16 ){
+		SetInstructionSet( CPUFeature::IA_AVX512BF16 );
+	}
 
 	if( Feature80.ECX & CPUID_80_ECX_FEATURE_SSE4A ){
 		SetInstructionSet( CPUFeature::IA_SSE4A );
@@ -814,12 +828,15 @@ DEF_CPUFEATURE_NAME_IA( AVX512F ),
 DEF_CPUFEATURE_NAME_IA( AVX512BW ),
 DEF_CPUFEATURE_NAME_IA( AVX512DQ ),
 DEF_CPUFEATURE_NAME_IA( AVX512VL ),
+DEF_CPUFEATURE_NAME_IA( AVX512VNNI ),
+DEF_CPUFEATURE_NAME_IA( AVX512BF16 ),
 DEF_CPUFEATURE_NAME_IA( AES ),
 DEF_CPUFEATURE_NAME_IA( FMA3 ),
 DEF_CPUFEATURE_NAME_IA( FMA4 ),
 DEF_CPUFEATURE_NAME_IA( SHA ),
 DEF_CPUFEATURE_NAME_IA( F16C ),
 DEF_CPUFEATURE_NAME_IA( X64 ),
+
 DEF_CPUFEATURE_NAME_ARM( NEON ),
 DEF_CPUFEATURE_NAME_ARM( VFPV4 ),
 DEF_CPUFEATURE_NAME_ARM( FPHP ),

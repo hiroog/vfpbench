@@ -171,6 +171,21 @@ void BenchApplication::ExportCPUInfo( util::BinaryBuffer32& buffer ) const
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ){
 			print( buffer, " AVX512F" );
+			if( Info.HasInstructionSet( CPUFeature::IA_AVX512BW ) ){
+				print( buffer, "/BW" );
+			}
+			if( Info.HasInstructionSet( CPUFeature::IA_AVX512DQ ) ){
+				print( buffer, "/DQ" );
+			}
+			if( Info.HasInstructionSet( CPUFeature::IA_AVX512VL ) ){
+				print( buffer, "/VL" );
+			}
+			if( Info.HasInstructionSet( CPUFeature::IA_AVX512VNNI ) ){
+				print( buffer, "/VNNI" );
+			}
+			if( Info.HasInstructionSet( CPUFeature::IA_AVX512BF16 ) ){
+				print( buffer, "/BF16" );
+			}
 		}
 		print( buffer, "\n" );
 		break;
@@ -266,7 +281,7 @@ void	BenchApplication::ExportLine( util::BinaryBuffer32& buffer, const ResultLin
 {
 	if( line.IsActive() ){
 #if USE_MAX_EXPORT
-		print( buffer, "%-30s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f) %9.1f\n",
+		print( buffer, "%-34s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f) %9.1f\n",
 				line.Title,
 				line.Time,
 				line.Flops,
@@ -276,7 +291,7 @@ void	BenchApplication::ExportLine( util::BinaryBuffer32& buffer, const ResultLin
 				line.Max
 			);
 #else
-		print( buffer, "%-30s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f)\n",
+		print( buffer, "%-34s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f)\n",
 				line.Title,
 				line.Time,
 				line.Flops,
@@ -301,11 +316,11 @@ void	BenchApplication::ExportData( util::BinaryBuffer32& buffer, const ResultDat
 	unsigned int	group= data.GetCoreGroup();
 	print( buffer, "\n* Group %d:  Thread=%d  Clock=%f GHz  (mask:%llx)\n", group, data.IsMultithread() ? Info.GetThreadCount( group ) : 1, Info.GetCoreClock( group )/1000000.0, Info.GetAffinityMask( group ) );
 	print( buffer, "* %s\n", data.GetTitle() );
-	//				012345678901234567890123456789: ________  _________  _________ (___ ___) _________
+	//				0123456789012345678901234567890123: ________  _________  _________ (___ ___) _________
 #if USE_MAX_EXPORT
-	print( buffer, "                                  TIME(s)   MFLOPS      MOPS     FOP   IPC  max MFLOPS\n" );
+	print( buffer, "                                      TIME(s)   MFLOPS      MOPS     FOP   IPC  max MFLOPS\n" );
 #else
-	print( buffer, "                                  TIME(s)   MFLOPS      MOPS     FOP   IPC\n" );
+	print( buffer, "                                      TIME(s)   MFLOPS      MOPS     FOP   IPC\n" );
 #endif
 	for( unsigned int ci= 0 ; ci< count ; ci++ ){
 		ExportLine( buffer, data.Get( ci ) );

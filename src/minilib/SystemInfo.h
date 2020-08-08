@@ -38,6 +38,8 @@ enum class CPUFeature : unsigned int {
 	IA_AVX512BW,
 	IA_AVX512DQ,
 	IA_AVX512VL,
+	IA_AVX512VNNI,
+	IA_AVX512BF16,
 	IA_AES,
 	IA_FMA3,
 	IA_FMA4,
