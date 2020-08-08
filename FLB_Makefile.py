@@ -39,6 +39,7 @@ src_list= [
         'src/minilib/SystemInfo.cpp',
         'src/minilib/ConsoleIO.cpp',
         'src/minilib/PlatformString.cpp',
+        'src/minilib/SystemTime.cpp',
     ]
 
 #        'src/MatrixTest_SSESP.cpp',

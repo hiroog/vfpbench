@@ -3,6 +3,7 @@
 
 #include	<minilib/CoreLib.h>
 #include	<minilib/SystemInfo.h>
+#include	<minilib/SystemTime.h>
 #include	"BenchApplication.h"
 #include	"TestBase.h"
 #include	<stdio.h>
@@ -331,6 +332,13 @@ void	BenchApplication::ExportLog( util::BinaryBuffer32& buffer ) const
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
+/*
+T DateTime
+N ProcessorName
+D Data
+L Line
+*/
+
 void	BenchApplication::LoadLine( ResultLine& line, const char* ptr )
 {
 	const int	WORD_BUFFER_SIZE= 64;
@@ -364,6 +372,9 @@ void	BenchApplication::LoadFile( const char* file_name )
 	for(; fgets( line_buffer, LINE_BUFFER_SIZE-2, fp ) ;){
 		const char*	ptr= SkipSpace( line_buffer );
 		if( *ptr == '#' || *ptr == '\n' ){
+			continue;
+		}
+		if( *ptr == 'T' ){
 			continue;
 		}
 		if( *ptr == 'D' ){
@@ -422,6 +433,10 @@ void	BenchApplication::SaveData( util::BinaryBuffer32& buffer, const ResultData&
 void	BenchApplication::SaveFile( const char* file_name ) const
 {
 	util::BinaryBuffer32	buffer;
+	SystemTime	time;
+	GetLocalTime( time );
+	print( buffer, "T \"%04d%02d%02d %02d%02d%02d\"\n", time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second );
+
 	unsigned int	bcount= GetDataCount();
 	for( unsigned int bi= 0 ; bi< bcount ; bi++ ){
 		SaveData( buffer, GetData( bi ) );
