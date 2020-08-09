@@ -118,7 +118,6 @@ tool.addNamedTask( env, 'debug', task_list )
 
 #------------------------------------------------------------------------------
 
-
 def BenchRun( task ):
     import  subprocess
     if os.path.exists( 'vfpbench' ):
@@ -127,6 +126,8 @@ def BenchRun( task ):
 
 task= tool.addScriptTask( env, 'run', BenchRun )
 
+
+#------------------------------------------------------------------------------
 
 def PushLog( task ):
     import re
@@ -153,4 +154,43 @@ def PushLog( task ):
     print( file_name )
 
 task= tool.addScriptTask( env, 'push', PushLog )
+
+
+#------------------------------------------------------------------------------
+
+def ListLog( task ):
+    log_list= os.listdir( 'log' )
+    import re
+    plist= [
+            re.compile( r'^SingleThread\s+HP\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^SingleThread\s+SP\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^SingleThread\s+DP\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^MultiThread\s+HP\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^MultiThread\s+SP\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^MultiThread\s+DP\s+max:\s+([0-9.-]+)' ),
+        ]
+    name_pat= re.compile( r'(.*)_[0-9]+_[0-9]+\.txt' )
+    device_list= []
+    for log in log_list:
+        score= []
+        with open( os.path.join( 'log', log ), 'r' ) as fi:
+            for line in fi:
+                for p in plist:
+                    pat= p.search( line )
+                    if pat is not None:
+                        flops= pat.group(1)
+                        if flops == '-':
+                            score.append( 0.0 )
+                        else:
+                            score.append( float(flops) )
+                        break
+        pat= name_pat.search( log )
+        name= pat.group(1)
+        device_list.append( (name,score) )
+    device_list_sp= sorted( device_list, key=lambda a: a[1][4], reverse=True )
+    for name,sc in device_list_sp:
+        print( '%-50s  %8.3f %8.3f %8.3f  %8.3f %8.3f %8.3f' % (name[:50], sc[0], sc[1], sc[2], sc[3], sc[4], sc[5]) )
+
+task= tool.addScriptTask( env, 'list', ListLog )
+
 
