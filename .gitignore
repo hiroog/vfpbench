@@ -13,8 +13,8 @@ vfpbench_log*.txt
 *.bak
 *.pyc
 cpu_info_cache.txt
-output_log.txt
-.save.log
+output_log*.txt
+.save*.log
 ###
 cpulist.py
 run_bench.py
