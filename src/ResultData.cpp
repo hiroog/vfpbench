@@ -122,9 +122,9 @@ void ResultData::Dump()
 	for( unsigned int ci= 0 ; ci< count ; ci++ ){
 		const ResultLine&	line= Get( ci );
 		if( line.IsActive() ){
-			FL_PRINT( "%-30s: %8.3f sec  %9.1f MFLOPS %9.1f MOPS %3.0f/%3.1f (%9.1f MFLOPS)\n", line.Title, line.Time, line.Flops, line.Ops, line.Fop, line.Ipc, line.Max );
+			FL_PRINT( "%-34s: %8.3f sec  %9.1f MFLOPS %9.1f MOPS %3.0f/%3.1f (%9.1f MFLOPS)\n", line.Title, line.Time, line.Flops, line.Ops, line.Fop, line.Ipc, line.Max );
 		}else{
-			FL_PRINT( "%-30s:        - sec          - MFLOPS         - MOPS         (        - MFLOPS)\n", line.Title );
+			FL_PRINT( "%-34s:        - sec          - MFLOPS         - MOPS         (        - MFLOPS)\n", line.Title );
 		}
 	}
 }

@@ -132,7 +132,7 @@ def PushLog( task ):
     import re
     import datetime
     src_file= 'output_log.txt'
-    cdate= datetime.datetime.today().strftime( '%Y%m%d_%H%M%S' )
+    #cdate= datetime.datetime.today().strftime( '%Y%m%d_%H%M%S' )
     fdate= datetime.datetime.fromtimestamp( os.stat( src_file ).st_mtime ).strftime( '%Y%m%d_%H%M%S' )
     with open( src_file, 'r' ) as fi:
         name= None
@@ -141,11 +141,16 @@ def PushLog( task ):
             pat= name_pat.search( line )
             if pat is not None:
                 name= pat.group(1).strip()
+    if name is None or name == '':
+        if os.path.exists( '.processor_name' ):
+            with open( '.processor_name', 'r' ) as fp:
+                name= fp.read().strip()
     if not os.path.exists( 'log' ):
         os.mkdir( 'log' )
     file_name= os.path.join( 'log', '%s_%s.txt' % (name, fdate) )
     import shutil
     shutil.copy( src_file, file_name )
+    print( file_name )
 
 task= tool.addScriptTask( env, 'push', PushLog )
 

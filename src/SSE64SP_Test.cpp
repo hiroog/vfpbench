@@ -1486,12 +1486,6 @@ static uint64_t AVX512_M_IR12_##name( CounterType LoopCount, float answer ) \
 
 
 
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-
-
-
 static const char*	Instruction_Title[]= {
 
 	"SSE mulss (32bit x1) n8",
@@ -1642,7 +1636,6 @@ FloatTest::FloatTest()
 	SetOp2f( RESULT_AVX512_FMA_MUL_IR12,	PER_LOOP_INST_12, (32+16)/2.0f	);
 	SetOp2f( RESULT_AVX512_FMA_ADD_IR12,	PER_LOOP_INST_12, (32+16)/2.0f	);
 }
-
 
 
 
