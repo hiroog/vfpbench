@@ -1,0 +1,162 @@
+ARCH: ARMv7A
+FPU : VFPv4-D32 NEON
+Name: Qualcomm MSM 8974 HAMMERHEAD (Flattened Device Tree) 800 Nexus5
+
+CPU Thread:  4
+CPU Core  :  4
+CPU Group :  1
+  Group 0: Thread= 4  Clock=2.265600 GHz  (mask:f)
+NEON   : yes
+FMA    : yes
+FPHP   : no
+SIMDHP : no
+DotProd: no
+
+Total:
+SingleThread HP max: -
+SingleThread SP max:   16.454 GFLOPS
+SingleThread DP max:    3.385 GFLOPS
+MultiThread  HP max: -
+MultiThread  SP max:   65.470 GFLOPS
+MultiThread  DP max:   13.868 GFLOPS
+
+Group 0:  Thread=4  Clock=2.265600 GHz  (mask:f)
+  SingleThread HP max: -
+  SingleThread SP max:   16.454 GFLOPS
+  SingleThread DP max:    3.385 GFLOPS
+  MultiThread  HP max: -
+  MultiThread  SP max:   65.470 GFLOPS
+  MultiThread  DP max:   13.868 GFLOPS
+
+
+* Group 0:  Thread=1  Clock=2.265600 GHz  (mask:f)
+* VFP/NEON (SP fp)
+                                      TIME(s)   MFLOPS      MOPS     FOP   IPC
+VFP fmuls (32bit x1) n8           :    0.656     2073.1     2073.1  (  1.0 0.9)
+VFP fadds (32bit x1) n8           :    0.608     2234.5     2234.5  (  1.0 1.0)
+VFP fmacs (32bit x1) n8           :    0.679     4005.7     2002.9  (  2.0 0.9)
+VFP vfma.f32 (32bit x1) n8        :        -          -          -       -   -
+NEON vmul.f32 (32bit x2) n8       :    0.601     4522.9     2261.5  (  2.0 1.0)
+NEON vadd.f32 (32bit x2) n8       :    0.601     4522.9     2261.4  (  2.0 1.0)
+NEON vmla.f32 (32bit x2) n8       :    0.661     8225.6     2056.4  (  4.0 0.9)
+NEON vfma.f32 (32bit x2) n8       :        -          -          -       -   -
+NEON vmul.f32 (32bit x4) n8       :    0.601     9048.7     2262.2  (  4.0 1.0)
+NEON vadd.f32 (32bit x4) n8       :    0.601     9049.0     2262.2  (  4.0 1.0)
+NEON vmla.f32 (32bit x4) n8       :    0.661    16453.7     2056.7  (  8.0 0.9)
+NEON vfma.f32 (32bit x4) n8       :        -          -          -       -   -
+VFP fmuls (32bit x1) ns4          :    0.751     1809.4     1809.4  (  1.0 0.8)
+VFP fadds (32bit x1) ns4          :    0.601     2262.2     2262.2  (  1.0 1.0)
+VFP fmacs (32bit x1) ns4          :    1.202     2261.1     1130.5  (  2.0 0.5)
+VFP vfma.f32 (32bit x1) ns4       :        -          -          -       -   -
+NEON vmul.f32 (32bit x2) ns4      :    0.751     3619.9     1810.0  (  2.0 0.8)
+NEON vadd.f32 (32bit x2) ns4      :    0.601     4524.0     2262.0  (  2.0 1.0)
+NEON vmla.f32 (32bit x2) ns4      :    1.202     4524.8     1131.2  (  4.0 0.5)
+NEON vfma.f32 (32bit x2) ns4      :        -          -          -       -   -
+NEON vmul.f32 (32bit x4) ns4      :    0.751     7239.4     1809.9  (  4.0 0.8)
+NEON vadd.f32 (32bit x4) ns4      :    0.601     9048.5     2262.1  (  4.0 1.0)
+NEON vmla.f32 (32bit x4) ns4      :    1.202     9048.8     1131.1  (  8.0 0.5)
+NEON vfma.f32 (32bit x4) ns4      :        -          -          -       -   -
+VFP fmuls (32bit x1) n1           :    0.601     2262.6     2262.6  (  1.0 1.0)
+VFP fadds (32bit x1) n1           :    0.601     2262.3     2262.3  (  1.0 1.0)
+VFP fmacs (32bit x1) n1           :    1.803     1508.1      754.1  (  2.0 0.3)
+VFP vfma.f32 (32bit x1) n1        :        -          -          -       -   -
+NEON vmul.f32 (32bit x2) n1       :    0.601     4524.4     2262.2  (  2.0 1.0)
+NEON vadd.f32 (32bit x2) n1       :    0.601     4524.3     2262.1  (  2.0 1.0)
+NEON vmla.f32 (32bit x2) n1       :    1.803     3016.2      754.1  (  4.0 0.3)
+NEON vfma.f32 (32bit x2) n1       :        -          -          -       -   -
+NEON vmul.f32 (32bit x4) n1       :    0.601     9049.0     2262.2  (  4.0 1.0)
+NEON vadd.f32 (32bit x4) n1       :    0.601     9047.8     2262.0  (  4.0 1.0)
+NEON vmla.f32 (32bit x4) n1       :    1.803     6031.8      754.0  (  8.0 0.3)
+NEON vfma.f32 (32bit x4) n1       :        -          -          -       -   -
+NEON vmul.f32 (32bit x4) n12      :    0.901     9047.9     2262.0  (  4.0 1.0)
+NEON vadd.f32 (32bit x4) n12      :    0.901     9048.3     2262.1  (  4.0 1.0)
+NEON vmla.f32 (32bit x4) n12      :    0.992    16449.1     2056.1  (  8.0 0.9)
+NEON vfma.f32 (32bit x4) n12      :        -          -          -       -   -
+Average                           :    0.838     6041.5     1916.5  (  3.3 0.8)
+Highest                           :    0.601    16453.7     2262.6  (  8.0 1.0)
+
+
+* Group 0:  Thread=1  Clock=2.265600 GHz  (mask:f)
+* VFP/NEON (DP fp)
+                                      TIME(s)   MFLOPS      MOPS     FOP   IPC
+VFP fmuld (64bit x1) n8           :    0.633     2147.7     2147.7  (  1.0 0.9)
+VFP faddd (64bit x1) n8           :    0.609     2232.0     2232.0  (  1.0 1.0)
+VFP fmacd (64bit x1) n8           :    0.803     3384.7     1692.4  (  2.0 0.7)
+VFP vfma.f64 (64bit x1) n8        :        -          -          -       -   -
+VFP fmuld (64bit x1) ns4          :    0.901     1508.0     1508.0  (  1.0 0.7)
+VFP faddd (64bit x1) ns4          :    0.601     2262.2     2262.2  (  1.0 1.0)
+VFP fmacd (64bit x1) ns4          :    1.503     1809.4      904.7  (  2.0 0.4)
+VFP vfma.f64 (64bit x1) ns4       :        -          -          -       -   -
+VFP fmuld (64bit x1) n1           :    0.601     2262.0     2262.0  (  1.0 1.0)
+VFP faddd (64bit x1) n1           :    0.601     2262.0     2262.0  (  1.0 1.0)
+VFP fmacd (64bit x1) n1           :    1.803     1508.0      754.0  (  2.0 0.3)
+VFP vfma.f64 (64bit x1) n1        :        -          -          -       -   -
+Average                           :    0.895     2152.9     1780.5  (  1.3 0.8)
+Highest                           :    0.601     3384.7     2262.2  (  2.0 1.0)
+
+
+* Group 0:  Thread=4  Clock=2.265600 GHz  (mask:f)
+* VFP/NEON (SP fp) multi-thread
+                                      TIME(s)   MFLOPS      MOPS     FOP   IPC
+VFP fmuls (32bit x1) n8           :    0.674     8073.2     2018.3  (  4.0 0.9)
+VFP fadds (32bit x1) n8           :    0.604     9008.2     2252.0  (  4.0 1.0)
+VFP fmacs (32bit x1) n8           :    0.663    16391.8     2049.0  (  8.0 0.9)
+VFP vfma.f32 (32bit x1) n8        :        -          -          -       -   -
+NEON vmul.f32 (32bit x2) n8       :    0.624    17421.0     2177.6  (  8.0 1.0)
+NEON vadd.f32 (32bit x2) n8       :    0.603    18019.9     2252.5  (  8.0 1.0)
+NEON vmla.f32 (32bit x2) n8       :    0.663    32789.0     2049.3  ( 16.0 0.9)
+NEON vfma.f32 (32bit x2) n8       :        -          -          -       -   -
+NEON vmul.f32 (32bit x4) n8       :    0.606    35907.6     2244.2  ( 16.0 1.0)
+NEON vadd.f32 (32bit x4) n8       :    0.604    35985.0     2249.1  ( 16.0 1.0)
+NEON vmla.f32 (32bit x4) n8       :    0.664    65470.0     2045.9  ( 32.0 0.9)
+NEON vfma.f32 (32bit x4) n8       :        -          -          -       -   -
+VFP fmuls (32bit x1) ns4          :    0.755     7200.8     1800.2  (  4.0 0.8)
+VFP fadds (32bit x1) ns4          :    0.612     8877.7     2219.4  (  4.0 1.0)
+VFP fmacs (32bit x1) ns4          :    1.211     8977.1     1122.1  (  8.0 0.5)
+VFP vfma.f32 (32bit x1) ns4       :        -          -          -       -   -
+NEON vmul.f32 (32bit x2) ns4      :    0.754    14431.3     1803.9  (  8.0 0.8)
+NEON vadd.f32 (32bit x2) ns4      :    0.602    18050.5     2256.3  (  8.0 1.0)
+NEON vmla.f32 (32bit x2) ns4      :    1.210    17977.7     1123.6  ( 16.0 0.5)
+NEON vfma.f32 (32bit x2) ns4      :        -          -          -       -   -
+NEON vmul.f32 (32bit x4) ns4      :    0.754    28846.4     1802.9  ( 16.0 0.8)
+NEON vadd.f32 (32bit x4) ns4      :    0.603    36046.2     2252.9  ( 16.0 1.0)
+NEON vmla.f32 (32bit x4) ns4      :    1.208    36023.9     1125.7  ( 32.0 0.5)
+NEON vfma.f32 (32bit x4) ns4      :        -          -          -       -   -
+VFP fmuls (32bit x1) n1           :    0.603     9011.4     2252.9  (  4.0 1.0)
+VFP fadds (32bit x1) n1           :    0.602     9026.0     2256.5  (  4.0 1.0)
+VFP fmacs (32bit x1) n1           :    1.812     6002.0      750.2  (  8.0 0.3)
+VFP vfma.f32 (32bit x1) n1        :        -          -          -       -   -
+NEON vmul.f32 (32bit x2) n1       :    0.603    18021.4     2252.7  (  8.0 1.0)
+NEON vadd.f32 (32bit x2) n1       :    0.602    18057.4     2257.2  (  8.0 1.0)
+NEON vmla.f32 (32bit x2) n1       :    1.811    12008.4      750.5  ( 16.0 0.3)
+NEON vfma.f32 (32bit x2) n1       :        -          -          -       -   -
+NEON vmul.f32 (32bit x4) n1       :    0.603    36040.2     2252.5  ( 16.0 1.0)
+NEON vadd.f32 (32bit x4) n1       :    0.602    36119.8     2257.5  ( 16.0 1.0)
+NEON vmla.f32 (32bit x4) n1       :    1.811    24014.1      750.4  ( 32.0 0.3)
+NEON vfma.f32 (32bit x4) n1       :        -          -          -       -   -
+NEON vmul.f32 (32bit x4) n12      :    0.905    36068.9     2254.3  ( 16.0 1.0)
+NEON vadd.f32 (32bit x4) n12      :    0.904    36072.9     2254.6  ( 16.0 1.0)
+NEON vmla.f32 (32bit x4) n12      :    1.000    65253.3     2039.2  ( 32.0 0.9)
+NEON vfma.f32 (32bit x4) n12      :        -          -          -       -   -
+Average                           :    0.843    24039.8     1905.8  ( 13.3 0.8)
+Highest                           :    0.602    65470.0     2257.5  ( 32.0 1.0)
+
+
+* Group 0:  Thread=4  Clock=2.265600 GHz  (mask:f)
+* VFP/NEON (DP fp) multi-thread
+                                      TIME(s)   MFLOPS      MOPS     FOP   IPC
+VFP fmuld (64bit x1) n8           :    0.664     8183.9     2046.0  (  4.0 0.9)
+VFP faddd (64bit x1) n8           :    0.620     8774.8     2193.7  (  4.0 1.0)
+VFP fmacd (64bit x1) n8           :    0.784    13868.3     1733.5  (  8.0 0.8)
+VFP vfma.f64 (64bit x1) n8        :        -          -          -       -   -
+VFP fmuld (64bit x1) ns4          :    0.907     5992.1     1498.0  (  4.0 0.7)
+VFP faddd (64bit x1) ns4          :    0.602     9025.3     2256.3  (  4.0 1.0)
+VFP fmacd (64bit x1) ns4          :    1.509     7208.4      901.0  (  8.0 0.4)
+VFP vfma.f64 (64bit x1) ns4       :        -          -          -       -   -
+VFP fmuld (64bit x1) n1           :    0.606     8975.5     2243.9  (  4.0 1.0)
+VFP faddd (64bit x1) n1           :    0.604     9006.1     2251.5  (  4.0 1.0)
+VFP fmacd (64bit x1) n1           :    1.811     6005.3      750.7  (  8.0 0.3)
+VFP vfma.f64 (64bit x1) n1        :        -          -          -       -   -
+Average                           :    0.901     8560.0     1763.9  (  5.3 0.8)
+Highest                           :    0.602    13868.3     2256.3  (  8.0 1.0)
+
