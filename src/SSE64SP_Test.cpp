@@ -1473,13 +1473,193 @@ static uint64_t AVX512_M_IR12_##name( CounterType LoopCount, float answer ) \
 
 
 
+//-----------------------------------------------------------------------------
+// Single Interleave 12 AVX512 + ymm256
+//-----------------------------------------------------------------------------
+
+#define AVX512_YMM_S_IR12_12(op) \
+			op " %%ymm13, %%ymm12, %%ymm0%{%%k1%}%{z%}\n"		\
+			op " %%ymm12, %%ymm13, %%ymm1%{%%k1%}%{z%}\n"		\
+			op " %%ymm13, %%ymm12, %%ymm2%{%%k1%}%{z%}\n"		\
+			op " %%ymm12, %%ymm13, %%ymm3%{%%k1%}%{z%}\n"		\
+			op " %%ymm13, %%ymm12, %%ymm4%{%%k1%}%{z%}\n"		\
+			op " %%ymm12, %%ymm13, %%ymm5%{%%k1%}%{z%}\n"		\
+			op " %%ymm13, %%ymm12, %%ymm6%{%%k1%}%{z%}\n"		\
+			op " %%ymm12, %%ymm13, %%ymm7%{%%k1%}%{z%}\n"		\
+			op " %%ymm13, %%ymm12, %%ymm8%{%%k1%}%{z%}\n"		\
+			op " %%ymm12, %%ymm13, %%ymm9%{%%k1%}%{z%}\n"		\
+			op " %%ymm13, %%ymm12, %%ymm10%{%%k1%}%{z%}\n"		\
+			op " %%ymm12, %%ymm13, %%ymm11%{%%k1%}%{z%}\n"		\
 
 
+
+#define AVX512_YMM_S_IR12_0(op,name) \
+static uint64_t AVX512_YMM_S_IR12_##name( CounterType LoopCount, float answer ) \
+{ \
+	float	ret0, ret1, ret2, ret3, ret4, ret5, ret6, ret7;	\
+	TimerClass	timer;			\
+	timer.Begin();				\
+	__asm__ __volatile__(		\
+		AVX512_REG_CLEAR()			\
+		"mov		$0xffffffff, %%eax\n"	\
+		"kmovw		%%eax, %%k1\n"	\
+		"mov		$2, %%eax\n"		\
+		"vcvtsi2ss	%%eax, %%xmm30, %%xmm30\n"	\
+		"vshufps	$0, %%xmm30, %%xmm30, %%xmm30\n"	\
+		"vbroadcastss	%%xmm30, %%zmm12\n"	\
+		"mov		$5, %%eax\n"		\
+		"vcvtsi2ss	%%eax, %%xmm30, %%xmm30\n"	\
+		"vshufps	$0, %%xmm30, %%xmm30, %%xmm30\n"	\
+		"vbroadcastss	%%xmm30, %%zmm13\n"	\
+		"mov	%[loop], %%rax\n"	\
+	"1:\n"	\
+		AVX512_YMM_S_IR12_12( op )	\
+		AVX512_YMM_S_IR12_12( op )	\
+		AVX512_YMM_S_IR12_12( op )	\
+		AVX512_YMM_S_IR12_12( op )	\
+		AVX512_YMM_S_IR12_12( op )	\
+		"dec	%%rax\n"	\
+		"jne	1b\n"	 	\
+		"vmovss	%%xmm0, %[o0]\n"	\
+		"vmovss	%%xmm1, %[o1]\n"	\
+		"vmovss	%%xmm2, %[o2]\n"	\
+		"vmovss	%%xmm3, %[o3]\n"	\
+		"vmovss	%%xmm4, %[o4]\n"	\
+		"vmovss	%%xmm5, %[o5]\n"	\
+		"vmovss	%%xmm6, %[o6]\n"	\
+		"vmovss	%%xmm7, %[o7]\n"	\
+	:	[o0]"=m"(ret0),	\
+		[o1]"=m"(ret1),	\
+		[o2]"=m"(ret2),	\
+		[o3]"=m"(ret3),	\
+		[o4]"=m"(ret4),	\
+		[o5]"=m"(ret5),	\
+		[o6]"=m"(ret6),	\
+		[o7]"=m"(ret7)	\
+	: [loop]"r"(LoopCount)	\
+	: "cc","%rax",	\
+		"%zmm0","%zmm1","%zmm2","%zmm3","%zmm4","%zmm5","%zmm6","%zmm7",\
+		"%zmm8","%zmm9","%zmm10","%zmm11","%zmm12","%zmm13","%zmm14","%zmm15",\
+		"%zmm16","%zmm17","%zmm18","%zmm19","%zmm20","%zmm21","%zmm22","%zmm23",\
+		"%zmm24","%zmm25","%zmm26","%zmm27","%zmm28","%zmm29","%zmm30","%zmm31",\
+		"%k1","%k2","%k3","%k4","%k5","%k6","%k7"\
+		); \
+\
+	timer.End();		\
+	timer.Dump( op );	\
+	/*check_result( ret0, answer );*/	\
+	/*check_result( ret1, answer );*/	\
+	/*check_result( ret2, answer );*/	\
+	/*check_result( ret3, answer );*/	\
+	/*check_result( ret4, answer );*/	\
+	/*check_result( ret5, answer );*/	\
+	/*check_result( ret6, answer );*/	\
+	/*check_result( ret7, answer );*/	\
+	return	timer.Result();	\
+}
+
+#define AVX512_YMM_S_IR12(op,name) AVX512_YMM_S_IR12_0(#op,name)
+
+
+
+
+
+//-----------------------------------------------------------------------------
+// Single Interleave 12 MAD AVX512 + ymm256
+//-----------------------------------------------------------------------------
+
+#define AVX512_YMM_M_IR12_12(op1,op2) \
+			op1 " %%ymm13, %%ymm12, %%ymm0%{%%k1%}%{z%}\n"		\
+			op2 " %%ymm13, %%ymm12, %%ymm1%{%%k1%}%{z%}\n"		\
+			op1 " %%ymm13, %%ymm12, %%ymm2%{%%k1%}%{z%}\n"		\
+			op2 " %%ymm13, %%ymm12, %%ymm3%{%%k1%}%{z%}\n"		\
+			op1 " %%ymm13, %%ymm12, %%ymm4%{%%k1%}%{z%}\n"		\
+			op2 " %%ymm13, %%ymm12, %%ymm5%{%%k1%}%{z%}\n"		\
+			op1 " %%ymm13, %%ymm12, %%ymm6%{%%k1%}%{z%}\n"		\
+			op2 " %%ymm13, %%ymm12, %%ymm7%{%%k1%}%{z%}\n"		\
+			op1 " %%ymm13, %%ymm12, %%ymm8%{%%k1%}%{z%}\n"		\
+			op2 " %%ymm13, %%ymm12, %%ymm9%{%%k1%}%{z%}\n"		\
+			op1 " %%ymm13, %%ymm12, %%ymm10%{%%k1%}%{z%}\n"		\
+			op2 " %%ymm13, %%ymm12, %%ymm11%{%%k1%}%{z%}\n"		\
+
+
+#define AVX512_YMM_M_IR12_0(op1,op2,name) \
+static uint64_t AVX512_YMM_M_IR12_##name( CounterType LoopCount, float answer ) \
+{ \
+	float	ret0, ret1, ret2, ret3, ret4, ret5, ret6, ret7;	\
+	TimerClass	timer;			\
+	timer.Begin();				\
+	__asm__ __volatile__(		\
+		AVX512_REG_CLEAR()			\
+		"mov		$0xffffffff, %%eax\n"	\
+		"kmovw		%%eax, %%k1\n"	\
+		"mov		$2, %%eax\n"		\
+		"vcvtsi2ss	%%eax, %%xmm30, %%xmm30\n"	\
+		"vshufps	$0, %%xmm30, %%xmm30, %%xmm30\n"	\
+		"vbroadcastss	%%xmm30, %%zmm12\n"	\
+		"mov		$5, %%eax\n"		\
+		"vcvtsi2ss	%%eax, %%xmm30, %%xmm30\n"	\
+		"vshufps	$0, %%xmm30, %%xmm30, %%xmm30\n"	\
+		"vbroadcastss	%%xmm30, %%zmm13\n"	\
+		"mov	%[loop], %%rax\n"	\
+	"1:\n"	\
+		AVX512_YMM_M_IR12_12( op1, op2)	\
+		AVX512_YMM_M_IR12_12( op1, op2)	\
+		AVX512_YMM_M_IR12_12( op1, op2)	\
+		AVX512_YMM_M_IR12_12( op1, op2)	\
+		AVX512_YMM_M_IR12_12( op1, op2)	\
+		"dec	%%rax\n"	\
+		"jne	1b\n"	 	\
+		"vmovss	%%xmm0, %[o0]\n"	\
+		"vmovss	%%xmm1, %[o1]\n"	\
+		"vmovss	%%xmm2, %[o2]\n"	\
+		"vmovss	%%xmm3, %[o3]\n"	\
+		"vmovss	%%xmm4, %[o4]\n"	\
+		"vmovss	%%xmm5, %[o5]\n"	\
+		"vmovss	%%xmm6, %[o6]\n"	\
+		"vmovss	%%xmm7, %[o7]\n"	\
+	:	[o0]"=m"(ret0),	\
+		[o1]"=m"(ret1),	\
+		[o2]"=m"(ret2),	\
+		[o3]"=m"(ret3),	\
+		[o4]"=m"(ret4),	\
+		[o5]"=m"(ret5),	\
+		[o6]"=m"(ret6),	\
+		[o7]"=m"(ret7)	\
+	: [loop]"r"(LoopCount)	\
+	: "cc","%rax",	\
+		"%zmm0","%zmm1","%zmm2","%zmm3","%zmm4","%zmm5","%zmm6","%zmm7",\
+		"%zmm8","%zmm9","%zmm10","%zmm11","%zmm12","%zmm13","%zmm14","%zmm15",\
+		"%zmm16","%zmm17","%zmm18","%zmm19","%zmm20","%zmm21","%zmm22","%zmm23",\
+		"%zmm24","%zmm25","%zmm26","%zmm27","%zmm28","%zmm29","%zmm30","%zmm31",\
+		"%k1","%k2","%k3","%k4","%k5","%k6","%k7"\
+		); \
+\
+	timer.End();		\
+	timer.Dump( op1 );	\
+	/*check_result( ret0, answer );*/	\
+	/*check_result( ret1, answer );*/	\
+	/*check_result( ret2, answer );*/	\
+	/*check_result( ret3, answer );*/	\
+	/*check_result( ret4, answer );*/	\
+	/*check_result( ret5, answer );*/	\
+	/*check_result( ret6, answer );*/	\
+	/*check_result( ret7, answer );*/	\
+	return	timer.Result();	\
+}
+
+#define AVX512_YMM_M_IR12(op1,op2,name) AVX512_YMM_M_IR12_0(#op1,#op2,name)
+
+
+
+
+
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 #endif
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -1530,6 +1710,10 @@ static const char*	Instruction_Title[]= {
 	"AVX512 vfmaddps (32bit x16) n12",
 	"AVX512 vfma+mps (32bit x16) n12",
 	"AVX512 vfma+aps (32bit x16) n12",
+
+	"AVX512 vmulps (32bit x8) n12",
+	"AVX512 vaddps (32bit x8) n12",
+	"AVX512 vfmaddps (32bit x8) n12",
 };
 
 
@@ -1635,6 +1819,10 @@ FloatTest::FloatTest()
 	SetOp2( RESULT_AVX512_VFMADDPS_IR12,	PER_LOOP_INST_12, 32	);
 	SetOp2f( RESULT_AVX512_FMA_MUL_IR12,	PER_LOOP_INST_12, (32+16)/2.0f	);
 	SetOp2f( RESULT_AVX512_FMA_ADD_IR12,	PER_LOOP_INST_12, (32+16)/2.0f	);
+
+	SetOp2( RESULT_AVX512_YMM_VMULPS_IR12,		PER_LOOP_INST_12, 8	);
+	SetOp2( RESULT_AVX512_YMM_VADDPS_IR12,		PER_LOOP_INST_12, 8	);
+	SetOp2( RESULT_AVX512_YMM_VFMADDPS_IR12,	PER_LOOP_INST_12, 16	);
 }
 
 
@@ -1705,6 +1893,10 @@ AVX512_S_IR12( vaddps,  vaddps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vfmadd231ps,	vfmaddps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vmulps,		vfmaddps_vmulps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vaddps,		vfmaddps_vaddps_ir12 );
+
+AVX512_YMM_S_IR12( vmulps,  vmulps_ir12 );
+AVX512_YMM_S_IR12( vaddps,  vaddps_ir12 );
+AVX512_YMM_M_IR12( vfmadd231ps,  vfmadd231ps,	vfmaddps_ir12 );
 #endif
 
 
@@ -1912,10 +2104,21 @@ return;
 		SetResult( RESULT_AVX512_FMA_ADD_IR12,	AVX512_M_IR12_vfmaddps_vaddps_ir12( Loop, 0.0f		) );
 		Progress++;
 
+
+
+		SetResult( RESULT_AVX512_YMM_VMULPS_IR12,	AVX512_YMM_S_IR12_vmulps_ir12( Loop, 0.0f		) );
+		Progress++;
+
+		SetResult( RESULT_AVX512_YMM_VADDPS_IR12,	AVX512_YMM_S_IR12_vaddps_ir12( Loop, 0.0f		) );
+		Progress++;
+
+		SetResult( RESULT_AVX512_YMM_VFMADDPS_IR12,	AVX512_YMM_M_IR12_vfmaddps_ir12( Loop, 0.0f		) );
+		Progress++;
+
 	}else
 #endif
 	{
-		Progress+= 5;
+		Progress+= 8;
 	}
 
 	//------------------------------------------------------
