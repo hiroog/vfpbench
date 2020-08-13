@@ -163,6 +163,7 @@ task= tool.addScriptTask( env, 'push', PushLog )
 def ListLog( task ):
     log_list= os.listdir( 'log' )
     import re
+    import urllib.parse
     plist= [
             re.compile( r'^SingleThread\s+HP\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^SingleThread\s+SP\s+max:\s+([0-9.-]+)' ),
@@ -186,14 +187,15 @@ def ListLog( task ):
                             score.append( float(flops) )
                         break
         name,_= os.path.splitext( log )
-        device_list.append( (name,score) )
+        device_list.append( (name,score,log) )
     device_list_sp= sorted( device_list, key=lambda a: a[1][4], reverse=True )
     if task.table:
         print( '^ Device  ^  Single Thread                     ^^^  Multi Thread                   ^^^' )
         print( '^ :::     ^  Half-p    ^   Single-p  ^  Double-p  ^  Half-p   ^  Single-p  ^  Double-p  ^' )
-    for name,sc in device_list_sp:
+    for name,sc,log in device_list_sp:
         if task.table:
-            line= '| %-70s  |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |' % (name[:70], sc[0], sc[1], sc[2], sc[3], sc[4], sc[5])
+            url= 'https://github.com/hiroog/vfpbench/blob/master/log/' + urllib.parse.quote( log )
+            line= '| [[%s|%-70s]]  |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |' % (url,name[:70], sc[0], sc[1], sc[2], sc[3], sc[4], sc[5])
             print( line.replace( '0.000', '--' ) )
         else:
             print( '%-50s  %8.3f %8.3f %8.3f  %8.3f %8.3f %8.3f' % (name[:50], sc[0], sc[1], sc[2], sc[3], sc[4], sc[5]) )

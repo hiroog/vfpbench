@@ -22,3 +22,4 @@ run_bench.py
 .DS_Store
 ppo
 .processor_name
+table.txt
