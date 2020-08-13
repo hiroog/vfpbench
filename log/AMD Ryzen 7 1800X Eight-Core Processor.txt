@@ -1,3 +1,4 @@
+Date: 20200624 215250
 ARCH: x64 (x86_64)
 FPU : SSE SSE2 SSSE3 SSE4.1 SSE4.2 AVX AVX2 FMA3 F16C
 Name: AMD Ryzen 7 1800X Eight-Core Processor         

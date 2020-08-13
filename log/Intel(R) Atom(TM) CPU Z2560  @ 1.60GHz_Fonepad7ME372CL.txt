@@ -1,3 +1,4 @@
+Date: 20200809 223051
 ARCH: x86
 FPU : SSE SSE2 SSSE3
 Name: Intel(R) Atom(TM) CPU Z2560  @ 1.60GHz

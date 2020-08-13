@@ -148,7 +148,8 @@ def PushLog( task ):
                 name= fp.read().strip()
     if not os.path.exists( 'log' ):
         os.mkdir( 'log' )
-    file_name= os.path.join( 'log', '%s_%s.txt' % (name, fdate) )
+    #file_name= os.path.join( 'log', '%s_%s.txt' % (name, fdate) )
+    file_name= os.path.join( 'log', '%s.txt' % name )
     import shutil
     shutil.copy( src_file, file_name )
     print( file_name )
@@ -169,7 +170,6 @@ def ListLog( task ):
             re.compile( r'^MultiThread\s+SP\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^MultiThread\s+DP\s+max:\s+([0-9.-]+)' ),
         ]
-    name_pat= re.compile( r'(.*)_[0-9]+_[0-9]+\.txt' )
     device_list= []
     for log in log_list:
         score= []
@@ -184,13 +184,42 @@ def ListLog( task ):
                         else:
                             score.append( float(flops) )
                         break
-        pat= name_pat.search( log )
-        name= pat.group(1)
+        name,_= os.path.splitext( log )
         device_list.append( (name,score) )
     device_list_sp= sorted( device_list, key=lambda a: a[1][4], reverse=True )
     for name,sc in device_list_sp:
         print( '%-50s  %8.3f %8.3f %8.3f  %8.3f %8.3f %8.3f' % (name[:50], sc[0], sc[1], sc[2], sc[3], sc[4], sc[5]) )
 
 task= tool.addScriptTask( env, 'list', ListLog )
+
+
+#------------------------------------------------------------------------------
+class Converter:
+    def __init__( self ):
+        import re
+        self.date_pat= re.compile( r'(.+)_([0-9]+)_([0-9]+)\.txt' )
+
+    def convet_filename_to_header( self, root, file_name ):
+        pat= self.date_pat.search( file_name );
+        if pat is None:
+            print( 'ERROR', file_name )
+            return
+        fname= pat.group( 1 )
+        fdate= pat.group( 2 )
+        ftime= pat.group( 3 )
+        full_path= os.path.join( root, file_name )
+        new_name= os.path.join( 'tlog', fname + '.txt' )
+        with open( full_path, 'r' ) as fi:
+            with open( new_name, 'w' ) as fo:
+                fo.write( 'Date: %s %s\n' % (fdate,ftime) )
+                for line in fi:
+                    fo.write( line )
+
+    def walk( self ):
+        for root,dirs,files in os.walk( 'log' ):
+            for file_name in files:
+                self.convet_filename_to_header( root, file_name )
+
+
 
 

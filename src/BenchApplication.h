@@ -15,6 +15,7 @@ class BenchApplication {
 private:
 
 	flatlib::util::FixedArray<ResultData>	DataArray;
+	char	DateTimeStr[24];
 
 public:
 	static void	save_size( flatlib::util::BinaryBuffer32& buffer, const void* ptr, unsigned int size );
@@ -51,6 +52,7 @@ public:
 	}
 
 	void	UpdateResult( unsigned int btype, ITestBase* bench );
+	void	UpdateTimestamp();
 
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------

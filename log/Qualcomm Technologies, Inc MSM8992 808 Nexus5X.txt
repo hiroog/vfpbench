@@ -1,3 +1,4 @@
+Date: 20200810 133340
 ARCH: ARMv8A AArch64
 FPU : ASIMD(AArch64 NEON)
 Name: Qualcomm Technologies, Inc MSM8992 808 Nexus5X

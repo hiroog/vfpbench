@@ -57,6 +57,14 @@ namespace {
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
+struct ArraySize {
+	template<size_t N>
+	constexpr static size_t	GetArraySize( const char (&data)[N] )
+	{
+		return	N;
+	}
+};
+
 const char*	SkipSpace( const char* ptr )
 {
 	for(; *ptr && *ptr <= ' ' ; ptr++ );
@@ -333,6 +341,9 @@ void	BenchApplication::ExportData( util::BinaryBuffer32& buffer, const ResultDat
 void	BenchApplication::ExportLog( util::BinaryBuffer32& buffer ) const
 {
 	util::BinaryBuffer32	info;
+	if( *DateTimeStr ){
+		print( buffer, "Date: %s\n", DateTimeStr );
+	}
 	ExportCPUInfo( info );
 	ExportFlops( info );
 	save_size( buffer, info.GetTop(), info.GetSize() );
@@ -390,6 +401,8 @@ void	BenchApplication::LoadFile( const char* file_name )
 			continue;
 		}
 		if( *ptr == 'T' ){
+			ptr= GetWord( word_buffer, WORD_BUFFER_SIZE, ptr );
+			ptr= GetWord( DateTimeStr, ArraySize::GetArraySize( DateTimeStr )-2, ptr );
 			continue;
 		}
 		if( *ptr == 'D' ){
@@ -448,9 +461,9 @@ void	BenchApplication::SaveData( util::BinaryBuffer32& buffer, const ResultData&
 void	BenchApplication::SaveFile( const char* file_name ) const
 {
 	util::BinaryBuffer32	buffer;
-	SystemTime	time;
-	GetLocalTime( time );
-	print( buffer, "T \"%04d%02d%02d %02d%02d%02d\"\n", time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second );
+	if( *DateTimeStr ){
+		print( buffer, "T \"%s\"\n", DateTimeStr );
+	}
 
 	unsigned int	bcount= GetDataCount();
 	for( unsigned int bi= 0 ; bi< bcount ; bi++ ){
@@ -470,6 +483,7 @@ void	BenchApplication::SaveFile( const char* file_name ) const
 
 BenchApplication::BenchApplication()
 {
+	*DateTimeStr= '\0';
 }
 
 
@@ -573,6 +587,15 @@ void BenchApplication::UpdateResult( unsigned int btype, ITestBase* bench )
 	data.UpdateEnd();
 }
 
+
+void	BenchApplication::UpdateTimestamp()
+{
+	SystemTime	time;
+	GetLocalTime( time );
+	size_t	length= ArraySize::GetArraySize( DateTimeStr );
+	snprintf( DateTimeStr, length-2, "%04d%02d%02d %02d%02d%02d", time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second );
+	DateTimeStr[length-1]= '\0';
+}
 
 
 

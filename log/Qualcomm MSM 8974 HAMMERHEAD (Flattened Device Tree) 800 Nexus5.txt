@@ -1,3 +1,4 @@
+Date: 20200810 141527
 ARCH: ARMv7A
 FPU : VFPv4-D32 NEON
 Name: Qualcomm MSM 8974 HAMMERHEAD (Flattened Device Tree) 800 Nexus5

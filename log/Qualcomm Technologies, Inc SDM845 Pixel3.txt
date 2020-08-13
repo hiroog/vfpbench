@@ -1,3 +1,4 @@
+Date: 20200808 162535
 ARCH: ARMv8.2A AArch64
 FPU : ASIMD(AArch64 NEON) FPHP ASIMDHP
 Name: Qualcomm Technologies, Inc SDM845 Pixel3

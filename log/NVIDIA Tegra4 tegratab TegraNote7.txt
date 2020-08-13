@@ -1,3 +1,4 @@
+Date: 20200808 133407
 ARCH: ARMv7A
 FPU : VFPv4-D32 NEON
 Name: Tegra4 tegratab TegraNote7

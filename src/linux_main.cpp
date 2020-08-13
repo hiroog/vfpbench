@@ -127,6 +127,7 @@ public:
 	{
 		PrintInfo();
 		RunBenchmark_All( btype );
+		App.UpdateTimestamp();
 		App.SaveFile( ".save.log" );
 
 		if( log_file ){

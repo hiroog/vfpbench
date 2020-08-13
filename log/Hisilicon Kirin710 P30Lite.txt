@@ -1,3 +1,4 @@
+Date: 20200808 171553
 ARCH: ARMv8A AArch64
 FPU : ASIMD(AArch64 NEON)
 Name: Hisilicon Kirin710 P30Lite
