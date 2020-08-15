@@ -36,7 +36,7 @@ public:
 	~AppModule()
 	{
 	}
-	void	Init( float loop_scale )
+	void	Init( float loop_scale, const char* save_file= ".save.log" )
 	{
 		Info.Init();
 		auto	bcount= BenchmarkInstance.GetBenchCount();
@@ -45,7 +45,7 @@ public:
 			App.InitData( bi, BenchmarkInstance.GetBenchmark( bi ) );
 		}
 		BenchmarkInstance.UpdateLoop( loop_scale );
-		App.LoadFile( ".save.log" );
+		App.LoadFile( save_file );
 	}
 	void	PrintInfo()
 	{
@@ -163,7 +163,7 @@ static void usage()
 		"usage: vfpbench [options]\n"
 		" -l                  List benchmark tests\n"
 		" -i                  Display system info\n"
-		" -r                  Show last results\n"
+		" -r[<savefile>]      Show last results\n"
 		" -b<bench_index>     Select benchmark test 0..n (1000=all)\n"
 		" -c<loop_scale>      Loop count scale (default 1.0)\n"
 		" --log <log_file>    Log filename (default 'output_log.txt')\n"
@@ -180,6 +180,7 @@ int main( int argc, char** argv )
 		float	loop_scale= 1.0f;
 		unsigned int	btype= BTYPE_ALL;
 		const char*		log_file= "output_log.txt";
+		const char*		save_file= ".save.log";
 		bool			list_mode= false;
 		unsigned int	info_mode= INFO_BENCH;
 		for(; --argc ;){
@@ -195,6 +196,9 @@ int main( int argc, char** argv )
 				case 'r':
 					info_mode= INFO_LOG;
 					list_mode= true;
+					if( (*argv)[2] ){
+						save_file= *argv+2;
+					}
 					break;
 				case 'b':
 					btype= atoi( *argv + 2 );
@@ -232,7 +236,7 @@ int main( int argc, char** argv )
 
 		{
 			AppModule	app;
-			app.Init( loop_scale );
+			app.Init( loop_scale, save_file );
 			if( list_mode ){
 				app.List( info_mode );
 			}else{

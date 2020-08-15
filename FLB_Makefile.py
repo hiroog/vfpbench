@@ -121,6 +121,21 @@ tool.addNamedTask( env, 'debug', task_list )
 
 def BenchRun( task ):
     import  subprocess
+    if os.path.exists( '.save.log' ):
+        if not os.path.exists( 'save' ):
+            os.mkdir( 'save' )
+        import  re
+        date_pat= re.compile( r'^T\s+"([0-9]+)\s+([0-9]+)"$' )
+        nnmae= 'save0.log'
+        with open( '.save.log', 'r' ) as fi:
+            for line in fi:
+                pat= date_pat.search( line )
+                if pat is not None:
+                    fdate= pat.group( 1 )
+                    ftime= pat.group( 2 )
+                    nname= 'save_%s_%s.log' % (fdate, ftime)
+                    break
+        os.rename( '.save.log', os.path.join( 'save', nname ) )
     if os.path.exists( 'vfpbench' ):
         proc= subprocess.Popen( ['./vfpbench'] )
         proc.wait()
