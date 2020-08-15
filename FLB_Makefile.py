@@ -158,10 +158,9 @@ def PushLog( task ):
             pat= name_pat.search( line )
             if pat is not None:
                 name= pat.group(1).strip()
-    if name is None or name == '':
-        if os.path.exists( '.processor_name' ):
-            with open( '.processor_name', 'r' ) as fp:
-                name= fp.read().strip()
+    if os.path.exists( '.processor_name' ):
+        with open( '.processor_name', 'r' ) as fp:
+            name= fp.read().strip()
     if not os.path.exists( 'log' ):
         os.mkdir( 'log' )
     #file_name= os.path.join( 'log', '%s_%s.txt' % (name, fdate) )
