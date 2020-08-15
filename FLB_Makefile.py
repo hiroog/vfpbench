@@ -187,9 +187,14 @@ def ListLog( task ):
             re.compile( r'^MultiThread\s+SP\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^MultiThread\s+DP\s+max:\s+([0-9.-]+)' ),
         ]
+    thread_pat= re.compile( r'^CPU\s+Thread:\s+([0-9]+)' )
+    core_pat=   re.compile( r'^CPU\s+Core\s+:\s+([0-9]+)' )
+    clock_pat=  re.compile( r'^\s+Group\s+[0-9]+\s*:.*Clock=\s*([0-9.-]+)\s*GHz' )
     device_list= []
     for log in log_list:
         score= []
+        min_clock= 1e30
+        max_clock= 0
         with open( os.path.join( 'log', log ), 'r' ) as fi:
             for line in fi:
                 for p in plist:
@@ -201,19 +206,32 @@ def ListLog( task ):
                         else:
                             score.append( float(flops) )
                         break
+                pat= thread_pat.search( line )
+                if pat is not None:
+                    cpu_thread= int(pat.group(1))
+                pat= core_pat.search( line )
+                if pat is not None:
+                    cpu_core= int(pat.group(1))
+                pat= clock_pat.search( line )
+                if pat is not None:
+                    cpu_clock= float(pat.group(1))
+                    if cpu_clock < min_clock:
+                        min_clock= cpu_clock
+                    if cpu_clock > max_clock:
+                        max_clock= cpu_clock
         name,_= os.path.splitext( log )
-        device_list.append( (name,score,log) )
+        device_list.append( (name,score,log,cpu_thread,cpu_core,min_clock,max_clock) )
     device_list_sp= sorted( device_list, key=lambda a: a[1][4], reverse=True )
     if task.table:
-        print( '^ Device  ^  Single Thread                     ^^^  Multi Thread                   ^^^' )
-        print( '^ :::     ^  Half-p    ^   Single-p  ^  Double-p  ^  Half-p   ^  Single-p  ^  Double-p  ^' )
-    for name,sc,log in device_list_sp:
+        print( '^ Device  ^ Clock ^ Thread ^  Single Thread                      ^^^  Multi Thread                     ^^^' )
+        print( '^ :::     ^ :::   ^ :::    ^  Half-p    ^   Single-p  ^  Double-p  ^  Half-p   ^  Single-p  ^  Double-p  ^' )
+    for name,sc,log,core,thread,mic,mac in device_list_sp:
         if task.table:
             url= 'https://github.com/hiroog/vfpbench/blob/master/log/' + urllib.parse.quote( log )
-            line= '| [[%s|%-70s]]  |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |' % (url,name[:70], sc[0], sc[1], sc[2], sc[3], sc[4], sc[5])
+            line= '| [[%s|%-70s]]  |  %5.3f GHz |  %d/%d |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |' % (url,name[:70], mac, thread, core, sc[0], sc[1], sc[2], sc[3], sc[4], sc[5])
             print( line.replace( '0.000', '--' ) )
         else:
-            print( '%-50s  %8.3f %8.3f %8.3f  %8.3f %8.3f %8.3f' % (name[:50], sc[0], sc[1], sc[2], sc[3], sc[4], sc[5]) )
+            print( '%-50s  %5.3f %2d/%2d %8.3f %8.3f %8.3f  %8.3f %8.3f %8.3f' % (name[:50], mac, thread, core, sc[0], sc[1], sc[2], sc[3], sc[4], sc[5]) )
 
 task= tool.addScriptTask( env, 'list', ListLog )
 task.table= False
