@@ -12,14 +12,14 @@ namespace flatlib {
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-namespace util {
+namespace ut {
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-
-template<typename SizeType= size_t, typename AFunc= DefaultAllocator<unsigned char,64>>
 class BinaryBuffer {
 private:
+	typedef DefaultAllocator<unsigned char,64>	AFunc;
+	typedef size_t	SizeType;
 	unsigned char*	AllocBuffer;
 	SizeType		Pointer;
 	SizeType		AllocSize;
@@ -95,9 +95,6 @@ public:
 		}
 	}
 };
-
-
-typedef BinaryBuffer<uint32_t>	BinaryBuffer32;
 
 
 //-----------------------------------------------------------------------------

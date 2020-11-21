@@ -10,7 +10,7 @@ namespace flatlib {
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-class ConsoleIO {
+class ConsoleLog {
 public:
 	static void Output( const char* msg );
 	static void Format( const char* format, va_list args );
@@ -23,10 +23,10 @@ public:
 //-----------------------------------------------------------------------------
 }
 
-#define	FL_OUTPUT	::flatlib::ConsoleIO::Output
-#define	FL_ERROR	::flatlib::ConsoleIO::Error
-#define	FL_LOG		::flatlib::ConsoleIO::Log
-#define	FL_PRINT	::flatlib::ConsoleIO::Print
+#define	FL_OUTPUT	::flatlib::ConsoleLog::Output
+#define	FL_ERROR	::flatlib::ConsoleLog::Error
+#define	FL_LOG		::flatlib::ConsoleLog::Log
+#define	FL_PRINT	::flatlib::ConsoleLog::Print
 
 #endif
 

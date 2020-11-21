@@ -14,8 +14,8 @@ template<typename T>
 class MultiAdapter : public ITestBase {
 public:
 private:
-	flatlib::util::FixedArray<T>	InstanceArray;
-	flatlib::util::FixedArrayPOD<flatlib::thread::ThreadFunctionBase*>	ThreadArray;
+	flatlib::ut::FixedArray<T>	InstanceArray;
+	flatlib::ut::FixedArrayPOD<flatlib::thread::ThreadFunctionBase*>	ThreadArray;
 public:
 
 	MultiAdapter( unsigned int group ) : ITestBase( true, group )

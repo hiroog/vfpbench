@@ -2,7 +2,7 @@
 // vim:ts=4 sw=4 noet:
 
 #include	"SystemAPI.h"
-#include	"ConsoleIO.h"
+#include	"ConsoleLog.h"
 #include	"Assert.h"
 
 #if flOS_UNIX

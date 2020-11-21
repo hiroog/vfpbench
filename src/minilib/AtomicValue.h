@@ -5,7 +5,6 @@
 #define	FLATLIB_THREAD_THREADATOMIC_H_
 
 #include	<minilib/Platform.h>
-//#include	<minilib/ConsoleIO.h>
 #include	<atomic>
 
 
@@ -18,15 +17,15 @@ namespace thread {
 //-----------------------------------------------------------------------------
 
 template<typename T>
-class Atomic {
+class AtomicValue {
 	std::atomic<T>	Value;
 	static const std::memory_order	DEFAULT_MEMORY_ORDER_LD= std::memory_order_seq_cst;
 	static const std::memory_order	DEFAULT_MEMORY_ORDER_ST= std::memory_order_seq_cst;
 public:
-	Atomic() : Value( 0 )
+	AtomicValue() : Value( 0 )
 	{
 	}
-	Atomic( T value ) : Value( value )
+	AtomicValue( T value ) : Value( value )
 	{
 	}
 	void	Increment()
@@ -47,7 +46,6 @@ public:
 	}
 	T	operator++( int )
 	{
-		//FL_LOG( "Step=%d\n", Value.load( DEFAULT_MEMORY_ORDER_LD ) );
 		return	Value++;
 	}
 	T	operator+=( T value )

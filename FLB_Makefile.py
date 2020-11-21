@@ -38,9 +38,9 @@ src_list= [
         'src/minilib/Matrix4.cpp',
         'src/minilib/Math.cpp',
         'src/minilib/SystemInfo.cpp',
-        'src/minilib/ConsoleIO.cpp',
+        'src/minilib/ConsoleLog.cpp',
         'src/minilib/PlatformString.cpp',
-        'src/minilib/SystemTime.cpp',
+        'src/minilib/DateTime.cpp',
     ]
 
 #        'src/MatrixTest_SSESP.cpp',

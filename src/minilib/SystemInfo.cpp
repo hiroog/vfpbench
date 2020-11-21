@@ -6,7 +6,7 @@
 #include	"ThreadFunction.h"
 #include	"FixedArray.h"
 #include	"SystemAPI.h"
-#include	"ThreadAtomic.h"
+#include	"AtomicValue.h"
 #include	"Matrix4.h"
 
 #if flOS_LINUX
@@ -251,8 +251,8 @@ void SystemInfo::DecodeCpuTopology()
 	}
 	time::TickTime	tick_time;
 	auto	start_time= tick_time.GetUS();
-	thread::Atomic<unsigned int>	ExitFlag( 0 );
-	util::FixedArrayPOD<thread::ThreadFunctionBase*>	ThreadArray( present );
+	thread::AtomicValue<unsigned int>	ExitFlag( 0 );
+	ut::FixedArrayPOD<thread::ThreadFunctionBase*>	ThreadArray( present );
 	for( unsigned int ti= 0 ; ti< present ; ti++ ){
 		auto*	thread= thread::CreateThreadFunction( [&ExitFlag](){
 					for(; ExitFlag.Get() == 0 ;){

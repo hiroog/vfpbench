@@ -17,7 +17,7 @@
 
 class BenchmarkTestBase {
 public:
-	flatlib::util::FixedArrayPOD<ITestBase*>	BenchArray;
+	flatlib::ut::FixedArrayPOD<ITestBase*>	BenchArray;
 	unsigned int	BenchIndex= 0;
 private:
 	void	Quit();

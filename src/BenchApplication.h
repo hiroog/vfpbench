@@ -14,22 +14,22 @@ class ITestBase;
 class BenchApplication {
 private:
 
-	flatlib::util::FixedArray<ResultData>	DataArray;
+	flatlib::ut::FixedArray<ResultData>	DataArray;
 	char	DateTimeStr[24];
 
 public:
-	static void	save_size( flatlib::util::BinaryBuffer32& buffer, const void* ptr, unsigned int size );
-	static void	save_line( flatlib::util::BinaryBuffer32& buffer, const char* ptr );
-	static void	save_format( flatlib::util::BinaryBuffer32& buffer, const char* format, va_list arg );
-	static void	print( flatlib::util::BinaryBuffer32& buffer, const char* format ... );
+	static void	save_size( flatlib::ut::BinaryBuffer& buffer, const void* ptr, unsigned int size );
+	static void	save_line( flatlib::ut::BinaryBuffer& buffer, const char* ptr );
+	static void	save_format( flatlib::ut::BinaryBuffer& buffer, const char* format, va_list arg );
+	static void	print( flatlib::ut::BinaryBuffer& buffer, const char* format ... );
 
 private:
-	static void	ExportLine( flatlib::util::BinaryBuffer32& buffer, const ResultLine& line );
-	static void	ExportData( flatlib::util::BinaryBuffer32& buffer, const ResultData& data );
+	static void	ExportLine( flatlib::ut::BinaryBuffer& buffer, const ResultLine& line );
+	static void	ExportData( flatlib::ut::BinaryBuffer& buffer, const ResultData& data );
 
 	void	LoadLine( ResultLine& line, const char* ptr );
-	void	SaveLine( flatlib::util::BinaryBuffer32& buffer, const ResultLine& line ) const;
-	void	SaveData( flatlib::util::BinaryBuffer32& buffer, const ResultData& data ) const;
+	void	SaveLine( flatlib::ut::BinaryBuffer& buffer, const ResultLine& line ) const;
+	void	SaveData( flatlib::ut::BinaryBuffer& buffer, const ResultData& data ) const;
 public:
 
 	BenchApplication();
@@ -57,9 +57,9 @@ public:
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------
 
-	void	ExportCPUInfo( flatlib::util::BinaryBuffer32& buffer ) const;
-	void	ExportFlops( flatlib::util::BinaryBuffer32& buffer ) const;
-	void	ExportLog( flatlib::util::BinaryBuffer32& buffer ) const;
+	void	ExportCPUInfo( flatlib::ut::BinaryBuffer& buffer ) const;
+	void	ExportFlops( flatlib::ut::BinaryBuffer& buffer ) const;
+	void	ExportLog( flatlib::ut::BinaryBuffer& buffer ) const;
 
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------

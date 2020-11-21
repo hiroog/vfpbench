@@ -2,7 +2,7 @@
 // vim:ts=4 sw=4 noet:
 
 #include	"CoreLib.h"
-#include	"ConsoleIO.h"
+#include	"ConsoleLog.h"
 #include	<stdio.h>
 
 #if flOS_ANDROID
@@ -13,7 +13,7 @@ namespace flatlib {
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-void ConsoleIO::Output( const char* msg )
+void ConsoleLog::Output( const char* msg )
 {
 #if flOS_ANDROID
 	__android_log_write( ANDROID_LOG_INFO, "vfpbench", msg );
@@ -22,7 +22,7 @@ void ConsoleIO::Output( const char* msg )
 #endif
 }
 
-void ConsoleIO::Format( const char* format, va_list args )
+void ConsoleLog::Format( const char* format, va_list args )
 {
 #if flOS_ANDROID
 	__android_log_vprint( ANDROID_LOG_INFO, "vfpbench", format, args );
@@ -31,7 +31,7 @@ void ConsoleIO::Format( const char* format, va_list args )
 #endif
 }
 
-void ConsoleIO::Log( const char* format ... )
+void ConsoleLog::Log( const char* format ... )
 {
 	if( flDEBUG ){
 		va_list	ap;
@@ -41,7 +41,7 @@ void ConsoleIO::Log( const char* format ... )
 	}
 }
 
-void ConsoleIO::Error( const char* format ... )
+void ConsoleLog::Error( const char* format ... )
 {
 	va_list	ap;
 	va_start( ap, format );
@@ -49,7 +49,7 @@ void ConsoleIO::Error( const char* format ... )
 	va_end( ap );
 }
 
-void ConsoleIO::Print( const char* format ... )
+void ConsoleLog::Print( const char* format ... )
 {
 	va_list	ap;
 	va_start( ap, format );

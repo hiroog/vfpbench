@@ -3,7 +3,7 @@
 
 #include	<minilib/CoreLib.h>
 #include	<minilib/SystemInfo.h>
-#include	<minilib/SystemTime.h>
+#include	<minilib/DateTime.h>
 #include	"BenchApplication.h"
 #include	"TestBase.h"
 #include	<stdio.h>
@@ -16,14 +16,14 @@ using namespace flatlib;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-void	BenchApplication::save_size( util::BinaryBuffer32& buffer, const void* ptr, unsigned int size )
+void	BenchApplication::save_size( ut::BinaryBuffer& buffer, const void* ptr, unsigned int size )
 {
 	void*	str= buffer.Alloc( size );
 	memcpy( str, ptr, size );
 }
 
 
-void	BenchApplication::save_line( util::BinaryBuffer32& buffer, const char* ptr )
+void	BenchApplication::save_line( ut::BinaryBuffer& buffer, const char* ptr )
 {
 	unsigned int	size= static_cast<unsigned int>(strlen( ptr ));
 	void*	str= buffer.Alloc( size );
@@ -31,7 +31,7 @@ void	BenchApplication::save_line( util::BinaryBuffer32& buffer, const char* ptr 
 }
 
 
-void	BenchApplication::save_format( util::BinaryBuffer32& buffer, const char* format, va_list arg )
+void	BenchApplication::save_format( ut::BinaryBuffer& buffer, const char* format, va_list arg )
 {
 	const int	MAX_BUFFER_PATH= 1024 * 4;
 	char	str_buffer[MAX_BUFFER_PATH];
@@ -40,7 +40,7 @@ void	BenchApplication::save_format( util::BinaryBuffer32& buffer, const char* fo
 }
 
 
-void	BenchApplication::print( util::BinaryBuffer32& buffer, const char* format ... )
+void	BenchApplication::print( ut::BinaryBuffer& buffer, const char* format ... )
 {
 	va_list	ap;
 	va_start( ap, format );
@@ -92,7 +92,7 @@ const char*	GetWord( char* buffer, size_t buffer_size, const char* ptr )
 	return	ptr;
 }
 
-static void	format_GFLOPS( util::BinaryBuffer32&buffer, const char* text, double flops )
+static void	format_GFLOPS( ut::BinaryBuffer&buffer, const char* text, double flops )
 {
 	if( flops != 0.0 ){
 		BenchApplication::print( buffer, "%s: %8.3f GFLOPS\n", text, flops / 1000.0 );
@@ -106,7 +106,7 @@ static void	format_GFLOPS( util::BinaryBuffer32&buffer, const char* text, double
 }
 
 
-void BenchApplication::ExportCPUInfo( util::BinaryBuffer32& buffer ) const
+void BenchApplication::ExportCPUInfo( ut::BinaryBuffer& buffer ) const
 {
 	auto	arch= Info.GetArch();
 
@@ -257,7 +257,7 @@ void BenchApplication::ExportCPUInfo( util::BinaryBuffer32& buffer ) const
 }
 
 
-void BenchApplication::ExportFlops( util::BinaryBuffer32& buffer ) const
+void BenchApplication::ExportFlops( ut::BinaryBuffer& buffer ) const
 {
 	print( buffer, "\nTotal:\n" );
 	format_GFLOPS( buffer, "SingleThread HP max", GetMaxMFLOPS( LOOPTYPE_HP, false ) );
@@ -285,7 +285,7 @@ void BenchApplication::ExportFlops( util::BinaryBuffer32& buffer ) const
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-void	BenchApplication::ExportLine( util::BinaryBuffer32& buffer, const ResultLine& line )
+void	BenchApplication::ExportLine( ut::BinaryBuffer& buffer, const ResultLine& line )
 {
 	if( line.IsActive() ){
 #if USE_MAX_EXPORT
@@ -318,7 +318,7 @@ void	BenchApplication::ExportLine( util::BinaryBuffer32& buffer, const ResultLin
 }
 
 
-void	BenchApplication::ExportData( util::BinaryBuffer32& buffer, const ResultData& data )
+void	BenchApplication::ExportData( ut::BinaryBuffer& buffer, const ResultData& data )
 {
 	unsigned int	count= data.GetSize();
 	unsigned int	group= data.GetCoreGroup();
@@ -338,9 +338,9 @@ void	BenchApplication::ExportData( util::BinaryBuffer32& buffer, const ResultDat
 
 
 
-void	BenchApplication::ExportLog( util::BinaryBuffer32& buffer ) const
+void	BenchApplication::ExportLog( ut::BinaryBuffer& buffer ) const
 {
-	util::BinaryBuffer32	info;
+	ut::BinaryBuffer	info;
 	if( *DateTimeStr ){
 		print( buffer, "Date: %s\n", DateTimeStr );
 	}
@@ -434,7 +434,7 @@ void	BenchApplication::LoadFile( const char* file_name )
 	fclose( fp );
 }
 
-void	BenchApplication::SaveLine( util::BinaryBuffer32& buffer, const ResultLine& line ) const
+void	BenchApplication::SaveLine( ut::BinaryBuffer& buffer, const ResultLine& line ) const
 {
 	print( buffer, "L \"%s\" %f %f %f %f %f %f\n",
 			line.Title,
@@ -447,7 +447,7 @@ void	BenchApplication::SaveLine( util::BinaryBuffer32& buffer, const ResultLine&
 		);
 }
 
-void	BenchApplication::SaveData( util::BinaryBuffer32& buffer, const ResultData& data ) const
+void	BenchApplication::SaveData( ut::BinaryBuffer& buffer, const ResultData& data ) const
 {
 	unsigned int	count= data.GetSize();
 	unsigned int	group= data.GetCoreGroup();
@@ -460,7 +460,7 @@ void	BenchApplication::SaveData( util::BinaryBuffer32& buffer, const ResultData&
 
 void	BenchApplication::SaveFile( const char* file_name ) const
 {
-	util::BinaryBuffer32	buffer;
+	ut::BinaryBuffer	buffer;
 	if( *DateTimeStr ){
 		print( buffer, "T \"%s\"\n", DateTimeStr );
 	}
@@ -590,8 +590,8 @@ void BenchApplication::UpdateResult( unsigned int btype, ITestBase* bench )
 
 void	BenchApplication::UpdateTimestamp()
 {
-	SystemTime	time;
-	GetLocalTime( time );
+	time::DateTime	time;
+	time::GetLocalTime( time );
 	size_t	length= ArraySize::GetArraySize( DateTimeStr );
 	snprintf( DateTimeStr, length-2, "%04d%02d%02d %02d%02d%02d", time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second );
 	DateTimeStr[length-1]= '\0';

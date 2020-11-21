@@ -4,7 +4,7 @@
 #ifndef	TEST_BASE_H_
 #define	TEST_BASE_H_
 
-#include	<minilib/ThreadAtomic.h>
+#include	<minilib/AtomicValue.h>
 
 enum class InfoType : unsigned int {
 	INFO_COUNT,
@@ -95,8 +95,8 @@ protected:
 	};
 	ResultTable		TestResult[RESULT_BUFFER_MAX];
 
-	flatlib::thread::Atomic<unsigned int>	Progress;
-	flatlib::thread::Atomic<unsigned int>	DoneFlag;
+	flatlib::thread::AtomicValue<unsigned int>	Progress;
+	flatlib::thread::AtomicValue<unsigned int>	DoneFlag;
 	unsigned int			LoopCount;
 protected:
 	void	SetOp( unsigned int index, unsigned int lop, unsigned int fop );

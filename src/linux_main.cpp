@@ -49,21 +49,21 @@ public:
 	}
 	void	PrintInfo()
 	{
-		util::BinaryBuffer32	buffer;
+		ut::BinaryBuffer	buffer;
 		App.ExportCPUInfo( buffer );
 		*reinterpret_cast<char*>(buffer.Alloc( 1 ))= '\0';
 		FL_PRINT( "%s\n", buffer.GetTop() );
 	}
 	void	PrintLog()
 	{
-		util::BinaryBuffer32	buffer;
+		ut::BinaryBuffer	buffer;
 		App.ExportLog( buffer );
 		*reinterpret_cast<char*>(buffer.Alloc( 1 ))= '\0';
 		FL_OUTPUT( reinterpret_cast<const char*>(buffer.GetTop()) );
 	}
 	void	PrintFlops()
 	{
-		util::BinaryBuffer32	buffer;
+		ut::BinaryBuffer	buffer;
 		App.ExportFlops( buffer );
 		*reinterpret_cast<char*>(buffer.Alloc( 1 ))= '\0';
 		FL_PRINT( "%s\n", buffer.GetTop() );
@@ -131,7 +131,7 @@ public:
 		App.SaveFile( ".save.log" );
 
 		if( log_file ){
-			util::BinaryBuffer32	buffer;
+			ut::BinaryBuffer	buffer;
 			App.ExportLog( buffer );
 
 			FILE*	fp= fopen( log_file, "wb" );

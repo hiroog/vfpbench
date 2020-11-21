@@ -48,7 +48,7 @@ inline constexpr T&& FL_Forward( typename FL_RM_REF<T>::Type&& src )
 //-----------------------------------------------------------------------------
 }
 
-#include	<minilib/ConsoleIO.h>
+#include	<minilib/ConsoleLog.h>
 #include	<minilib/Assert.h>
 #include	<minilib/PlatformString.h>
 

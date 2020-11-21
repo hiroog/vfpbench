@@ -44,7 +44,7 @@ public:
 class ResultData {
 private:
 
-	flatlib::util::FixedArray<ResultLine>	DataList;
+	flatlib::ut::FixedArray<ResultLine>	DataList;
 	unsigned int	UpdatePosition= 0;
 
 	const char*		Title= nullptr;
