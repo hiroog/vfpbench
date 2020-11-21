@@ -4,11 +4,14 @@
 #ifndef	BENCHMARK_TEST_H_
 #define	BENCHMARK_TEST_H_
 
-#include	<minilib/Platform.h>
+#include	<flatlib/core/CoreBase.h>
+//#include	<minilib/Platform.h>
 #include	"ThreadAdapter.h"
 #include	"MultiAdapter.h"
-#include	<minilib/FixedArray.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/ut/FixedArray.h>
+#include	<flatlib/core/system/SystemInfo.h>
+//#include	<minilib/FixedArray.h>
+//#include	<minilib/SystemInfo.h>
 
 #define	USE_MATRIX_TEST		0
 
@@ -17,7 +20,7 @@
 
 class BenchmarkTestBase {
 public:
-	flatlib::ut::FixedArrayPOD<ITestBase*>	BenchArray;
+	flatlib::ut::FixedArray<ITestBase*>	BenchArray;
 	unsigned int	BenchIndex= 0;
 private:
 	void	Quit();
@@ -29,12 +32,12 @@ public:
 	template<typename T>
 	void			AddBenchSingle( unsigned int group )
 	{
-		AddBench( flatlib::memory::New<ThreadAdapter<T>>( group ) );
+		AddBench( FL_MEMORY::New<ThreadAdapter<T>>( group ) );
 	}
 	template<typename T>
 	void			AddBenchMulti( unsigned int group )
 	{
-		AddBench( flatlib::memory::New<MultiAdapter<T>>( group ) );
+		AddBench( FL_MEMORY::New<MultiAdapter<T>>( group ) );
 	}
 	unsigned int	GetBenchCount() const;
 	ITestBase*		GetBenchmark( unsigned int index ) const;

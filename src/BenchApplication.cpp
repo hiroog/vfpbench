@@ -1,10 +1,10 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
-#include	<minilib/DateTime.h>
 #include	"BenchApplication.h"
+#include	<flatlib/core/time/DateTime.h>
+#include	<flatlib/core/system/CoreContext.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TestBase.h"
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -12,18 +12,20 @@
 #define	USE_MAX_EXPORT	0
 
 using namespace flatlib;
+using system::CPUArch;
+using system::CPUFeature;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-
-void	BenchApplication::save_size( ut::BinaryBuffer& buffer, const void* ptr, unsigned int size )
+#if 0
+void	BenchApplication::save_size( text::TextPool& pool, const void* ptr, unsigned int size )
 {
 	void*	str= buffer.Alloc( size );
 	memcpy( str, ptr, size );
 }
 
 
-void	BenchApplication::save_line( ut::BinaryBuffer& buffer, const char* ptr )
+void	BenchApplication::save_line( text::TextPool& pool, const char* ptr )
 {
 	unsigned int	size= static_cast<unsigned int>(strlen( ptr ));
 	void*	str= buffer.Alloc( size );
@@ -31,7 +33,7 @@ void	BenchApplication::save_line( ut::BinaryBuffer& buffer, const char* ptr )
 }
 
 
-void	BenchApplication::save_format( ut::BinaryBuffer& buffer, const char* format, va_list arg )
+void	BenchApplication::save_format( text::TextPool& pool, const char* format, va_list arg )
 {
 	const int	MAX_BUFFER_PATH= 1024 * 4;
 	char	str_buffer[MAX_BUFFER_PATH];
@@ -40,14 +42,14 @@ void	BenchApplication::save_format( ut::BinaryBuffer& buffer, const char* format
 }
 
 
-void	BenchApplication::print( ut::BinaryBuffer& buffer, const char* format ... )
+void	BenchApplication::print( text::TextPool& pool, const char* format ... )
 {
 	va_list	ap;
 	va_start( ap, format );
 	save_format( buffer, format, ap );
 	va_end( ap );
 }
-
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -92,12 +94,12 @@ const char*	GetWord( char* buffer, size_t buffer_size, const char* ptr )
 	return	ptr;
 }
 
-static void	format_GFLOPS( ut::BinaryBuffer&buffer, const char* text, double flops )
+static void	format_GFLOPS( text::TextPool& pool, const char* text, double flops )
 {
 	if( flops != 0.0 ){
-		BenchApplication::print( buffer, "%s: %8.3f GFLOPS\n", text, flops / 1000.0 );
+		pool.AddFormat( "%s: %8.3f GFLOPS\n", text, flops / 1000.0 );
 	}else{
-		BenchApplication::print( buffer, "%s: -\n", text );
+		pool.AddFormat( "%s: -\n", text );
 	}
 }
 
@@ -106,123 +108,124 @@ static void	format_GFLOPS( ut::BinaryBuffer&buffer, const char* text, double flo
 }
 
 
-void BenchApplication::ExportCPUInfo( ut::BinaryBuffer& buffer ) const
+void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 {
-	auto	arch= Info.GetArch();
+	const auto&	Info= system::RCore().RSystemInfo();
+	auto	arch= Info.GetCompiledArch();
 
-	print( buffer, "ARCH: %s\n", Info.GetArchNameLong() );
-	print( buffer, "FPU :" );
+	pool.AddFormat( "ARCH: %s\n", Info.GetArchNameLong( arch ) );
+	pool.AddFormat( "FPU :" );
 
 
 	switch( arch ){
 	case CPUArch::CPU_ARM6:
 	case CPUArch::CPU_ARM7:
 		if( Info.HasInstructionSet( CPUFeature::ARM_VFPV4 ) ){
-			print( buffer, " VFPv4" );
+			pool.AddFormat( " VFPv4" );
 		}else{
-			print( buffer, " VFPv3" );
+			pool.AddFormat( " VFPv3" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::ARM_NEON ) ){
-			print( buffer, "-D32 NEON" );
+			pool.AddFormat( "-D32 NEON" );
 		}else{
-			print( buffer, "-D16" );
+			pool.AddFormat( "-D16" );
 		}
-		print( buffer, "\n" );
+		pool.AddFormat( "\n" );
 		break;
 	case CPUArch::CPU_ARM64:
-		print( buffer, " ASIMD(AArch64 NEON)" );
+		pool.AddFormat( " ASIMD(AArch64 NEON)" );
 		if( Info.HasInstructionSet( CPUFeature::ARM_FPHP ) ){
-			print( buffer, " FPHP" );
+			pool.AddFormat( " FPHP" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::ARM_SIMDHP ) ){
-			print( buffer, " ASIMDHP" );
+			pool.AddFormat( " ASIMDHP" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::ARM_SIMDDP ) ){
-			print( buffer, " DOTPROD" );
+			pool.AddFormat( " DOTPROD" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::ARM_SVE ) ){
-			print( buffer, " SVE" );
+			pool.AddFormat( " SVE" );
 		}
-		print( buffer, "\n" );
+		pool.AddFormat( "\n" );
 		break;
 	case CPUArch::CPU_X86:
 	case CPUArch::CPU_X64:
 		if( Info.HasInstructionSet( CPUFeature::IA_SSE ) ){
-			print( buffer, " SSE" );
+			pool.AddFormat( " SSE" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_SSE2 ) ){
-			print( buffer, " SSE2" );
+			pool.AddFormat( " SSE2" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_SSSE3 ) ){
-			print( buffer, " SSSE3" );
+			pool.AddFormat( " SSSE3" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_SSE41 ) ){
-			print( buffer, " SSE4.1" );
+			pool.AddFormat( " SSE4.1" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_SSE42 ) ){
-			print( buffer, " SSE4.2" );
+			pool.AddFormat( " SSE4.2" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_AVX ) ){
-			print( buffer, " AVX" );
+			pool.AddFormat( " AVX" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_AVX2 ) ){
-			print( buffer, " AVX2" );
+			pool.AddFormat( " AVX2" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
-			print( buffer, " FMA3" );
+			pool.AddFormat( " FMA3" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_FMA4 ) ){
-			print( buffer, " FMA4" );
+			pool.AddFormat( " FMA4" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_F16C ) ){
-			print( buffer, " F16C" );
+			pool.AddFormat( " F16C" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ){
-			print( buffer, " AVX512F" );
+			pool.AddFormat( " AVX512F" );
 			if( Info.HasInstructionSet( CPUFeature::IA_AVX512BW ) ){
-				print( buffer, "/BW" );
+				pool.AddFormat( "/BW" );
 			}
 			if( Info.HasInstructionSet( CPUFeature::IA_AVX512DQ ) ){
-				print( buffer, "/DQ" );
+				pool.AddFormat( "/DQ" );
 			}
 			if( Info.HasInstructionSet( CPUFeature::IA_AVX512VL ) ){
-				print( buffer, "/VL" );
+				pool.AddFormat( "/VL" );
 			}
 			if( Info.HasInstructionSet( CPUFeature::IA_AVX512VNNI ) ){
-				print( buffer, "/VNNI" );
+				pool.AddFormat( "/VNNI" );
 			}
 			if( Info.HasInstructionSet( CPUFeature::IA_AVX512BF16 ) ){
-				print( buffer, "/BF16" );
+				pool.AddFormat( "/BF16" );
 			}
 		}
-		print( buffer, "\n" );
+		pool.AddFormat( "\n" );
 		break;
 	case CPUArch::CPU_MIPS32:
 	case CPUArch::CPU_MIPS64:
 		if( Info.HasInstructionSet( CPUFeature::MIPS_PS ) ){
-			print( buffer, " PS" );
+			pool.AddFormat( " PS" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::MIPS_F64 ) ){
-			print( buffer, " F64" );
+			pool.AddFormat( " F64" );
 		}
 		if( Info.HasInstructionSet( CPUFeature::MIPS_MSA ) ){
-			print( buffer, " MSA" );
+			pool.AddFormat( " MSA" );
 		}
-		print( buffer, "\n" );
+		pool.AddFormat( "\n" );
 		break;
 	default:
-		print( buffer, "\n" );
+		pool.AddFormat( "\n" );
 		break;
 	}
 
-	print( buffer, "Name: %s\n", Info.GetDeviceName() );
-	print( buffer, "CPU Thread: %2d\n", Info.GetTotalThreadCount() );
-	print( buffer, "CPU Core  : %2d\n", Info.GetPhysicalCoreCount() );
-	print( buffer, "CPU Group : %2d\n", Info.GetCoreGroupCount() );
+	pool.AddFormat( "Name: %s\n", Info.GetDeviceName() );
+	pool.AddFormat( "CPU Thread: %2d\n", Info.GetTotalThreadCount() );
+	pool.AddFormat( "CPU Core  : %2d\n", Info.GetPhysicalCoreCount() );
+	pool.AddFormat( "CPU Group : %2d\n", Info.GetCoreGroupCount() );
 	{
 		unsigned int 	group_count= Info.GetCoreGroupCount();
 		for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
-			print( buffer, "  Group %d: Thread=%2d  Clock=%f GHz  (mask:%llx)\n", gi, Info.GetThreadCount( gi ), Info.GetCoreClock( gi )/1000000.0, Info.GetAffinityMask( gi ) );
+			pool.AddFormat( "  Group %d: Thread=%2d  Clock=%f GHz  (mask:%llx)\n", gi, Info.GetThreadCount( gi ), Info.GetCoreClock( gi )/1000000.0, Info.GetAffinityMask( gi ) );
 		}
 	}
 
@@ -231,24 +234,24 @@ void BenchApplication::ExportCPUInfo( ut::BinaryBuffer& buffer ) const
 	case CPUArch::CPU_ARM6:
 	case CPUArch::CPU_ARM7:
 	case CPUArch::CPU_ARM64:
-		print( buffer, "NEON   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_NEON ) ? "yes" : "no" );
-		print( buffer, "FMA    : %s\n", Info.HasInstructionSet( CPUFeature::ARM_VFPV4 ) ? "yes" : "no" );
-		print( buffer, "FPHP   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_FPHP ) ? "yes" : "no" );
-		print( buffer, "SIMDHP : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDHP ) ? "yes" : "no" );
-		print( buffer, "DotProd: %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDDP ) ? "yes" : "no" );
+		pool.AddFormat( "NEON   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_NEON ) ? "yes" : "no" );
+		pool.AddFormat( "FMA    : %s\n", Info.HasInstructionSet( CPUFeature::ARM_VFPV4 ) ? "yes" : "no" );
+		pool.AddFormat( "FPHP   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_FPHP ) ? "yes" : "no" );
+		pool.AddFormat( "SIMDHP : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDHP ) ? "yes" : "no" );
+		pool.AddFormat( "DotProd: %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDDP ) ? "yes" : "no" );
 		break;
 	case CPUArch::CPU_X86:
 	case CPUArch::CPU_X64:
-		print( buffer, "SSE   : %s\n", Info.HasInstructionSet( CPUFeature::IA_SSE2 ) ? "yes" : "no" );
-		print( buffer, "AVX   : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX ) ? "yes" : "no" );
-		print( buffer, "FMA   : %s\n", Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ? "yes" : "no" );
-		print( buffer, "F16C  : %s\n", Info.HasInstructionSet( CPUFeature::IA_F16C ) ? "yes" : "no" );
-		print( buffer, "AVX512: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ? "yes" : "no" );
+		pool.AddFormat( "SSE   : %s\n", Info.HasInstructionSet( CPUFeature::IA_SSE2 ) ? "yes" : "no" );
+		pool.AddFormat( "AVX   : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX ) ? "yes" : "no" );
+		pool.AddFormat( "FMA   : %s\n", Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ? "yes" : "no" );
+		pool.AddFormat( "F16C  : %s\n", Info.HasInstructionSet( CPUFeature::IA_F16C ) ? "yes" : "no" );
+		pool.AddFormat( "AVX512: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ? "yes" : "no" );
 		break;
 	case CPUArch::CPU_MIPS32:
 	case CPUArch::CPU_MIPS64:
-		print( buffer, "FPU-PS: %s\n", Info.HasInstructionSet( CPUFeature::MIPS_PS ) ? "yes" : "no" );
-		print( buffer, "MSA   : %s\n", Info.HasInstructionSet( CPUFeature::MIPS_MSA ) ? "yes" : "no" );
+		pool.AddFormat( "FPU-PS: %s\n", Info.HasInstructionSet( CPUFeature::MIPS_PS ) ? "yes" : "no" );
+		pool.AddFormat( "MSA   : %s\n", Info.HasInstructionSet( CPUFeature::MIPS_MSA ) ? "yes" : "no" );
 		break;
 	default:
 		break;
@@ -257,39 +260,39 @@ void BenchApplication::ExportCPUInfo( ut::BinaryBuffer& buffer ) const
 }
 
 
-void BenchApplication::ExportFlops( ut::BinaryBuffer& buffer ) const
+void BenchApplication::ExportFlops( text::TextPool& pool ) const
 {
-	print( buffer, "\nTotal:\n" );
-	format_GFLOPS( buffer, "SingleThread HP max", GetMaxMFLOPS( LOOPTYPE_HP, false ) );
-	format_GFLOPS( buffer, "SingleThread SP max", GetMaxMFLOPS( LOOPTYPE_SP, false ) );
-	format_GFLOPS( buffer, "SingleThread DP max", GetMaxMFLOPS( LOOPTYPE_DP, false ) );
-	format_GFLOPS( buffer, "MultiThread  HP max", GetTotalMFLOPS( LOOPTYPE_HP, true  ) );
-	format_GFLOPS( buffer, "MultiThread  SP max", GetTotalMFLOPS( LOOPTYPE_SP, true  ) );
-	format_GFLOPS( buffer, "MultiThread  DP max", GetTotalMFLOPS( LOOPTYPE_DP, true  ) );
+	pool.AddFormat( "\nTotal:\n" );
+	format_GFLOPS( pool, "SingleThread HP max", GetMaxMFLOPS( LOOPTYPE_HP, false ) );
+	format_GFLOPS( pool, "SingleThread SP max", GetMaxMFLOPS( LOOPTYPE_SP, false ) );
+	format_GFLOPS( pool, "SingleThread DP max", GetMaxMFLOPS( LOOPTYPE_DP, false ) );
+	format_GFLOPS( pool, "MultiThread  HP max", GetTotalMFLOPS( LOOPTYPE_HP, true  ) );
+	format_GFLOPS( pool, "MultiThread  SP max", GetTotalMFLOPS( LOOPTYPE_SP, true  ) );
+	format_GFLOPS( pool, "MultiThread  DP max", GetTotalMFLOPS( LOOPTYPE_DP, true  ) );
 
-
+	const auto&	Info= system::RCore().RSystemInfo();
 	unsigned int	group_count= Info.GetCoreGroupCount();
 	for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
-		print( buffer, "\nGroup %d:  Thread=%d  Clock=%f GHz  (mask:%llx)\n", gi, Info.GetThreadCount( gi ), Info.GetCoreClock( gi )/1000000.0, Info.GetAffinityMask( gi ) );
-		format_GFLOPS( buffer, "  SingleThread HP max", GetMFLOPS( LOOPTYPE_HP, false, gi ) );
-		format_GFLOPS( buffer, "  SingleThread SP max", GetMFLOPS( LOOPTYPE_SP, false, gi ) );
-		format_GFLOPS( buffer, "  SingleThread DP max", GetMFLOPS( LOOPTYPE_DP, false, gi ) );
-		format_GFLOPS( buffer, "  MultiThread  HP max", GetMFLOPS( LOOPTYPE_HP, true,  gi ) );
-		format_GFLOPS( buffer, "  MultiThread  SP max", GetMFLOPS( LOOPTYPE_SP, true,  gi ) );
-		format_GFLOPS( buffer, "  MultiThread  DP max", GetMFLOPS( LOOPTYPE_DP, true,  gi ) );
+		pool.AddFormat( "\nGroup %d:  Thread=%d  Clock=%f GHz  (mask:%llx)\n", gi, Info.GetThreadCount( gi ), Info.GetCoreClock( gi )/1000000.0, Info.GetAffinityMask( gi ) );
+		format_GFLOPS( pool, "  SingleThread HP max", GetMFLOPS( LOOPTYPE_HP, false, gi ) );
+		format_GFLOPS( pool, "  SingleThread SP max", GetMFLOPS( LOOPTYPE_SP, false, gi ) );
+		format_GFLOPS( pool, "  SingleThread DP max", GetMFLOPS( LOOPTYPE_DP, false, gi ) );
+		format_GFLOPS( pool, "  MultiThread  HP max", GetMFLOPS( LOOPTYPE_HP, true,  gi ) );
+		format_GFLOPS( pool, "  MultiThread  SP max", GetMFLOPS( LOOPTYPE_SP, true,  gi ) );
+		format_GFLOPS( pool, "  MultiThread  DP max", GetMFLOPS( LOOPTYPE_DP, true,  gi ) );
 	}
-	print( buffer, "\n" );
+	pool.AddFormat( "\n" );
 }
 
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-void	BenchApplication::ExportLine( ut::BinaryBuffer& buffer, const ResultLine& line )
+void	BenchApplication::ExportLine( text::TextPool& pool, const ResultLine& line )
 {
 	if( line.IsActive() ){
 #if USE_MAX_EXPORT
-		print( buffer, "%-34s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f) %9.1f\n",
+		pool.AddFormat( "%-34s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f) %9.1f\n",
 				line.Title,
 				line.Time,
 				line.Flops,
@@ -299,7 +302,7 @@ void	BenchApplication::ExportLine( ut::BinaryBuffer& buffer, const ResultLine& l
 				line.Max
 			);
 #else
-		print( buffer, "%-34s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f)\n",
+		pool.AddFormat( "%-34s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f)\n",
 				line.Title,
 				line.Time,
 				line.Flops,
@@ -310,47 +313,50 @@ void	BenchApplication::ExportLine( ut::BinaryBuffer& buffer, const ResultLine& l
 #endif
 	}else{
 #if USE_MAX_EXPORT
-		print( buffer, "%-34s:        -          -          -       -   -          -\n", line.Title );
+		pool.AddFormat( "%-34s:        -          -          -       -   -          -\n", line.Title );
 #else
-		print( buffer, "%-34s:        -          -          -       -   -\n", line.Title );
+		pool.AddFormat( "%-34s:        -          -          -       -   -\n", line.Title );
 #endif
 	}
 }
 
 
-void	BenchApplication::ExportData( ut::BinaryBuffer& buffer, const ResultData& data )
+void	BenchApplication::ExportData( text::TextPool& pool, const ResultData& data )
 {
+	const auto&	Info= system::RCore().RSystemInfo();
 	unsigned int	count= data.GetSize();
 	unsigned int	group= data.GetCoreGroup();
-	print( buffer, "\n* Group %d:  Thread=%d  Clock=%f GHz  (mask:%llx)\n", group, data.IsMultithread() ? Info.GetThreadCount( group ) : 1, Info.GetCoreClock( group )/1000000.0, Info.GetAffinityMask( group ) );
-	print( buffer, "* %s\n", data.GetTitle() );
+	pool.AddFormat( "\n* Group %d:  Thread=%d  Clock=%f GHz  (mask:%llx)\n", group, data.IsMultithread() ? Info.GetThreadCount( group ) : 1, Info.GetCoreClock( group )/1000000.0, Info.GetAffinityMask( group ) );
+	pool.AddFormat( "* %s\n", data.GetTitle() );
 	//				0123456789012345678901234567890123: ________  _________  _________ (___ ___) _________
 #if USE_MAX_EXPORT
-	print( buffer, "                                      TIME(s)   MFLOPS      MOPS     FOP   IPC  max MFLOPS\n" );
+	pool.AddFormat( "                                      TIME(s)   MFLOPS      MOPS     FOP   IPC  max MFLOPS\n" );
 #else
-	print( buffer, "                                      TIME(s)   MFLOPS      MOPS     FOP   IPC\n" );
+	pool.AddFormat( "                                      TIME(s)   MFLOPS      MOPS     FOP   IPC\n" );
 #endif
 	for( unsigned int ci= 0 ; ci< count ; ci++ ){
-		ExportLine( buffer, data.Get( ci ) );
+		ExportLine( pool, data.Get( ci ) );
 	}
-	print( buffer, "\n" );
+	pool.AddFormat( "\n" );
 }
 
 
 
-void	BenchApplication::ExportLog( ut::BinaryBuffer& buffer ) const
+void	BenchApplication::ExportLog( text::TextPool& pool ) const
 {
-	ut::BinaryBuffer	info;
+	text::TextPool	info;
 	if( *DateTimeStr ){
-		print( buffer, "Date: %s\n", DateTimeStr );
+		pool.AddFormat( "Date: %s\n", DateTimeStr );
 	}
 	ExportCPUInfo( info );
 	ExportFlops( info );
-	save_size( buffer, info.GetTop(), info.GetSize() );
+	//save_size( buffer, info.GetTop(), info.GetSize() );
+	info.AddChar( '\0' );
+	pool.AddText( info.GetText() );
 
 	unsigned int	bcount= GetDataCount();
 	for( unsigned int bi= 0 ; bi< bcount ; bi++ ){
-		ExportData( buffer, GetData( bi ) );
+		ExportData( pool, GetData( bi ) );
 	}
 }
 
@@ -374,7 +380,7 @@ void	BenchApplication::LoadLine( ResultLine& line, const char* ptr )
 	if( strcmp( line.Title, word_buffer ) != 0 ){
 		return;
 	}
-	flASSERT( (&line.Max - &line.Time + 1) == 6 );
+	FL_ASSERT( (&line.Max - &line.Time + 1) == 6 );
 	double*	dptr= &line.Time;
 	for( int i= 0 ; i< 6 ; i++ ){
 		ptr= GetWord( word_buffer, WORD_BUFFER_SIZE, ptr );
@@ -434,9 +440,9 @@ void	BenchApplication::LoadFile( const char* file_name )
 	fclose( fp );
 }
 
-void	BenchApplication::SaveLine( ut::BinaryBuffer& buffer, const ResultLine& line ) const
+void	BenchApplication::SaveLine( text::TextPool& pool, const ResultLine& line ) const
 {
-	print( buffer, "L \"%s\" %f %f %f %f %f %f\n",
+	pool.AddFormat( "L \"%s\" %f %f %f %f %f %f\n",
 			line.Title,
 			line.Time,
 			line.Flops,
@@ -447,32 +453,33 @@ void	BenchApplication::SaveLine( ut::BinaryBuffer& buffer, const ResultLine& lin
 		);
 }
 
-void	BenchApplication::SaveData( ut::BinaryBuffer& buffer, const ResultData& data ) const
+void	BenchApplication::SaveData( text::TextPool& pool, const ResultData& data ) const
 {
+	const auto&	Info= system::RCore().RSystemInfo();
 	unsigned int	count= data.GetSize();
 	unsigned int	group= data.GetCoreGroup();
-	print( buffer, "# Group=%d Thread=%d Clock=%d Mask=%llx\n", group, Info.GetThreadCount( group ), Info.GetCoreClock( group ), Info.GetAffinityMask( group ) );
-	print( buffer, "D %d %d %d \"%s\"\n", data.GetBenchIndex(), count, group, data.GetTitle() );
+	pool.AddFormat( "# Group=%d Thread=%d Clock=%d Mask=%llx\n", group, Info.GetThreadCount( group ), Info.GetCoreClock( group ), Info.GetAffinityMask( group ) );
+	pool.AddFormat( "D %d %d %d \"%s\"\n", data.GetBenchIndex(), count, group, data.GetTitle() );
 	for( unsigned int ci= 0 ; ci< count ; ci++ ){
-		SaveLine( buffer, data.Get( ci ) );
+		SaveLine( pool, data.Get( ci ) );
 	}
 }
 
 void	BenchApplication::SaveFile( const char* file_name ) const
 {
-	ut::BinaryBuffer	buffer;
+	text::TextPool	pool;
 	if( *DateTimeStr ){
-		print( buffer, "T \"%s\"\n", DateTimeStr );
+		pool.AddFormat( "T \"%s\"\n", DateTimeStr );
 	}
 
 	unsigned int	bcount= GetDataCount();
 	for( unsigned int bi= 0 ; bi< bcount ; bi++ ){
-		SaveData( buffer, GetData( bi ) );
+		SaveData( pool, GetData( bi ) );
 	}
 	{
 		FILE*	fp= fopen( file_name, "wb" );
 		if( fp ){
-			fwrite( buffer.GetTop(), buffer.GetSize(), 1, fp );
+			fwrite( pool.GetBuffer(), pool.GetDataSize(), 1, fp );
 			fclose( fp );
 		}
 	}
@@ -489,12 +496,13 @@ BenchApplication::BenchApplication()
 
 void	BenchApplication::Init( unsigned int bench_count )
 {
-	DataArray.Init( bench_count );
+	DataArray.SetArraySize( bench_count );
 }
 
 
 void	BenchApplication::InitData( unsigned int btype, ITestBase* bench )
 {
+	const auto&	Info= system::RCore().RSystemInfo();
 	ResultData&	data= GetData( btype );
 	data.SetInfo( bench->GetTestName(), bench->GetLoopType(), btype, bench->IsMultithread(), bench->GetCoreGroup(), Info.GetCoreClock( bench->GetCoreGroup() ) );
 
@@ -560,6 +568,7 @@ double	BenchApplication::GetMaxMFLOPS( unsigned int loop_type, bool multithread 
 
 void BenchApplication::UpdateResult( unsigned int btype, ITestBase* bench )
 {
+	const auto&	Info= system::RCore().RSystemInfo();
 	ResultData&	data= GetData( btype );
 	data.UpdateBegin();
 	unsigned int	count= bench->GetResultInfo( InfoType::INFO_COUNT );
@@ -571,7 +580,6 @@ void BenchApplication::UpdateResult( unsigned int btype, ITestBase* bench )
 		double	time= bench->GetResult( ci ) / 1000000.0;
 		double	float_op= bench->GetLoopOp( ci );
 		double	inst_fop= bench->GetInstFop( ci );
-		//printf( "float_op=%f  inst_fop=%f\n", float_op, inst_fop );
 		double	flops= 0.0;
 		double	ops= 0.0;
 		double	ipc= 0.0;

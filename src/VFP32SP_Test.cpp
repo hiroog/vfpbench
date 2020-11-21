@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"VFP32SP_Test.h"
 
@@ -12,6 +12,7 @@
 //-----------------------------------------------------------------------------
 
 using namespace flatlib;
+using system::CPUFeature;
 
 namespace VFP32SP {
 //-----------------------------------------------------------------------------
@@ -45,7 +46,7 @@ namespace VFP32SP {
 static void check_result( float ret, float ans )
 {
 	FL_LOG( "check: %f %f\n", ret, ans );
-	flASSERT( ret == ans );
+	FL_ASSERT( ret == ans );
 }
 
 
@@ -1000,7 +1001,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	flASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -1205,10 +1206,10 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMULS_IR8,	VFP_S_IR8_fmuls_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADDS_IR8,	VFP_S_IR8_fadds_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	float	sum= 0;
 	for( unsigned int i= 0 ; i< Loop * 5 ; i++ ){
@@ -1216,12 +1217,12 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	}
 
 	SetResult( RESULT_VFP_FMACS_IR8,	VFP_S_IR8_fmacs_ir8( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F32_IR8,	VFP_S_IR8_vfma_f32_ir8( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1232,18 +1233,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 //----------------------------------
 
 	SetResult( RESULT_NEON_D_VMUL_F32_IR8,	NEON_D_IR8_vmul_f32_ir8( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_D_VADD_F32_IR8,	NEON_D_IR8_vadd_f32_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_D_VMLA_F32_IR8,	NEON_D_IR8_vmla_f32_ir8( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_D_VFMA_F32_IR8,	NEON_D_IR8_vfma_f32_ir8( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1251,18 +1252,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_Q_VMUL_F32_IR8,	NEON_Q_IR8_vmul_f32_ir8( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_Q_VADD_F32_IR8,	NEON_Q_IR8_vadd_f32_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_Q_VMLA_F32_IR8,	NEON_Q_IR8_vmla_f32_ir8( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_Q_VFMA_F32_IR8,	NEON_Q_IR8_vfma_f32_ir8( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 //----------------------------------
 #endif
@@ -1277,18 +1278,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMULS_IRS4,	VFP_S_IRS4_fmuls_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADDS_IRS4,	VFP_S_IRS4_fadds_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FMACS_IRS4,	VFP_S_IRS4_fmacs_irs4( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F32_IRS4,	VFP_S_IRS4_vfma_f32_irs4( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1299,18 +1300,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 //----------------------------------
 
 	SetResult( RESULT_NEON_D_VMUL_F32_IRS4,	NEON_D_IRS4_vmul_f32_irs4( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_D_VADD_F32_IRS4,	NEON_D_IRS4_vadd_f32_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_D_VMLA_F32_IRS4,	NEON_D_IRS4_vmla_f32_irs4( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_D_VFMA_F32_IRS4,	NEON_D_IRS4_vfma_f32_irs4( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1318,18 +1319,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_Q_VMUL_F32_IRS4,	NEON_Q_IRS4_vmul_f32_irs4( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_Q_VADD_F32_IRS4,	NEON_Q_IRS4_vadd_f32_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_Q_VMLA_F32_IRS4,	NEON_Q_IRS4_vmla_f32_irs4( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_Q_VFMA_F32_IRS4,	NEON_Q_IRS4_vfma_f32_irs4( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 //----------------------------------
 #endif
@@ -1342,18 +1343,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMULS_IR1,	VFP_S_IR1_fmuls_ir1( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADDS_IR1,	VFP_S_IR1_fadds_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FMACS_IR1,	VFP_S_IR1_fmacs_ir1( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F32_IR1,	VFP_S_IR1_vfma_f32_ir1( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1364,18 +1365,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 //----------------------------------
 
 	SetResult( RESULT_NEON_D_VMUL_F32_IR1,	NEON_D_IR1_vmul_f32_ir1( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_D_VADD_F32_IR1,	NEON_D_IR1_vadd_f32_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_D_VMLA_F32_IR1,	NEON_D_IR1_vmla_f32_ir1( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_D_VFMA_F32_IR1,	NEON_D_IR1_vfma_f32_ir1( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1383,18 +1384,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_Q_VMUL_F32_IR1,	NEON_Q_IR1_vmul_f32_ir1( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_Q_VADD_F32_IR1,	NEON_Q_IR1_vadd_f32_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_Q_VMLA_F32_IR1,	NEON_Q_IR1_vmla_f32_ir1( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_Q_VFMA_F32_IR1,	NEON_Q_IR1_vfma_f32_ir1( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 //----------------------------------
 #endif
@@ -1412,18 +1413,18 @@ FL_LOG( "VFP loop=%d\n", Loop );
 //----------------------------------
 
 	SetResult( RESULT_NEON_Q_VMUL_F32_IR12,	NEON_Q_IR12_vmul_f32_ir12( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_Q_VADD_F32_IR12,	NEON_Q_IR12_vadd_f32_ir12( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_Q_VMLA_F32_IR12,	NEON_Q_IR12_vmla_f32_ir12( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_Q_VFMA_F32_IR12,	NEON_Q_IR12_vfma_f32_ir12( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 //----------------------------------
 #endif
@@ -1437,8 +1438,8 @@ FL_LOG( "VFP loop=%d\n", Loop );
 
 const char*	FloatTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 

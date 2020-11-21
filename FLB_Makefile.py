@@ -33,15 +33,16 @@ src_list= [
         'src/ResultData.cpp',
         'src/BenchApplication.cpp',
         'src/BenchmarkTest.cpp',
-        'src/minilib/SystemAPI.cpp',
-        'src/minilib/Thread.cpp',
-        'src/minilib/MemoryAllocator.cpp',
-        'src/minilib/Matrix4.cpp',
-        'src/minilib/Math.cpp',
-        'src/minilib/SystemInfo.cpp',
-        'src/minilib/ConsoleLog.cpp',
-        'src/minilib/PlatformString.cpp',
-        'src/minilib/DateTime.cpp',
+
+#        'src/minilib/SystemAPI.cpp',
+#        'src/minilib/Thread.cpp',
+#        'src/minilib/MemoryAllocator.cpp',
+#        'src/minilib/Matrix4.cpp',
+#        'src/minilib/Math.cpp',
+#        'src/minilib/SystemInfo.cpp',
+#        'src/minilib/ConsoleLog.cpp',
+#        'src/minilib/PlatformString.cpp',
+#        'src/minilib/DateTime.cpp',
     ]
 
 #        'src/MatrixTest_SSESP.cpp',
@@ -71,17 +72,23 @@ def get_arm64_arch( env ):
 
 #------------------------------------------------------------------------------
 
+FLATLIB_ROOT= tool.findPath( '../../flatlib5', 'FLATLIB5' )
+
 env= tool.createTargetEnvironment()
-env.addIncludePaths( ['src'] )
+env.addIncludePaths( [ 'src', FLATLIB_ROOT ] )
+env.addLibraries( [ 'flatCore' ] )
 
 if env.getHostPlatform() == 'macOS':
     env.addCCFlags( ['-DFL_PRESET_OSX=1'] )
 elif env.getHostPlatform() == 'Linux':
     env.addCCFlags( ['-DFL_PRESET_LINUX=1'] )
 
+
+
 env.refresh()
 
 def addCustomBuild( env, TargetName, src_list, config ):
+    global FLATLIB_ROOT
     is_termux= False
     if env.getHostPlatform() == 'Linux':
         is_termux= env.isTermux()
@@ -105,6 +112,9 @@ def addCustomBuild( env, TargetName, src_list, config ):
         else:
             local_env.addCCFlags( ['-DDEBUG=1'] )
             exe_name= env.getExeName( TargetName + '_' + env.getTargetArch() + '_' + env.getConfig() )
+        local_env.addLibPaths( [
+                local_env.getOutputPath( os.path.join( FLATLIB_ROOT, 'lib' ) )
+            ] )
         local_env.refresh()
         task= tool.addExeTask( local_env, None, src_list, target=exe_name )
         task_list.append( task )

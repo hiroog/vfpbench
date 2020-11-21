@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"SSE64SP_Test.h"
 
@@ -17,6 +17,7 @@
 #endif
 
 using namespace flatlib;
+using system::CPUFeature;
 
 namespace SSE64SP {
 //-----------------------------------------------------------------------------
@@ -39,7 +40,7 @@ typedef	uint64_t CounterType;
 static void check_result( float ret, float ans )
 {
 	FL_LOG( "check: %f %f\n", ret, ans );
-	flASSERT( ret == ans );
+	FL_ASSERT( ret == ans );
 }
 
 
@@ -1769,7 +1770,7 @@ static void asm_debug_test()
 
 FloatTest::FloatTest()
 {
-	flASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -1926,63 +1927,63 @@ return;
 	//------------------------------------------------------
 
 	SetResult( RESULT_SSE_MULSS_IR8,	SSE_S_IR8_mulss_ir8( Loop, 10.0f,	0.9999f, 0.9998f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDSS_IR8,	SSE_S_IR8_addss_ir8( Loop, 10.0f,  1e-35f, 1e-35f		) );
-	Progress++;
+	Progress.Increment();
 
 	if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 		SetResult( RESULT_SSE_FMADDSS_IR8,	SSE_S_FMA_IR8_fmaddss_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMADDSS_IR12,	SSE_S_FMA_IR12_fmaddss_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMA_MULSS_IR12,	SSE_M_FMA_IR12_fmaddss_mulss_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMA_ADDSS_IR12,	SSE_M_FMA_IR12_fmaddss_addss_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress++;
-		Progress++;
-		Progress++;
-		Progress++;
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
 	}
 
 
 	SetResult( RESULT_SSE_MULPS_IR8,	SSE_S_IR8_mulps_ir8( Loop, 10.0f,	0.99999f, 0.99998f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDPS_IR8,	SSE_S_IR8_addps_ir8( Loop, 10.0f,	1e-37f, 1e-37f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	SetResult( RESULT_SSE_MULPS_ADDPS_IR8,	SSE_M_IR8_mulps_addps_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 		SetResult( RESULT_SSE_FMADDPS_IR8,	SSE_S_FMA_IR8_fmaddps_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMADDPS_IR12,	SSE_S_FMA_IR12_fmaddps_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMA_MULPS_IR12,	SSE_M_FMA_IR12_fmaddps_mulps_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMA_ADDPS_IR12,	SSE_M_FMA_IR12_fmaddps_addps_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress++;
-		Progress++;
-		Progress++;
-		Progress++;
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
 	}
 
 	//------------------------------------------------------
@@ -1990,7 +1991,7 @@ return;
 	//------------------------------------------------------
 
 	SetResult( RESULT_SSE_ML_AD_ADDPS_IR9,	SSE_M_IR9_ml_ad_addps_ir9( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	//------------------------------------------------------
@@ -1998,18 +1999,18 @@ return;
 	//------------------------------------------------------
 
 	SetResult( RESULT_SSE_MULSS_IRS4,	SSE_S_IRS4_mulss_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDSS_IRS4,	SSE_S_IRS4_addss_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
 	SetResult( RESULT_SSE_MULPS_IRS4,	SSE_S_IRS4_mulps_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDPS_IRS4,	SSE_S_IRS4_addps_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
@@ -2030,36 +2031,36 @@ return;
 		//------------------------------------------------------
 
 		SetResult( RESULT_AVX_VMULPS_IR8,	AVX_S_IR8_vmulps_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX_VADDPS_IR8,	AVX_S_IR8_vaddps_ir8( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 
 		SetResult( RESULT_AVX_VMULPS_VADDPS_IR8,	AVX_M_IR8_vmulps_vaddps_ir8( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 		if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 			SetResult( RESULT_AVX_VFMADDPS_IR8,	AVX_S_FMA_IR8_vfmaddps_ir8( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 			SetResult( RESULT_AVX_VFMADDPS_IR12,	AVX_S_FMA_IR12_vfmaddps_ir12( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 			SetResult( RESULT_AVX_FMA_MUL_IR12,		AVX_M_FMA_IR12_vfmaddps_vmulps_ir12( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 			SetResult( RESULT_AVX_FMA_ADD_IR12,		AVX_M_FMA_IR12_vfmaddps_vaddps_ir12( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 		}else{
-			Progress++;
-			Progress++;
-			Progress++;
-			Progress++;
+			Progress.Increment();
+			Progress.Increment();
+			Progress.Increment();
+			Progress.Increment();
 		}
 
 		//------------------------------------------------------
@@ -2067,19 +2068,19 @@ return;
 		//------------------------------------------------------
 
 		SetResult( RESULT_AVX_VML_AD_VADDPS_IR9,	AVX_M_IR9_vml_ad_vaddps_ir9( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 #if 0
 		if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 			SetResult( RESULT_AVX_VFMA_ML_VADDPS_IR9,	AVX_M_IR9_vfma_ml_vaddps_ir9( Loop, 7.0f		) );
-			Progress++;
+			Progress.Increment();
 		}else{
-			Progress++;
+			Progress.Increment();
 		}
 #endif
 
 	}else{
-		Progress+= 8;
+		Progress.LoadAdd( 8 );
 	}
 
 	//------------------------------------------------------
@@ -2090,35 +2091,35 @@ return;
 	if( Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ){
 
 		SetResult( RESULT_AVX512_VMULPS_IR12,	AVX512_S_IR12_vmulps_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_VADDPS_IR12,	AVX512_S_IR12_vaddps_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_VFMADDPS_IR12,	AVX512_M_IR12_vfmaddps_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_FMA_MUL_IR12,	AVX512_M_IR12_vfmaddps_vmulps_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_FMA_ADD_IR12,	AVX512_M_IR12_vfmaddps_vaddps_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 
 		SetResult( RESULT_AVX512_YMM_VMULPS_IR12,	AVX512_YMM_S_IR12_vmulps_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_YMM_VADDPS_IR12,	AVX512_YMM_S_IR12_vaddps_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_YMM_VFMADDPS_IR12,	AVX512_YMM_M_IR12_vfmaddps_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else
 #endif
 	{
-		Progress+= 8;
+		Progress.LoadAdd( 8 );
 	}
 
 	//------------------------------------------------------
@@ -2130,8 +2131,8 @@ return;
 
 const char*	FloatTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 

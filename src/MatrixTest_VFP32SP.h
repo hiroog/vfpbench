@@ -42,12 +42,12 @@ public:
 	void	Run() override;
 	unsigned int	GetLoopOp( unsigned int index ) const override
 	{
-		flASSERT( index < RESULT_MAX );
+		FL_ASSERT( index < RESULT_MAX );
 		return	FLOAT_OP_ONE;
 	}
 	float	GetInstFop( unsigned int index ) const override
 	{
-		flASSERT( index < RESULT_MAX );
+		FL_ASSERT( index < RESULT_MAX );
 		return	1.0f;
 	}
 	unsigned int	GetResultInfo( InfoType index ) const override
@@ -60,7 +60,7 @@ public:
 		case InfoType::INFO_LOOP:
 			return	LoopCount;
 		}
-		flASSERT( 0 );
+		FL_ASSERT( 0 );
 		return	0;
 	}
 

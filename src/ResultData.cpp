@@ -1,7 +1,7 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"ResultData.h"
 
 
@@ -11,7 +11,7 @@
 void	ResultData::InitSize( unsigned int size )
 {
 	Clear();
-	DataList.Init( size + 2 );
+	DataList.SetArraySize( size + 2 );
 
 	for( unsigned int si= 0 ; si< size ; si++ ){
 		ResultLine&	line= Get( si );

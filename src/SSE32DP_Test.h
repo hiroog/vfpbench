@@ -4,7 +4,7 @@
 #ifndef	SSE32DP_TEST_H_
 #define	SSE32DP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace SSE32DP {
@@ -71,7 +71,7 @@ public:
 		case InfoType::INFO_LOOP:
 			return	LoopCount;
 		}
-		flASSERT( 0 );
+		FL_ASSERT( 0 );
 		return	0;
 	}
 

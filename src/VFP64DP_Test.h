@@ -4,7 +4,7 @@
 #ifndef	VFP64DP_TEST_H_
 #define	VFP64DP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace VFP64DP {
@@ -72,7 +72,7 @@ public:
 		case InfoType::INFO_LOOP:
 			return	LoopCount;
 		}
-		flASSERT( 0 );
+		FL_ASSERT( 0 );
 		return	0;
 	}
 

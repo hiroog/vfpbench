@@ -4,25 +4,23 @@
 #ifndef	TIMER_CLASS_H_
 #define	TIMER_CLASS_H_
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemAPI.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/time/SystemClock.h>
 
 struct TimerClass {
 	uint64_t	start_time;
 	uint64_t	result_time;
-	flatlib::time::TickTime	Time;
 public:
 	TimerClass()
 	{
-		Time.Init();
 	}
 	void 	Begin()
 	{
-		start_time= Time.GetUS();
+		start_time= flatlib::time::GetPerfCounterUS();
 	}
 	void 	End()
 	{
-		uint64_t	end_time= Time.GetUS();
+		uint64_t	end_time= flatlib::time::GetPerfCounterUS();
 		result_time= end_time - start_time;
 	}
 	void 	Dump( const char* msg= nullptr, int cycle= 0 )

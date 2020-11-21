@@ -784,7 +784,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 	SetResult( RESULT_LIB, Matrix_Mul_LIB_A( result_LIB.dest, src1, src2, Loop ) );
 
 
-	Progress++;
+	Progress.Increment();
 
 
 //-----------------------------------------------------------------------------
@@ -799,25 +799,25 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 		SetResult( RESULT_NEON_AQ, Matrix_Mul_NEON_AQ( result_AQ.dest, src1, src2, Loop ) );
 		CHECK_( result_AQ );
 
-		Progress++;
+		Progress.Increment();
 
 		Result	result_BQ;
 		SetResult( RESULT_NEON_BQ, Matrix_Mul_NEON_BQ( result_BQ.dest, src1, src2, Loop ) );
 		CHECK_( result_BQ );
 
-		Progress++;
+		Progress.Increment();
 
 		Result	result_AD;
 		SetResult( RESULT_NEON_AD, Matrix_Mul_NEON_AD( result_AD.dest, src1, src2, Loop ) );
 		CHECK_( result_AD );
 
-		Progress++;
+		Progress.Increment();
 
 		Result	result_BD;
 		SetResult( RESULT_NEON_BD, Matrix_Mul_NEON_BD( result_BD.dest, src1, src2, Loop ) );
 		CHECK_( result_BD );
 
-		Progress++;
+		Progress.Increment();
 
 # if FL_CPU_VFPV4
 
@@ -825,19 +825,19 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 		SetResult( RESULT_NEON_AQ_FMA, Matrix_Mul_NEON_AQ_FMA( result_AQ_FMA.dest,   src1, src2, Loop ) );
 		CHECK_( result_AQ_FMA );
 
-		Progress++;
+		Progress.Increment();
 
 		Result	result_BQ_FMA;
 		SetResult( RESULT_NEON_BQ_FMA, Matrix_Mul_NEON_BQ_FMA( result_BQ_FMA.dest,   src1, src2, Loop ) );
 		CHECK_( result_BQ_FMA );
 
-		Progress++;
+		Progress.Increment();
 
 		Result	result_BQ_FMA_RN;
 		SetResult( RESULT_NEON_AQ_FMA_RN, Matrix_Mul_NEON_AQ_FMA_RN( result_BQ_FMA_RN.dest, src1, src2, Loop ) );
 		CHECK_( result_BQ_FMA_RN );
 
-		Progress++;
+		Progress.Increment();
 
 #  if FL_DEBUG
 		result_LIB.dest.Dump( "LIB" );
@@ -860,13 +860,13 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 		SetResult( RESULT_NEON_AQ, Matrix_Mul_NEON_AQ( result_AQ.dest, src1, src2, Loop ) );
 		CHECK_( result_AQ );
 
-		Progress++;
+		Progress.Increment();
 
 		Result	result_BQ;
 		SetResult( RESULT_NEON_BQ, Matrix_Mul_NEON_BQ( result_BQ.dest, src1, src2, Loop ) );
 		CHECK_( result_BQ );
 
-		Progress++;
+		Progress.Increment();
 
 		Progress+= 5;
 
@@ -884,7 +884,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 
 	DoneFlag= true;
 
-//	flASSERT( err_count == 0 );
+//	FL_ASSERT( err_count == 0 );
 }
 
 
@@ -906,8 +906,8 @@ static const char*	Instruction_Title[]= {
 
 const char*	MatrixTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 

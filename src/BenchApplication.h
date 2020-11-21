@@ -4,8 +4,11 @@
 #ifndef	BENCH_APPLICATION_H_
 #define	BENCH_APPLICATION_H_
 
-#include	<minilib/Platform.h>
-#include	<minilib/BinaryBuffer.h>
+#include	<flatlib/core/core.h>
+#include	<flatlib/core/ut/FixedArray.h>
+#include	<flatlib/core/text/TextPool.h>
+//#include	<minilib/Platform.h>
+//#include	<minilib/BinaryBuffer.h>
 #include	"ResultData.h"
 
 
@@ -16,20 +19,20 @@ private:
 
 	flatlib::ut::FixedArray<ResultData>	DataArray;
 	char	DateTimeStr[24];
-
+#if 0
 public:
-	static void	save_size( flatlib::ut::BinaryBuffer& buffer, const void* ptr, unsigned int size );
-	static void	save_line( flatlib::ut::BinaryBuffer& buffer, const char* ptr );
-	static void	save_format( flatlib::ut::BinaryBuffer& buffer, const char* format, va_list arg );
-	static void	print( flatlib::ut::BinaryBuffer& buffer, const char* format ... );
-
+	static void	save_size( flatlib::text::TextPool& buffer, const void* ptr, unsigned int size );
+	static void	save_line( flatlib::text::TextPool& buffer, const char* ptr );
+	static void	save_format( flatlib::text::TextPool& buffer, const char* format, va_list arg );
+	static void	print( flatlib::text::TextPool& buffer, const char* format ... );
+#endif
 private:
-	static void	ExportLine( flatlib::ut::BinaryBuffer& buffer, const ResultLine& line );
-	static void	ExportData( flatlib::ut::BinaryBuffer& buffer, const ResultData& data );
+	static void	ExportLine( flatlib::text::TextPool& buffer, const ResultLine& line );
+	static void	ExportData( flatlib::text::TextPool& buffer, const ResultData& data );
 
 	void	LoadLine( ResultLine& line, const char* ptr );
-	void	SaveLine( flatlib::ut::BinaryBuffer& buffer, const ResultLine& line ) const;
-	void	SaveData( flatlib::ut::BinaryBuffer& buffer, const ResultData& data ) const;
+	void	SaveLine( flatlib::text::TextPool& buffer, const ResultLine& line ) const;
+	void	SaveData( flatlib::text::TextPool& buffer, const ResultData& data ) const;
 public:
 
 	BenchApplication();
@@ -38,7 +41,7 @@ public:
 
 	unsigned int	GetDataCount() const
 	{
-		return	DataArray.GetSize();
+		return	DataArray.GetDataSize();
 	}
 
 	const ResultData& GetData( unsigned int data_index ) const
@@ -57,9 +60,9 @@ public:
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------
 
-	void	ExportCPUInfo( flatlib::ut::BinaryBuffer& buffer ) const;
-	void	ExportFlops( flatlib::ut::BinaryBuffer& buffer ) const;
-	void	ExportLog( flatlib::ut::BinaryBuffer& buffer ) const;
+	void	ExportCPUInfo( flatlib::text::TextPool& buffer ) const;
+	void	ExportFlops( flatlib::text::TextPool& buffer ) const;
+	void	ExportLog( flatlib::text::TextPool& buffer ) const;
 
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------

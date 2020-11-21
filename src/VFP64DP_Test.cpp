@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"VFP64DP_Test.h"
 
@@ -12,6 +12,7 @@
 //-----------------------------------------------------------------------------
 
 using namespace flatlib;
+using system::CPUFeature;
 
 namespace VFP64DP {
 //-----------------------------------------------------------------------------
@@ -48,7 +49,7 @@ typedef	unsigned long	CounterType;
 static void check_result( double ret, double ans )
 {
 	FL_LOG( "check: %f %f\n", ret, ans );
-	flASSERT( ret == ans );
+	FL_ASSERT( ret == ans );
 }
 
 //-----------------
@@ -1343,7 +1344,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	flASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -1510,13 +1511,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IR8,		VFP_S_IR8_fmul_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IR8,		VFP_S_IR8_fadd_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FMADD_IR8,	MAD_S_IR8_fmadd_ir8( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1524,13 +1525,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_D2_IR8,	NEON_V_IR8_fmul_2d_ir8( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_D2_IR8,	NEON_V_IR8_fadd_2d_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_D2_IR8,	NEON_V_IR8_fmla_2d_ir8( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1543,13 +1544,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IRS4,	VFP_S_IRS4_fmul_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IRS4,	VFP_S_IRS4_fadd_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FMADD_IRS4,	MAD_S_IRS4_fmadd_irs4( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1557,13 +1558,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_D2_IRS4,		NEON_V_IRS4_fmul_2d_irs4( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_D2_IRS4,		NEON_V_IRS4_fadd_2d_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_D2_IRS4,		NEON_V_IRS4_fmla_2d_irs4( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1575,13 +1576,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IR1,		VFP_S_IR1_fmul_ir1( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IR1,		VFP_S_IR1_fadd_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FMADD_IR1,	MAD_S_IR1_fmadd_ir1( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1589,13 +1590,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_D2_IR1,	NEON_V_IR1_fmul_2d_ir1( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_D2_IR1,	NEON_V_IR1_fadd_2d_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_D2_IR1,	NEON_V_IR1_fmla_2d_ir1( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1607,13 +1608,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_D2_IR12,		NEON_V_IR12_fmul_2d_ir12( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_D2_IR12,		NEON_V_IR12_fadd_2d_ir12( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_D2_IR12,		NEON_V_IR12_fmla_2d_ir12( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1624,8 +1625,8 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 
 const char*	FloatTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 

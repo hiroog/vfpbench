@@ -4,8 +4,8 @@
 #ifndef	RESULT_DATA_H_
 #define	RESULT_DATA_H_
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/FixedArray.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/ut/FixedArray.h>
 
 
 struct ResultLine {
@@ -92,7 +92,7 @@ public:
 
 	void	Clear()
 	{
-		DataList.Clear();
+		DataList.Finalize();
 		UpdatePosition= 0;
 	}
 
@@ -123,7 +123,7 @@ public:
 
 	unsigned int	GetSize() const
 	{
-		return	DataList.GetSize();
+		return	DataList.GetDataSize();
 	}
 
 	const ResultLine&	GetAverage() const

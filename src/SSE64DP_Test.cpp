@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"SSE64DP_Test.h"
 
@@ -22,6 +22,7 @@ namespace SSE64DP {
 //-----------------------------------------------------------------------------
 
 using namespace flatlib;
+using system::CPUFeature;
 
 /*
 	xmm0-xmm7
@@ -39,7 +40,7 @@ typedef	uint64_t	CounterType;
 static void check_result( double ret, double ans )
 {
 	FL_LOG( "check: %f %f\n", ret, ans );
-	flASSERT( ret == ans );
+	FL_ASSERT( ret == ans );
 }
 
 
@@ -1460,7 +1461,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	flASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -1591,65 +1592,65 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	// IR8
 	//------------------------------------------------------
 	SetResult( RESULT_SSE_MULSD_IR8,	SSE_S_IR8_mulsd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDSD_IR8,	SSE_S_IR8_addsd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 		SetResult( RESULT_SSE_FMADDSD_IR8,	SSE_S_FMA_IR8_fmaddsd_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMADDSD_IR12,	SSE_S_FMA_IR12_fmaddsd_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMA_MULSD_IR12,	SSE_M_FMA_IR12_fmaddsd_mulsd_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMA_ADDSD_IR12,	SSE_M_FMA_IR12_fmaddsd_addsd_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress++;
-		Progress++;
-		Progress++;
-		Progress++;
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
 	}
 
 
 
 
 	SetResult( RESULT_SSE_MULPD_IR8,	SSE_S_IR8_mulpd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDPD_IR8,	SSE_S_IR8_addpd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	SetResult( RESULT_SSE_MULPD_ADDPD_IR8,	SSE_M_IR8_mulpd_addpd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 		SetResult( RESULT_SSE_FMADDPD_IR8,	SSE_S_FMA_IR8_fmaddpd_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMADDPD_IR12,	SSE_S_FMA_IR12_fmaddpd_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMA_MULPD_IR12,	SSE_M_FMA_IR12_fmaddpd_mulpd_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_SSE_FMA_ADDPD_IR12,	SSE_M_FMA_IR12_fmaddpd_addpd_ir12( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress++;
-		Progress++;
-		Progress++;
-		Progress++;
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
 	}
 
 
@@ -1659,7 +1660,7 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_SSE_ML_AD_ADDPD_IR9,	SSE_M_IR9_ml_ad_addpd_ir9( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
@@ -1667,18 +1668,18 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	// IRS4
 	//------------------------------------------------------
 	SetResult( RESULT_SSE_MULSD_IRS4,	SSE_S_IRS4_mulsd_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDSD_IRS4,	SSE_S_IRS4_addsd_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
 	SetResult( RESULT_SSE_MULPD_IRS4,	SSE_S_IRS4_mulpd_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDPD_IRS4,	SSE_S_IRS4_addpd_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
@@ -1699,35 +1700,35 @@ FL_LOG( "SSE loop=%d\n", Loop );
 		// IR8
 		//------------------------------------------------------
 		SetResult( RESULT_AVX_VMULPD_IR8,	AVX_S_IR8_vmulpd_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX_VADDPD_IR8,	AVX_S_IR8_vaddpd_ir8( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 		SetResult( RESULT_AVX_VMULPD_VADDPD_IR8,	AVX_M_IR8_vmulpd_vaddpd_ir8( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 		if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 			SetResult( RESULT_AVX_VFMADDPD_IR8,	AVX_S_FMA_IR8_vfmaddpd_ir8( Loop, 10.0f		) );	// **!!!** 15
-			Progress++;
+			Progress.Increment();
 
 			SetResult( RESULT_AVX_VFMADDPD_IR12,	AVX_S_FMA_IR12_vfmaddpd_ir12( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 			SetResult( RESULT_AVX_FMA_MUL_IR12,	AVX_M_FMA_IR12_vfmaddpd_vmulpd_ir12( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 			SetResult( RESULT_AVX_FMA_ADD_IR12,	AVX_M_FMA_IR12_vfmaddpd_vaddpd_ir12( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 		}else{
-			Progress++;
-			Progress++;
-			Progress++;
-			Progress++;
+			Progress.Increment();
+			Progress.Increment();
+			Progress.Increment();
+			Progress.Increment();
 		}
 
 
@@ -1735,10 +1736,10 @@ FL_LOG( "SSE loop=%d\n", Loop );
 		// IR9
 		//------------------------------------------------------
 		SetResult( RESULT_AVX_VML_AD_VADDPD_IR9,	AVX_M_IR9_vml_ad_vaddpd_ir9( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress+= 8;
+		Progress.LoadAdd( 8 );
 	}
 
 
@@ -1750,24 +1751,24 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	if( Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ){
 
 		SetResult( RESULT_AVX512_VMULPD_IR12,	AVX512_S_IR12_vmulpd_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_VADDPD_IR12,	AVX512_S_IR12_vaddpd_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_VFMADDPD_IR12,	AVX512_M_IR12_vfmaddpd_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_FMA_MUL_IR12,	AVX512_M_IR12_vfmaddpd_vmulpd_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX512_FMA_ADD_IR12,	AVX512_M_IR12_vfmaddpd_vaddpd_ir12( Loop, 0.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else
 #endif
 	{
-		Progress+= 5;
+		Progress.LoadAdd( 5 );
 	}
 
 
@@ -1780,8 +1781,8 @@ FL_LOG( "SSE loop=%d\n", Loop );
 
 const char*	FloatTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 

@@ -1,8 +1,9 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/CoreContext.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"BenchmarkTest.h"
 
 using namespace flatlib;
@@ -22,16 +23,17 @@ BenchmarkTestBase::~BenchmarkTestBase()
 
 void	BenchmarkTestBase::Quit()
 {
-	unsigned int	bench_count= BenchArray.GetSize();
+	unsigned int	bench_count= BenchArray.GetDataSize();
 	for( unsigned int bi= 0 ; bi< bench_count ; bi++ ){
-		memory::SafeDelete( BenchArray[bi] );
+		memory::ZDelete( BenchArray[bi] );
 	}
 }
 
 unsigned int	BenchmarkTestBase::Init( unsigned int unit_count )
 {
+	const auto&	Info= system::RCore().RSystemInfo();
 	unsigned int	group_count= Info.GetCoreGroupCount();
-	BenchArray.Init( unit_count * group_count );
+	BenchArray.SetArraySize( unit_count * group_count );
 	BenchIndex= 0;
 	return	group_count;
 }
@@ -44,7 +46,7 @@ void	BenchmarkTestBase::AddBench( ITestBase* bench )
 
 unsigned int	BenchmarkTestBase::GetBenchCount() const
 {
-	return	BenchArray.GetSize();
+	return	BenchArray.GetDataSize();
 }
 
 ITestBase*		BenchmarkTestBase::GetBenchmark( unsigned int index ) const
@@ -61,6 +63,7 @@ void	BenchmarkTestBase::SetLoop( unsigned int index, unsigned int loop )
 
 void	BenchmarkTestBase::UpdateLoop( float loop_sclae )
 {
+	const auto&	Info= system::RCore().RSystemInfo();
 	unsigned int	bench_count= GetBenchCount();
 	for( unsigned int bi= 0 ; bi< bench_count ; bi++ ){
 		auto*	bench= BenchArray[bi];

@@ -4,7 +4,7 @@
 #ifndef	VFP32SP_TEST_H_
 #define	VFP32SP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace VFP32SP {
@@ -91,7 +91,7 @@ public:
 		case InfoType::INFO_LOOP:
 			return	LoopCount;
 		}
-		flASSERT( 0 );
+		FL_ASSERT( 0 );
 		return	0;
 	}
 

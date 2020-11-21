@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"SSE32SP_Test.h"
 
@@ -33,7 +33,7 @@ typedef	uint32_t	CounterType;
 static void check_result( float ret, float ans )
 {
 	FL_LOG( "check: %f %f\n", ret, ans );
-	flASSERT( ret == ans );
+	FL_ASSERT( ret == ans );
 }
 
 
@@ -852,7 +852,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	flASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -952,39 +952,39 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	// IR8
 	//------------------------------------------------------
 	SetResult( RESULT_SSE_MULSS_IR8,	SSE_S_IR8_mulss_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDSS_IR8,	SSE_S_IR8_addss_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 		SetResult( RESULT_SSE_FMADDSS_IR8,	SSE_S_FMA_IR8_fmaddss_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress++;
+		Progress.Increment();
 	}
 
 
 	SetResult( RESULT_SSE_MULPS_IR8,	SSE_S_IR8_mulps_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDPS_IR8,	SSE_S_IR8_addps_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	SetResult( RESULT_SSE_MULPS_ADDPS_IR8,	SSE_M_IR8_mulps_addps_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 		SetResult( RESULT_SSE_FMADDPS_IR8,	SSE_S_FMA_IR8_fmaddps_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress++;
+		Progress.Increment();
 	}
 
 
@@ -993,25 +993,25 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_SSE_ML_AD_ADDPS_IR6,	SSE_M_IR6_ml_ad_addps_ir6( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	//------------------------------------------------------
 	// IRS4
 	//------------------------------------------------------
 	SetResult( RESULT_SSE_MULSS_IRS4,	SSE_S_IRS4_mulss_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDSS_IRS4,	SSE_S_IRS4_addss_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
 	SetResult( RESULT_SSE_MULPS_IRS4,	SSE_S_IRS4_mulps_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDPS_IRS4,	SSE_S_IRS4_addps_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
@@ -1032,28 +1032,28 @@ FL_LOG( "SSE loop=%d\n", Loop );
 		// IR4
 		//------------------------------------------------------
 		SetResult( RESULT_AVX_VMULPS_IR4,	AVX_S_IR4_vmulps_ir4( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX_VADDPS_IR4,	AVX_S_IR4_vaddps_ir4( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 		SetResult( RESULT_AVX_VMULPS_VADDPS_IR4,	AVX_M_IR4_vmulps_vaddps_ir4( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 		if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 			SetResult( RESULT_AVX_VFMADDPS_IR8,	AVX_S_FMA_IR4_vfmaddps_ir4( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 			//SetResult( RESULT_AVX_VFMADDPS_IR12,	AVX_S_FMA_IR12_vfmaddps_ir12( Loop, 10.0f		) );
 			SetResult( RESULT_AVX_VFMADDPS_IR12,	AVX_S_FMA_IR4_vfmaddps_ir4( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 		}else{
-			Progress++;
-			Progress++;
+			Progress.Increment();
+			Progress.Increment();
 		}
 
 
@@ -1062,7 +1062,7 @@ FL_LOG( "SSE loop=%d\n", Loop );
 		//------------------------------------------------------
 
 		SetResult( RESULT_AVX_VML_AD_VADDPS_IR6,	AVX_M_IR6_vml_ad_vaddps_ir6( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}
 
@@ -1075,8 +1075,8 @@ FL_LOG( "SSE loop=%d\n", Loop );
 
 const char*	FloatTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 

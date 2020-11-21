@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"SSE32DP_Test.h"
 
@@ -33,7 +33,7 @@ typedef	uint32_t	CounterType;
 static void check_result( double ret, double ans )
 {
 	FL_LOG( "check: %f %f\n", ret, ans );
-	flASSERT( ret == ans );
+	FL_ASSERT( ret == ans );
 }
 
 
@@ -861,7 +861,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	flASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -970,42 +970,42 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	// IR8
 	//------------------------------------------------------
 	SetResult( RESULT_SSE_MULSD_IR8,	SSE_S_IR8_mulsd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDSD_IR8,	SSE_S_IR8_addsd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 		SetResult( RESULT_SSE_FMADDSD_IR8,	SSE_S_FMA_IR8_fmaddsd_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress++;
+		Progress.Increment();
 	}
 
 
 	SetResult( RESULT_SSE_MULPD_IR8,	SSE_S_IR8_mulpd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDPD_IR8,	SSE_S_IR8_addpd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
 
 	SetResult( RESULT_SSE_MULPD_ADDPD_IR8,	SSE_M_IR8_mulpd_addpd_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
 	if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 		SetResult( RESULT_SSE_FMADDPD_IR8,	SSE_S_FMA_IR8_fmaddpd_ir8( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 	}else{
-		Progress++;
+		Progress.Increment();
 	}
 
 
@@ -1014,7 +1014,7 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_SSE_ML_AD_ADDPD_IR6,	SSE_M_IR6_ml_ad_addpd_ir6( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
@@ -1022,18 +1022,18 @@ FL_LOG( "SSE loop=%d\n", Loop );
 	// IRS4
 	//------------------------------------------------------
 	SetResult( RESULT_SSE_MULSD_IRS4,	SSE_S_IRS4_mulsd_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDSD_IRS4,	SSE_S_IRS4_addsd_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
 	SetResult( RESULT_SSE_MULPD_IRS4,	SSE_S_IRS4_mulpd_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_SSE_ADDPD_IRS4,	SSE_S_IRS4_addpd_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 
@@ -1054,23 +1054,23 @@ FL_LOG( "SSE loop=%d\n", Loop );
 		// IR4
 		//------------------------------------------------------
 		SetResult( RESULT_AVX_VMULPD_IR4,	AVX_S_IR4_vmulpd_ir4( Loop, 10.0f		) );
-		Progress++;
+		Progress.Increment();
 
 		SetResult( RESULT_AVX_VADDPD_IR4,	AVX_S_IR4_vaddpd_ir4( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 		SetResult( RESULT_AVX_VMULPD_VADDPD_IR4,	AVX_M_IR4_vmulpd_vaddpd_ir4( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 		if( Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ){
 
 			SetResult( RESULT_AVX_VFMADDPD_IR4,	AVX_S_FMA_IR4_vfmaddpd_ir4( Loop, 10.0f		) );
-			Progress++;
+			Progress.Increment();
 
 		}else{
-			Progress++;
+			Progress.Increment();
 		}
 
 
@@ -1078,7 +1078,7 @@ FL_LOG( "SSE loop=%d\n", Loop );
 		// IR6
 		//------------------------------------------------------
 		SetResult( RESULT_AVX_VML_AD_VADDPD_IR6,	AVX_M_IR6_vml_ad_vaddpd_ir6( Loop, 7.0f		) );
-		Progress++;
+		Progress.Increment();
 
 
 	}
@@ -1092,8 +1092,8 @@ FL_LOG( "SSE loop=%d\n", Loop );
 
 const char*	FloatTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 

@@ -4,7 +4,13 @@
 #ifndef	TEST_BASE_H_
 #define	TEST_BASE_H_
 
-#include	<minilib/AtomicValue.h>
+#include	<flatlib/core/thread/AtomicValue.h>
+
+namespace flatlib {
+	namespace system {
+		class SystemInfo;
+	}
+}
 
 enum class InfoType : unsigned int {
 	INFO_COUNT,
@@ -97,6 +103,7 @@ protected:
 
 	flatlib::thread::AtomicValue<unsigned int>	Progress;
 	flatlib::thread::AtomicValue<unsigned int>	DoneFlag;
+	flatlib::system::SystemInfo&	Info;
 	unsigned int			LoopCount;
 protected:
 	void	SetOp( unsigned int index, unsigned int lop, unsigned int fop );

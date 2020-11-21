@@ -4,8 +4,8 @@
 #ifndef	THREAD_ADAPTER_H_
 #define	THREAD_ADAPTER_H_
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/ThreadFunction.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/thread//ThreadInstance.h>
 #include	"TestBase.h"
 
 
@@ -14,7 +14,7 @@ class ThreadAdapter : public ITestBase {
 public:
 private:
 	T	Instance;
-	flatlib::thread::ThreadFunctionBase*	BenchThread;
+	flatlib::thread::ThreadInstance*	BenchThread;
 public:
 
 	ThreadAdapter( unsigned int group ) : ITestBase( false, group ), BenchThread( nullptr )
@@ -45,7 +45,7 @@ public:
 			FL_LOG( "ThreadAdapter Join\n" );
 			BenchThread->Join();
 			FL_LOG( "ThreadAdapter Join COMPLETE\n" );
-			flatlib::memory::SafeDelete( BenchThread );
+			flatlib::memory::ZDelete( BenchThread );
 		}
 	}
 
