@@ -11,10 +11,8 @@
 using namespace flatlib;
 
 
-
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-
 
 void	ITestBase::SetCpuAffinity()
 {
@@ -30,7 +28,6 @@ void	ITestBase::SetCpuAffinity()
 					affinity_mask,
 					core_clock );
 }
-
 
 
 //-----------------------------------------------------------------------------
@@ -106,7 +103,6 @@ void	TestBase::SetResult( unsigned int index, uint64_t time )
 	auto&	result= TestResult[index];
 	result.Time= time;
 }
-
 
 
 unsigned int	TestBase::GetResult( unsigned int index ) const

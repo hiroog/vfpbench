@@ -1,9 +1,9 @@
 // 2014/01/15 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/Matrix4.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/math/Matrix4.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"MatrixTest_SSESP.h"
 
@@ -1046,7 +1046,5 @@ const char*	MatrixTest::GetTestName() const
 //-----------------------------------------------------------------------------
 #endif // FL_CPU_X86 || FL_CPU_X64
 //-----------------------------------------------------------------------------
-
-
 
 

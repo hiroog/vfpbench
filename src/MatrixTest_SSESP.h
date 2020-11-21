@@ -4,7 +4,7 @@
 #ifndef	MATRIX_TEST_SSESP_H_
 #define	MATRIX_TEST_SSESP_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace SSESP {
@@ -72,6 +72,5 @@ public:
 }
 
 #endif
-
 
 

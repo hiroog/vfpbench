@@ -17,43 +17,6 @@ using system::CPUFeature;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-#if 0
-void	BenchApplication::save_size( text::TextPool& pool, const void* ptr, unsigned int size )
-{
-	void*	str= buffer.Alloc( size );
-	memcpy( str, ptr, size );
-}
-
-
-void	BenchApplication::save_line( text::TextPool& pool, const char* ptr )
-{
-	unsigned int	size= static_cast<unsigned int>(strlen( ptr ));
-	void*	str= buffer.Alloc( size );
-	memcpy( str, ptr, size );
-}
-
-
-void	BenchApplication::save_format( text::TextPool& pool, const char* format, va_list arg )
-{
-	const int	MAX_BUFFER_PATH= 1024 * 4;
-	char	str_buffer[MAX_BUFFER_PATH];
-	vsprintf_s( str_buffer, MAX_BUFFER_PATH-1, format, arg );
-	save_line( buffer, str_buffer );
-}
-
-
-void	BenchApplication::print( text::TextPool& pool, const char* format ... )
-{
-	va_list	ap;
-	va_start( ap, format );
-	save_format( buffer, format, ap );
-	va_end( ap );
-}
-#endif
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 
 namespace {
 //-----------------------------------------------------------------------------
@@ -565,7 +528,6 @@ double	BenchApplication::GetMaxMFLOPS( unsigned int loop_type, bool multithread 
 }
 
 
-
 void BenchApplication::UpdateResult( unsigned int btype, ITestBase* bench )
 {
 	const auto&	Info= system::RCore().RSystemInfo();
@@ -604,8 +566,5 @@ void	BenchApplication::UpdateTimestamp()
 	snprintf( DateTimeStr, length-2, "%04d%02d%02d %02d%02d%02d", time.Year, time.Month, time.Day, time.Hour, time.Minute, time.Second );
 	DateTimeStr[length-1]= '\0';
 }
-
-
-
 
 

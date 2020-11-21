@@ -7,8 +7,6 @@
 #include	<flatlib/core/core.h>
 #include	<flatlib/core/ut/FixedArray.h>
 #include	<flatlib/core/text/TextPool.h>
-//#include	<minilib/Platform.h>
-//#include	<minilib/BinaryBuffer.h>
 #include	"ResultData.h"
 
 
@@ -19,13 +17,6 @@ private:
 
 	flatlib::ut::FixedArray<ResultData>	DataArray;
 	char	DateTimeStr[24];
-#if 0
-public:
-	static void	save_size( flatlib::text::TextPool& buffer, const void* ptr, unsigned int size );
-	static void	save_line( flatlib::text::TextPool& buffer, const char* ptr );
-	static void	save_format( flatlib::text::TextPool& buffer, const char* format, va_list arg );
-	static void	print( flatlib::text::TextPool& buffer, const char* format ... );
-#endif
 private:
 	static void	ExportLine( flatlib::text::TextPool& buffer, const ResultLine& line );
 	static void	ExportData( flatlib::text::TextPool& buffer, const ResultData& data );
@@ -82,9 +73,5 @@ public:
 };
 
 #endif
-
-
-
-
 
 

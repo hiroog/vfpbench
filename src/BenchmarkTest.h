@@ -5,13 +5,10 @@
 #define	BENCHMARK_TEST_H_
 
 #include	<flatlib/core/CoreBase.h>
-//#include	<minilib/Platform.h>
-#include	"ThreadAdapter.h"
-#include	"MultiAdapter.h"
 #include	<flatlib/core/ut/FixedArray.h>
 #include	<flatlib/core/system/SystemInfo.h>
-//#include	<minilib/FixedArray.h>
-//#include	<minilib/SystemInfo.h>
+#include	"ThreadAdapter.h"
+#include	"MultiAdapter.h"
 
 #define	USE_MATRIX_TEST		0
 
@@ -253,15 +250,5 @@ public:
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-
-
-
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-
 #endif
-
-
 

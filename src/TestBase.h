@@ -89,7 +89,6 @@ public:
 };
 
 
-
 class TestBase : public ITestBase {
 protected:
 	enum {
@@ -126,12 +125,7 @@ public:
 	virtual unsigned int			GetResult( unsigned int result_index ) const override;
 	virtual unsigned int			GetLoopOp( unsigned int result_index ) const override;
 	virtual float					GetInstFop( unsigned int result_index ) const override;
-
-
 };
 
-
-
 #endif
-
 

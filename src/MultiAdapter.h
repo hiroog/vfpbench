@@ -9,9 +9,6 @@
 #include	<flatlib/core/system/SystemInfo.h>
 #include	<flatlib/core/thread/ThreadInstance.h>
 #include	<flatlib/core/ut/FixedArray.h>
-//#include	<minilib/CoreLib.h>
-//#include	<minilib/Thread.h>
-//#include	<minilib/FixedArray.h>
 #include	"TestBase.h"
 
 
@@ -28,7 +25,6 @@ public:
 		unsigned int	core= flatlib::system::RCore().RSystemInfo().GetThreadCount( group );
 		InstanceArray.SetArraySize( core );
 		ThreadArray.SetArraySize( core );
-		//ThreadArray.ClearZero();
 		for( unsigned int ti= 0 ; ti< core ; ti++ ){
 			ThreadArray[ti]= nullptr;
 		}
@@ -168,9 +164,5 @@ public:
 	}
 };
 
-
-
 #endif
-
-
 

@@ -5,13 +5,10 @@
 #include	<flatlib/core/thread/Sleep.h>
 #include	"BenchmarkTest.h"
 #include	"BenchApplication.h"
-
 #include	<stdio.h>
 #include	<stdlib.h>
 
-
 using namespace flatlib;
-
 
 enum : unsigned int {
 	BTYPE_ALL	=	1000,
@@ -22,7 +19,6 @@ enum : unsigned int {
 	INFO_CPU,
 	INFO_LOG,
 };
-
 
 class AppModule {
 private:
@@ -87,7 +83,6 @@ public:
 			break;
 		}
 	}
-
 	void Dump( unsigned int btype )
 	{
 		FL_PRINT( "-------------------\n" );
@@ -95,7 +90,6 @@ public:
 		FL_PRINT( "-------------------\n" );
 		FL_PRINT( "\n" );
 	}
-
 	void Wait( unsigned int btype )
 	{
 		auto*	bench= BenchmarkInstance.GetBenchmark( btype );
@@ -109,7 +103,6 @@ public:
 		App.UpdateResult( btype, bench );
 		Dump( btype );
 	}
-
 	void RunBenchmark_All( unsigned int btype )
 	{
 		if( btype != BTYPE_ALL ){
@@ -121,7 +114,6 @@ public:
 			}
 		}
 	}
-
 	void RunBenchmark( unsigned int btype, const char* log_file )
 	{
 		PrintInfo();
@@ -149,10 +141,7 @@ public:
 		PrintFlops();
 #endif
 	}
-
 };
-
-
 
 
 static void usage()
@@ -169,8 +158,6 @@ static void usage()
 		);
 	exit( 1 );
 }
-
-
 
 int main( int argc, char** argv )
 {
@@ -245,15 +232,11 @@ int main( int argc, char** argv )
 			}
 		}
 
+		memory::ZRelease( context );
 	}
 	memory::RAllocator().DumpStatus();
 	FL_ASSERT( memory::RAllocator().GetTotalCount() == 0 );
-	//FL_LOG( "memory=%zd %zd\n", memory::GetAllocCount(), memory::GetAllocSize() );
-	//FL_ASSERT( memory::GetAllocCount() == 0 );
-	//FL_ASSERT( memory::GetAllocSize() == 0 );
-
 	return 0;
 }
-
 
 
