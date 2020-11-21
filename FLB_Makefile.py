@@ -126,7 +126,7 @@ def BenchRun( task ):
             os.mkdir( 'save' )
         import  re
         date_pat= re.compile( r'^T\s+"([0-9]+)\s+([0-9]+)"$' )
-        nnmae= 'save0.log'
+        nname= 'save0.log'
         with open( '.save.log', 'r' ) as fi:
             for line in fi:
                 pat= date_pat.search( line )
