@@ -209,7 +209,7 @@ static uint64_t VFP_S_IR1_##name( CounterType LoopCount, float answer ) \
 			op " h7, h8, h9 \n"
 
 
-//		"udot   v0.4s, v1.16b, v1.16b\n"	\
+//		"udot   v0.4s, v1.16b, v1.16b\n"	
 
 #define VFP_S_IR8_0(op,name) \
 static uint64_t VFP_S_IR8_##name( CounterType LoopCount, float answer ) \

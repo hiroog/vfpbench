@@ -12,6 +12,7 @@
 # Show CPU information
 #  $ ./vfpbench -i
 
+import re
 
 #------------------------------------------------------------------------------
 
@@ -51,35 +52,32 @@ TargetName= 'vfpbench'
 
 #------------------------------------------------------------------------------
 
-def addCleanTask( env, task_name, dir_name= os.getcwd() ):
-    def command( task ):
-        import  BuildUtility
-        BuildUtility.RemoveTree( os.path.join( task.cwd, task.env.OUTPUT_OBJ_DIR ) )
-    clean_task= env.tool.addScriptTask( env, task_name, command )
-    clean_task.cwd= os.getcwd()
-    return  clean_task
+tool.addCleanTask( genv, 'clean' )
 
-addCleanTask( genv, 'clean' )
+#------------------------------------------------------------------------------
 
-
-def makeExeName( env, src_file ):
-    if env.getConfig() == 'Release':
-        return  src_file
-    if src_file:
-        return  env.getExeName( src_file + '_' + env.getTargetArch() + '_' + env.getConfig() )
-    return  '.'
+def get_arm64_arch( env ):
+    global re
+    if env.getTargetPlatform() == 'Linux':
+        pat_fphp= re.compile( r'\bfphp\b' )
+        pat_asimdhp= re.compile( r'\basimdhp\b' )
+        with open( '/proc/cpuinfo', 'r' ) as fi:
+            for line in fi:
+                pat1= pat_fphp.search( line )
+                pat2= pat_asimdhp.search( line )
+                if pat1 and pat2:
+                    return  'armv8.2-a+simd+fp16'
+    return  'armv8-a+simd'
 
 #------------------------------------------------------------------------------
 
 env= tool.createTargetEnvironment()
-env.EXE_NAME_FUNC= makeExeName
 env.addIncludePaths( ['src'] )
 
 if env.getHostPlatform() == 'macOS':
     env.addCCFlags( ['-DflPRESET_OSX=1'] )
 elif env.getHostPlatform() == 'Linux':
     env.addCCFlags( ['-DflPRESET_LINUX=1'] )
-
 
 env.refresh()
 
@@ -100,21 +98,23 @@ def addCustomBuild( env, TargetName, src_list, config ):
             elif arch == 'x64':
                 local_env.setTargetArch( 'x86' )
         if arch == 'arm64':
-            #local_env.addCCFlags( ['-march=armv8a+fp16'] )
-            local_env.addCCFlags( ['-march=armv8a'] )
-            #local_env.addCCFlags( ['-march=armv8.2a+crypto+fp16+dotprod'] )
-        if config != 'Release':
+                global get_arm64_arch
+                local_env.addCCFlags( ['-march=' + get_arm64_arch( env ) ] )
+        if config == 'Release':
+            exe_name= TargetName
+        else:
             local_env.addCCFlags( ['-DDEBUG=1'] )
+            exe_name= env.getExeName( TargetName + '_' + env.getTargetArch() + '_' + env.getConfig() )
         local_env.refresh()
-        task= tool.addExeTask( local_env, TargetName, src_list )
+        task= tool.addExeTask( local_env, None, src_list, target=exe_name )
         task_list.append( task )
     return  task_list
 
 task_list= addCustomBuild( env, TargetName, src_list, 'Release' )
-tool.addNamedTask( env, 'build', task_list )
+tool.addGroupTask( env, 'build', task_list )
 
 task_list= addCustomBuild( env, TargetName, src_list, 'Debug' )
-tool.addNamedTask( env, 'debug', task_list )
+tool.addGroupTask( env, 'debug', task_list )
 
 
 #------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ def BenchRun( task ):
     if os.path.exists( '.save.log' ):
         if not os.path.exists( 'save' ):
             os.mkdir( 'save' )
-        import  re
+        global  re
         date_pat= re.compile( r'^T\s+"([0-9]+)\s+([0-9]+)"$' )
         nname= 'save0.log'
         with open( '.save.log', 'r' ) as fi:
@@ -146,7 +146,7 @@ task= tool.addScriptTask( env, 'run', BenchRun )
 #------------------------------------------------------------------------------
 
 def PushLog( task ):
-    import re
+    global re
     import datetime
     src_file= 'output_log.txt'
     #cdate= datetime.datetime.today().strftime( '%Y%m%d_%H%M%S' )
@@ -176,7 +176,7 @@ task= tool.addScriptTask( env, 'push', PushLog )
 
 def ListLog( task ):
     log_list= os.listdir( 'log' )
-    import re
+    global re
     import urllib.parse
     plist= [
             re.compile( r'^SingleThread\s+HP\s+max:\s+([0-9.-]+)' ),
@@ -241,7 +241,7 @@ task.table= True
 #------------------------------------------------------------------------------
 class Converter:
     def __init__( self ):
-        import re
+        global re
         self.date_pat= re.compile( r'(.+)_([0-9]+)_([0-9]+)\.txt' )
 
     def convet_filename_to_header( self, root, file_name ):
