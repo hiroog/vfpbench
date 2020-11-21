@@ -29,12 +29,12 @@ public:
 	template<typename T>
 	void			AddBenchSingle( unsigned int group )
 	{
-		AddBench( flatlib::memory::New<ThreadAdapter<T>>( group ) );
+		AddBench( FL_MEMORY::New<ThreadAdapter<T>>( group ) );
 	}
 	template<typename T>
 	void			AddBenchMulti( unsigned int group )
 	{
-		AddBench( flatlib::memory::New<MultiAdapter<T>>( group ) );
+		AddBench( FL_MEMORY::New<MultiAdapter<T>>( group ) );
 	}
 	unsigned int	GetBenchCount() const;
 	ITestBase*		GetBenchmark( unsigned int index ) const;

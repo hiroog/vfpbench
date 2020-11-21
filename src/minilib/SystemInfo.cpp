@@ -283,7 +283,7 @@ void SystemInfo::DecodeCpuTopology()
 	for( unsigned int ti= 0 ; ti< present ; ti++ ){
 		auto*	thread= ThreadArray[ti];
 		thread->Join();
-		memory::SafeDelete( thread );
+		memory::ZDelete( thread );
 		ThreadArray[ti]= nullptr;
 	}
 }

@@ -74,7 +74,7 @@ public:
 	void 	Clear()
 	{
 		if( Array ){
-			memory::DeleteArray( Array, ArraySize );
+			FL_MEMORY::DeleteArray( Array, ArraySize );
 			Array= nullptr;
 			ArraySize= 0;
 		}
@@ -93,7 +93,7 @@ public:
 		flASSERT( Array == nullptr );
 		ArraySize= count;
 		if( count ){
-			Array= memory::NewArray<T>( count );
+			Array= FL_MEMORY::NewArray<T>( count );
 		}
 		return	*this;
 	}

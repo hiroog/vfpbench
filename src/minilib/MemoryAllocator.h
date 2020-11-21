@@ -6,6 +6,8 @@
 
 #include	<minilib/CoreLib.h>
 
+#define	FL_MEMORY	flatlib::memory::ma
+
 namespace flatlib {
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -25,6 +27,9 @@ inline constexpr size_t	GetAlignment()
 	return	alignof(T) < sizeof(void*) ? sizeof(void*) : alignof(T);
 }
 
+namespace ma {
+//-----------------------------------------------------------------------------
+
 template<typename T,typename... ARG>
 inline static T*	New( ARG&&... arg )
 {
@@ -38,13 +43,6 @@ inline void	Delete( T* ptr )
 		ptr->~T();
 		MemoryFree( ptr );
 	}
-}
-
-template<typename T>
-inline void	SafeDelete( T*& ptr )
-{
-	Delete( ptr );
-	ptr= nullptr;
 }
 
 template<typename T>
@@ -71,6 +69,16 @@ inline void	DeleteArray( T* ptr, size_t count )
 	}
 }
 
+//-----------------------------------------------------------------------------
+}
+
+template<typename T>
+inline void	ZDelete( T*& ptr )
+{
+	FL_MEMORY::Delete( ptr );
+	ptr= nullptr;
+}
+
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -81,5 +89,4 @@ inline void	DeleteArray( T* ptr, size_t count )
 }
 
 #endif
-
 

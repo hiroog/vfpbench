@@ -75,7 +75,7 @@ public:
 template<typename FT>
 ThreadFunction<FT>* CreateThreadFunction( FT func )
 {
-	return	flatlib::memory::New<ThreadFunction<FT>>( func );
+	return	FL_MEMORY::New<ThreadFunction<FT>>( func );
 }
 
 
