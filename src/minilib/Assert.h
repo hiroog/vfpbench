@@ -11,7 +11,7 @@
 #include	<minilib/Platform.h>
 #include	<assert.h>
 
-#if flOS_ANDROID
+#if FL_OS_ANDROID
 # include	<android/log.h>
 #endif
 
@@ -30,7 +30,7 @@ namespace flatlib {
 
 
 //--------------------------------------
-#if flOS_ANDROID
+#if FL_OS_ANDROID
 //--------------------------------------
 
 inline static void flatlib_assert( const char* text, const char* file, int line )
@@ -49,7 +49,7 @@ inline static void flatlib_assert( const char* text, const char* file, int line 
 #endif
 //--------------------------------------
 
-#if flOS_WINDOWS
+#if FL_OS_WINDOWS
 # define	flABORT()		DebugBreak()
 #else
 # define	flABORT()		flASSERT(0)

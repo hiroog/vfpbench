@@ -6,15 +6,15 @@
 
 #include	<minilib/Platform.h>
 
-#if flOS_WINDOWS
+#if FL_OS_WINDOWS
 # include	<windows.h>
 #endif
 
-#if flOS_DARWIN
+#if FL_OS_DARWIN
 # include	<TargetConditionals.h>
 #endif
 
-#if flOS_UNIX
+#if FL_OS_UNIX
 # include	<new>
 # include	<stddef.h>
 # include	<stdint.h>

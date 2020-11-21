@@ -21,7 +21,7 @@ void	SleepMS( unsigned int ms );
 //-----------------------------------------------------------------------------
 
 class TickTime {
-#if flOS_WINDOWS
+#if FL_OS_WINDOWS
 	int64_t	Freq;
 #endif
 public:

@@ -5,7 +5,7 @@
 #include	"ConsoleLog.h"
 #include	<stdio.h>
 
-#if flOS_ANDROID
+#if FL_OS_ANDROID
 # include	<android/log.h>
 #endif
 
@@ -15,7 +15,7 @@ namespace flatlib {
 
 void ConsoleLog::Output( const char* msg )
 {
-#if flOS_ANDROID
+#if FL_OS_ANDROID
 	__android_log_write( ANDROID_LOG_INFO, "vfpbench", msg );
 #else
 	printf( "%s", msg );
@@ -24,7 +24,7 @@ void ConsoleLog::Output( const char* msg )
 
 void ConsoleLog::Format( const char* format, va_list args )
 {
-#if flOS_ANDROID
+#if FL_OS_ANDROID
 	__android_log_vprint( ANDROID_LOG_INFO, "vfpbench", format, args );
 #else
 	vprintf( format, args );

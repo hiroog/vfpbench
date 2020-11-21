@@ -5,7 +5,7 @@
 #define	FLATLIB_THREAD_THREAD_H_
 
 #include	<minilib/Platform.h>
-#if flOS_UNIX
+#if FL_OS_UNIX
 # include	<pthread.h>
 #endif
 
@@ -20,13 +20,13 @@ namespace thread {
 
 class Thread {
 private:
-#if flOS_UNIX
+#if FL_OS_UNIX
 	pthread_t	hThread;
 #endif
 	void	(*Func)( void* arg );
 	void*	Arg;
 private:
-#if flOS_UNIX
+#if FL_OS_UNIX
 	static void*	ThreadFunc( void* arg );
 #endif
 public:
@@ -48,7 +48,7 @@ public:
 //-----------------------------------------------------------------------------
 
 
-#if flOS_WINDOWS
+#if FL_OS_WINDOWS
 
 class ThreadLock {
 	CRITICAL_SECTION	LockData;
@@ -70,7 +70,7 @@ public:
 	}
 };
 
-#elif flOS_UNIX
+#elif FL_OS_UNIX
 
 class ThreadLock {
 	pthread_mutex_t		LockData;

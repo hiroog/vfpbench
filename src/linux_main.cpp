@@ -159,7 +159,7 @@ public:
 static void usage()
 {
 	FL_PRINT(
-		"vfpbench v2.1 2014-2019 Hiroyuki Ogasawara\n"
+		"vfpbench v2.2 2014-2020 Hiroyuki Ogasawara\n"
 		"usage: vfpbench [options]\n"
 		" -l                  List benchmark tests\n"
 		" -i                  Display system info\n"

@@ -5,12 +5,12 @@
 #include	"ConsoleLog.h"
 #include	"Assert.h"
 
-#if flOS_UNIX
+#if FL_OS_UNIX
 # include	<time.h>
 # include	<sys/time.h>
-# if flOS_LINUX
+# if FL_OS_LINUX
 #  include	<sys/types.h>
-#  if !flOS_PPO
+#  if !FL_OS_PPO
 #   include	<sys/syscall.h>
 #  endif
 #  include	<sched.h>
@@ -18,7 +18,7 @@
 # endif
 #endif
 
-#if flOS_DARWIN
+#if FL_OS_DARWIN
 # include	<pthread.h>
 # include	<mach/mach.h>
 # include	<mach/task_info.h>
@@ -37,10 +37,10 @@ namespace time {
 
 void SleepMS( unsigned int ms )
 {
-#if flOS_WINDOWS
+#if FL_OS_WINDOWS
 	::Sleep( ms );
 #endif
-#if flOS_UNIX
+#if FL_OS_UNIX
 	struct timespec	spec;
 	spec.tv_sec= ms/1000;
 	spec.tv_nsec= (ms%1000) * 1000000;
@@ -57,7 +57,7 @@ TickTime::TickTime()
 	Init();
 }
 
-#if flOS_WINDOWS
+#if FL_OS_WINDOWS
 
 void	TickTime::Init()
 {
@@ -103,9 +103,9 @@ void	SetAffinityMask( uint64_t cpu_mask )
 	if( !cpu_mask ){
 		return;
 	}
-#if flOS_PPO
+#if FL_OS_PPO
 	return;
-#elif flOS_LINUX
+#elif FL_OS_LINUX
 	cpu_set_t	mask;
 
 	CPU_ZERO( &mask );
@@ -130,7 +130,7 @@ void	SetAffinityMask( uint64_t cpu_mask )
 }
 
 
-#if flOS_DARWIN
+#if FL_OS_DARWIN
 void	SetCpuAffinityTag( unsigned int tag )
 {
 	auto	thread= pthread_mach_thread_np( pthread_self() );
@@ -166,9 +166,9 @@ void	GetAffinityInfo()
 
 void	SetCpuAffinity( unsigned int cpu_index )
 {
-#if flOS_PPO
+#if FL_OS_PPO
 	return;
-#elif flOS_LINUX
+#elif FL_OS_LINUX
 	cpu_set_t	mask;
 
 	CPU_ZERO( &mask );
@@ -182,7 +182,7 @@ void	SetCpuAffinity( unsigned int cpu_index )
 	if( result != 0 ){
 		FL_ERROR( "SetCpuAffinity: Error %d\n", result );
 	}
-#elif flOS_DARWIN
+#elif FL_OS_DARWIN
 
 	mach_port_t	thread= pthread_mach_thread_np( pthread_self() );
 

@@ -16,9 +16,9 @@
 # else
 #  error "macos"
 # endif
-# define	flOS_UNIX			1
-# define	flOS_DARWIN			1
-# define	flOS_OSX			1
+# define	FL_OS_UNIX			1
+# define	FL_OS_DARWIN			1
+# define	FL_OS_OSX			1
 # define	flCC_CLANG			1
 # define	flSYSTEMTYPE_DEFINED
 #endif
@@ -44,9 +44,9 @@
 #  define	flCPU_ARM6			1
 #  define	flCPU_NEON			0
 # endif
-# define	flOS_UNIX			1
-# define	flOS_DARWIN			1
-# define	flOS_IOS			1
+# define	FL_OS_UNIX			1
+# define	FL_OS_DARWIN			1
+# define	FL_OS_IOS			1
 # define	flCC_CLANG			1
 # ifdef __ARM_VFPV4__
 #  define	flCPU_VFPV4			1
@@ -65,7 +65,7 @@
 //-----------------------------------------------------------------------------
 #if defined(flPRESET_PPO) && flPRESET_PPO
 # define	flPRESET_LINUX	1
-# define	flOS_PPO		1
+# define	FL_OS_PPO		1
 #endif
 
 #if defined(flPRESET_LINUX) && flPRESET_LINUX
@@ -82,8 +82,8 @@
 #  define	flCPU_ARM7			1
 #  define	flCPU_NEON			1
 # endif
-# define	flOS_UNIX			1
-# define	flOS_LINUX			1
+# define	FL_OS_UNIX			1
+# define	FL_OS_LINUX			1
 # ifdef __clang__
 #  define	flCC_CLANG			1
 # else
@@ -118,8 +118,8 @@
 #   define	flCPU_ARM7			1
 #  endif
 # endif
-# define	flOS_UNIX			1
-# define	flOS_ANDROID		1
+# define	FL_OS_UNIX			1
+# define	FL_OS_ANDROID		1
 # ifdef __clang__
 #  define	flCC_CLANG			1
 # else
@@ -194,30 +194,30 @@
 
 
 // OS
-#ifndef	flOS_WINDOWS
-# define	flOS_WINDOWS		0
+#ifndef	FL_OS_WINDOWS
+# define	FL_OS_WINDOWS		0
 #endif
-#ifndef	flOS_UNIX
-# define	flOS_UNIX			0
+#ifndef	FL_OS_UNIX
+# define	FL_OS_UNIX			0
 #endif
-#ifndef	flOS_DARWIN
-# define	flOS_DARWIN			0
+#ifndef	FL_OS_DARWIN
+# define	FL_OS_DARWIN			0
 #endif
 
-#ifndef	flOS_LINUX
-# define	flOS_LINUX			0
+#ifndef	FL_OS_LINUX
+# define	FL_OS_LINUX			0
 #endif
-#ifndef	flOS_ANDROID
-# define	flOS_ANDROID		0
+#ifndef	FL_OS_ANDROID
+# define	FL_OS_ANDROID		0
 #endif
-#ifndef	flOS_OSX
-# define	flOS_OSX			0
+#ifndef	FL_OS_OSX
+# define	FL_OS_OSX			0
 #endif
-#ifndef	flOS_IOS
-# define	flOS_IOS			0
+#ifndef	FL_OS_IOS
+# define	FL_OS_IOS			0
 #endif
-#ifndef	flOS_PPO
-# define	flOS_PPO			0
+#ifndef	FL_OS_PPO
+# define	FL_OS_PPO			0
 #endif
 
 

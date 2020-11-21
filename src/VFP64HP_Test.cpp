@@ -20,7 +20,7 @@ namespace VFP64HP {
 #if flCPU_FP16
 
 
-#if flOS_ANDROID
+#if FL_OS_ANDROID
 # define	USE_ANDROID_GCC		1
 #else
 # define	USE_ANDROID_GCC		0

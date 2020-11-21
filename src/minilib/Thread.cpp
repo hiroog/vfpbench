@@ -28,12 +28,12 @@ void  Thread::Quit()
 
 void  Thread::Join()
 {
-#if flOS_UNIX
+#if FL_OS_UNIX
 	pthread_join( hThread, nullptr );
 #endif
 }
 
-#if flOS_UNIX
+#if FL_OS_UNIX
 void* Thread::ThreadFunc( void* arg )
 {
 	Thread*	This= reinterpret_cast<Thread*>( arg );
@@ -51,7 +51,7 @@ int  Thread::Run( void ( *exec)(void*), void* arg )
 	Arg= arg;
 	Func= exec;
 
-#if flOS_UNIX
+#if FL_OS_UNIX
 	int	err= pthread_create( &hThread, nullptr, (void* (*)(void*))ThreadFunc, reinterpret_cast<void*>( this ) );
 
 	// 0:success, else:errcode
@@ -68,7 +68,7 @@ int  Thread::Run( void ( *exec)(void*), void* arg )
 
 void  Thread::Exit()
 {
-#if flOS_UNIX
+#if FL_OS_UNIX
 	pthread_exit( nullptr );
 #endif
 }

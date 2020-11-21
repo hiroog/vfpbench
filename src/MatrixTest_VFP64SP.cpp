@@ -19,7 +19,7 @@ namespace VFP64SP {
 //-----------------------------------------------------------------------------
 
 
-#if flOS_ANDROID
+#if FL_OS_ANDROID
 # define	USE_ANDROID_GCC		1
 #else
 # define	USE_ANDROID_GCC		0

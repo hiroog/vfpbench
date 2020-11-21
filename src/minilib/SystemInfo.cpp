@@ -9,7 +9,7 @@
 #include	"AtomicValue.h"
 #include	"Matrix4.h"
 
-#if flOS_LINUX
+#if FL_OS_LINUX
 # include	<stdio.h>
 # include	<stdlib.h>
 # include	<sys/types.h>
@@ -17,7 +17,7 @@
 # include	<map>
 #endif
 
-#if flOS_DARWIN
+#if FL_OS_DARWIN
 # include	<sys/types.h>
 # include	<sys/sysctl.h>
 # include	<mach/mach.h>
@@ -44,7 +44,7 @@ SystemInfo	Info;
 
 
 //-----------------------------------------------------------------------------
-#if flOS_LINUX
+#if FL_OS_LINUX
 //-----------------------------------------------------------------------------
 
 namespace {
@@ -386,7 +386,7 @@ void SystemInfo::DecodeCpuInfo()
 
 
 //-----------------------------------------------------------------------------
-#if flOS_DARWIN
+#if FL_OS_DARWIN
 //-----------------------------------------------------------------------------
 
 namespace {
@@ -786,15 +786,15 @@ void	SystemInfo::Init()
 	if( !Initialized ){
 		Initialized= true;
 		GetCPUSpecification();
-#if flOS_PPO
+#if FL_OS_PPO
 		CoreList[0].CoreClock= 2100000;
 		TotalThreadCount=  4;
 		PhysicalCoreCount= 2;
-#elif flOS_LINUX
+#elif FL_OS_LINUX
 		DecodeCpuInfo();
 		DecodeCpuTopology();
 #endif
-#if flOS_DARWIN
+#if FL_OS_DARWIN
 		GetHWInfo();
 #endif
 	}
