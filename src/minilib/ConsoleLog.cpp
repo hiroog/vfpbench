@@ -33,7 +33,7 @@ void ConsoleLog::Format( const char* format, va_list args )
 
 void ConsoleLog::Log( const char* format ... )
 {
-	if( flDEBUG ){
+	if( FL_DEBUG ){
 		va_list	ap;
 		va_start( ap, format );
 		Format( format, ap );

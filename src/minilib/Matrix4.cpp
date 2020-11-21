@@ -136,7 +136,7 @@ void Matrix4::TransposeCopy_FPU( const Matrix4& mat0 )
 
 void Matrix4::Dump( const char* msg ) const
 {
-#if !flRETAIL
+#if !FL_RETAIL
     if( !msg ){
         msg= "";
     }

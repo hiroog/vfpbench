@@ -9,7 +9,7 @@
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_X86 || flCPU_X64
+#if FL_CPU_X86 || FL_CPU_X64
 //-----------------------------------------------------------------------------
 
 using namespace flatlib;
@@ -23,7 +23,7 @@ namespace SSESP {
 // SSE A 128bit
 //-----------------------------------------------------------------------------
 
-#if flCPU_X86
+#if FL_CPU_X86
 
 inline void Mul_SSE_A128( math::Matrix4* p3, const math::Matrix4* p1, const math::Matrix4* p2 )
 {
@@ -129,7 +129,7 @@ inline void Mul_SSE_A128( math::Matrix4* p3, const math::Matrix4* p1, const math
 }
 
 
-#else	// flCPU_X64
+#else	// FL_CPU_X64
 
 
 inline void Mul_SSE_A128( math::Matrix4* p3, const math::Matrix4* p1, const math::Matrix4* p2 )
@@ -365,7 +365,7 @@ inline void Mul_SSE_A128( math::Matrix4* p3, const math::Matrix4* p1, const math
 // 80 20  8  2 = aa = 170
 // c0 30  c  3 = ff = 255
 
-#if flCPU_X86
+#if FL_CPU_X86
 
 
 #if 1
@@ -536,7 +536,7 @@ inline void Mul_AVX_A256( math::Matrix4* p3, const math::Matrix4* p1, const math
 
 
 
-#else // flCPU_X64
+#else // FL_CPU_X64
 
 
 #if 0
@@ -1044,7 +1044,7 @@ const char*	MatrixTest::GetTestName() const
 
 
 //-----------------------------------------------------------------------------
-#endif // flCPU_X86 || flCPU_X64
+#endif // FL_CPU_X86 || FL_CPU_X64
 //-----------------------------------------------------------------------------
 
 

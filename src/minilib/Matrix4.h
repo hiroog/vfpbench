@@ -72,7 +72,7 @@ public:
 
 	void 	Mul( const Matrix4& mat0 )
 	{
-#if flCPU_SIMD
+#if FL_CPU_SIMD
 		MulCopy_4_4_SIMD_I( *this, mat0 );
 #else
 		MulCopy_4_4_FPU( *this, mat0 );
@@ -135,7 +135,7 @@ public:
 };
 
 
-#if flCPU_SIMD_SSE
+#if FL_CPU_SIMD_SSE
 inline void	Matrix4::MulCopy_4_4_SIMD_I( const Matrix4& p2, const Matrix4& p1 )
 {
 #if 1

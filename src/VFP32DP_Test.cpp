@@ -8,7 +8,7 @@
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_ARM7 || flCPU_ARM6
+#if FL_CPU_ARM7 || FL_CPU_ARM6
 //-----------------------------------------------------------------------------
 
 using namespace flatlib;
@@ -364,7 +364,7 @@ VFP_D_IR1( fmuld, fmuld_ir1 );
 VFP_D_IR1( faddd, faddd_ir1 );
 VFP_D_IR1( fmacd, fmacd_ir1 );
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 VFP_D_IR8(  vfma.f64, vfma_f64_ir8 );
 VFP_D_IRS4( vfma.f64, vfma_f64_irs4 );
 VFP_D_IR1(  vfma.f64, vfma_f64_ir1 );
@@ -398,7 +398,7 @@ FL_LOG( "VFP2(dp) loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FMACD_IR8,	VFP_D_IR8_fmacd_ir8( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F64_IR8,	VFP_D_IR8_vfma_f64_ir8( Loop, sum ) );
 #endif
 	Progress++;
@@ -417,7 +417,7 @@ FL_LOG( "VFP2(dp) loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FMACD_IRS4,	VFP_D_IRS4_fmacd_irs4( Loop, 0.0 ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F64_IRS4,	VFP_D_IRS4_vfma_f64_irs4( Loop, 0.0 ) );
 #endif
 	Progress++;
@@ -436,7 +436,7 @@ FL_LOG( "VFP2(dp) loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FMACD_IR1,	VFP_D_IR1_fmacd_ir1( Loop, 0.0 ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F64_IR1,	VFP_D_IR1_vfma_f64_ir1( Loop, 0.0 ) );
 #endif
 	Progress++;

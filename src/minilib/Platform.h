@@ -8,19 +8,19 @@
 //-----------------------------------------------------------------------------
 // MacOSX
 //-----------------------------------------------------------------------------
-#if defined(flPRESET_OSX) && flPRESET_OSX
+#if defined(FL_PRESET_OSX) && FL_PRESET_OSX
 # if defined(__i386__)
-#  define	flCPU_X86			1
+#  define	FL_CPU_X86			1
 # elif defined(__x86_64__)
-#  define	flCPU_X64			1
+#  define	FL_CPU_X64			1
 # else
 #  error "macos"
 # endif
 # define	FL_OS_UNIX			1
 # define	FL_OS_DARWIN			1
 # define	FL_OS_OSX			1
-# define	flCC_CLANG			1
-# define	flSYSTEMTYPE_DEFINED
+# define	FL_CC_CLANG			1
+# define	FL_SYSTEMTYPE_DEFINED
 #endif
 
 
@@ -29,31 +29,31 @@
 //-----------------------------------------------------------------------------
 // iOS
 //-----------------------------------------------------------------------------
-#if defined(flPRESET_IOS) && flPRESET_IOS
+#if defined(FL_PRESET_IOS) && FL_PRESET_IOS
 # if defined(__i386__)
-#  define	flCPU_X86			1
+#  define	FL_CPU_X86			1
 # elif defined(__x86_64__)
-#  define	flCPU_X64			1
+#  define	FL_CPU_X64			1
 # elif defined(__arm64__)
-#  define	flCPU_ARM64			1
-#  define	flCPU_NEON			1
+#  define	FL_CPU_ARM64			1
+#  define	FL_CPU_NEON			1
 # elif __ARM_ARCH == 7
-#  define	flCPU_ARM7			1
-#  define	flCPU_NEON			1
+#  define	FL_CPU_ARM7			1
+#  define	FL_CPU_NEON			1
 # else
-#  define	flCPU_ARM6			1
-#  define	flCPU_NEON			0
+#  define	FL_CPU_ARM6			1
+#  define	FL_CPU_NEON			0
 # endif
 # define	FL_OS_UNIX			1
 # define	FL_OS_DARWIN			1
 # define	FL_OS_IOS			1
-# define	flCC_CLANG			1
+# define	FL_CC_CLANG			1
 # ifdef __ARM_VFPV4__
-#  define	flCPU_VFPV4			1
+#  define	FL_CPU_VFPV4			1
 # else
-#  define	flCPU_VFPV4			0
+#  define	FL_CPU_VFPV4			0
 # endif
-# define	flSYSTEMTYPE_DEFINED
+# define	FL_SYSTEMTYPE_DEFINED
 #endif
 
 
@@ -63,36 +63,36 @@
 //-----------------------------------------------------------------------------
 // Linux
 //-----------------------------------------------------------------------------
-#if defined(flPRESET_PPO) && flPRESET_PPO
-# define	flPRESET_LINUX	1
+#if defined(FL_PRESET_PPO) && FL_PRESET_PPO
+# define	FL_PRESET_LINUX	1
 # define	FL_OS_PPO		1
 #endif
 
-#if defined(flPRESET_LINUX) && flPRESET_LINUX
+#if defined(FL_PRESET_LINUX) && FL_PRESET_LINUX
 # if defined(__x86_64__)
-#  define	flCPU_X64			1
+#  define	FL_CPU_X64			1
 # elif defined(__aarch64__)
-#  define	flCPU_ARM64			1
-#  define	flCPU_NEON			1
+#  define	FL_CPU_ARM64			1
+#  define	FL_CPU_NEON			1
 # elif defined(__i386__)
-#  define	flCPU_X86			1
+#  define	FL_CPU_X86			1
 # elif defined(__ARM_ARCH_6__)
-#  define	flCPU_ARM6			1
+#  define	FL_CPU_ARM6			1
 # elif defined(__arm__)
-#  define	flCPU_ARM7			1
-#  define	flCPU_NEON			1
+#  define	FL_CPU_ARM7			1
+#  define	FL_CPU_NEON			1
 # endif
 # define	FL_OS_UNIX			1
 # define	FL_OS_LINUX			1
 # ifdef __clang__
-#  define	flCC_CLANG			1
+#  define	FL_CC_CLANG			1
 # else
-#  define	flCC_GCC			1
+#  define	FL_CC_GCC			1
 # endif
 # ifdef __ARM_FEATURE_FMA
-#  define	flCPU_VFPV4			1 // nexus7=0, raspberry pi 2=1
+#  define	FL_CPU_VFPV4			1 // nexus7=0, raspberry pi 2=1
 # endif
-# define	flSYSTEMTYPE_DEFINED
+# define	FL_SYSTEMTYPE_DEFINED
 #endif
 
 
@@ -100,51 +100,51 @@
 //-----------------------------------------------------------------------------
 // Android
 //-----------------------------------------------------------------------------
-#if defined(flPRESET_ANDROID) && flPRESET_ANDROID
+#if defined(FL_PRESET_ANDROID) && FL_PRESET_ANDROID
 # if defined(__x86_64__)
-#  define	flCPU_X64			1
+#  define	FL_CPU_X64			1
 # elif defined(__AARCH64EL__)
-#  define	flCPU_ARM64			1
+#  define	FL_CPU_ARM64			1
 # elif defined(__mips64)
-#  define	flCPU_MIPS64		1
+#  define	FL_CPU_MIPS64		1
 # elif defined(__i386__)
-#  define	flCPU_X86			1
+#  define	FL_CPU_X86			1
 # elif defined(__mips__)
-#  define	flCPU_MIPS32		1
+#  define	FL_CPU_MIPS32		1
 # elif defined(__arm__)
-#  if defined(flCPU_ARM5) && flCPU_ARM5
-#	define	flCPU_ARM5			1
+#  if defined(FL_CPU_ARM5) && FL_CPU_ARM5
+#	define	FL_CPU_ARM5			1
 #  else
-#   define	flCPU_ARM7			1
+#   define	FL_CPU_ARM7			1
 #  endif
 # endif
 # define	FL_OS_UNIX			1
 # define	FL_OS_ANDROID		1
 # ifdef __clang__
-#  define	flCC_CLANG			1
+#  define	FL_CC_CLANG			1
 # else
-#  define	flCC_GCC			1
+#  define	FL_CC_GCC			1
 # endif
-# define	flSYSTEMTYPE_DEFINED
+# define	FL_SYSTEMTYPE_DEFINED
 #endif
 
 
 #ifdef __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
-# define	flCPU_FP16			1
+# define	FL_CPU_FP16			1
 #endif
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-#define	flCPU_ARM	(flCPU_ARM5 || flCPU_ARM6 || flCPU_ARM7 || flCPU_ARM64)
+#define	FL_CPU_ARM	(FL_CPU_ARM5 || FL_CPU_ARM6 || FL_CPU_ARM7 || FL_CPU_ARM64)
 
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
 
-#ifndef	flSYSTEMTYPE_DEFINED
-# error "flPRESET_* not defined"
+#ifndef	FL_SYSTEMTYPE_DEFINED
+# error "FL_PRESET_* not defined"
 #endif
 
 
@@ -152,43 +152,43 @@
 //-----------------------------------------------------------------------------
 
 // CPU
-#ifndef flCPU_X86
-# define	flCPU_X86			0
+#ifndef FL_CPU_X86
+# define	FL_CPU_X86			0
 #endif
-#ifndef	flCPU_X64
-# define	flCPU_X64			0
+#ifndef	FL_CPU_X64
+# define	FL_CPU_X64			0
 #endif
-#ifndef	flCPU_ARM5
-# define	flCPU_ARM5			0
+#ifndef	FL_CPU_ARM5
+# define	FL_CPU_ARM5			0
 #endif
-#ifndef	flCPU_ARM6
-# define	flCPU_ARM6			0
+#ifndef	FL_CPU_ARM6
+# define	FL_CPU_ARM6			0
 #endif
-#ifndef	flCPU_ARM7
-# define	flCPU_ARM7			0
+#ifndef	FL_CPU_ARM7
+# define	FL_CPU_ARM7			0
 #endif
-#ifndef	flCPU_ARM64
-# define	flCPU_ARM64			0
+#ifndef	FL_CPU_ARM64
+# define	FL_CPU_ARM64			0
 #endif
-#ifndef	flCPU_MIPS32
-# define	flCPU_MIPS32		0
+#ifndef	FL_CPU_MIPS32
+# define	FL_CPU_MIPS32		0
 #endif
-#ifndef	flCPU_MIPS64
-# define	flCPU_MIPS64		0
+#ifndef	FL_CPU_MIPS64
+# define	FL_CPU_MIPS64		0
 #endif
-#ifndef	flCPU_PPC64
-# define	flCPU_PPC64			0
+#ifndef	FL_CPU_PPC64
+# define	FL_CPU_PPC64			0
 #endif
 
 
-#ifndef	flCPU_NEON
-# define	flCPU_NEON			0
+#ifndef	FL_CPU_NEON
+# define	FL_CPU_NEON			0
 #endif
-#ifndef	flCPU_VFPV4
-# define	flCPU_VFPV4			0
+#ifndef	FL_CPU_VFPV4
+# define	FL_CPU_VFPV4			0
 #endif
-#ifndef flCPU_FP16
-# define	flCPU_FP16			0
+#ifndef FL_CPU_FP16
+# define	FL_CPU_FP16			0
 #endif
 
 
@@ -224,14 +224,14 @@
 
 
 // COMPILER
-#ifndef	flCC_VC
-# define	flCC_VC				0
+#ifndef	FL_CC_VC
+# define	FL_CC_VC				0
 #endif
-#ifndef	flCC_GCC
-# define	flCC_GCC			0
+#ifndef	FL_CC_GCC
+# define	FL_CC_GCC			0
 #endif
-#ifndef	flCC_CLANG
-# define	flCC_CLANG			0
+#ifndef	FL_CC_CLANG
+# define	FL_CC_CLANG			0
 #endif
 
 
@@ -240,17 +240,17 @@
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-#ifndef	flDEBUG
+#ifndef	FL_DEBUG
 # if defined(NDEBUG)
-#  define	flDEBUG			0
+#  define	FL_DEBUG			0
 # elif defined(_DEBUG) || defined(DEBUG)
-#  define	flDEBUG			1
+#  define	FL_DEBUG			1
 # else
-#  define	flDEBUG			1
+#  define	FL_DEBUG			1
 # endif
 #endif
-#ifndef	flRETAIL
-# define	flRETAIL		0
+#ifndef	FL_RETAIL
+# define	FL_RETAIL		0
 #endif
 
 

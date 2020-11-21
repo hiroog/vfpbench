@@ -75,9 +75,9 @@ env= tool.createTargetEnvironment()
 env.addIncludePaths( ['src'] )
 
 if env.getHostPlatform() == 'macOS':
-    env.addCCFlags( ['-DflPRESET_OSX=1'] )
+    env.addCCFlags( ['-DFL_PRESET_OSX=1'] )
 elif env.getHostPlatform() == 'Linux':
-    env.addCCFlags( ['-DflPRESET_LINUX=1'] )
+    env.addCCFlags( ['-DFL_PRESET_LINUX=1'] )
 
 env.refresh()
 
@@ -224,6 +224,8 @@ def ListLog( task ):
     if task.table:
         print( '^ Device  ^ Clock ^ Thread ^  Single Thread                      ^^^  Multi Thread                     ^^^' )
         print( '^ :::     ^ :::   ^ :::    ^  Half-p    ^   Single-p  ^  Double-p  ^  Half-p   ^  Single-p  ^  Double-p  ^' )
+    else:
+        print( 'Device                                              Clock  C/T      S-HP     S-SP     S-DP      M-HP     M-SP     M-DP' )
     for name,sc,log,core,thread,mic,mac in device_list_sp:
         if task.table:
             url= 'https://github.com/hiroog/vfpbench/blob/master/log/' + urllib.parse.quote( log )

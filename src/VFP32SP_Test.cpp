@@ -8,7 +8,7 @@
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_ARM7 || flCPU_ARM6
+#if FL_CPU_ARM7 || FL_CPU_ARM6
 //-----------------------------------------------------------------------------
 
 using namespace flatlib;
@@ -366,7 +366,7 @@ static uint64_t VFP_S_IRS4_##name( unsigned int LoopCount, float answer ) \
 //=============================================================================
 
 //-----------------------------------------------------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //-----------------------------------------------------------------------------
 
 
@@ -926,7 +926,7 @@ static uint64_t NEON_Q_IR12_##name( unsigned int LoopCount, float answer ) \
 
 
 //-----------------------------------------------------------------------------
-#endif // flCPU_NEON
+#endif // FL_CPU_NEON
 //-----------------------------------------------------------------------------
 
 
@@ -1083,18 +1083,18 @@ unsigned int FloatTest::GetProgressStep() const
 VFP_S_IR8( fmuls, fmuls_ir8 );
 VFP_S_IR8( fadds, fadds_ir8 );
 VFP_S_IR8( fmacs, fmacs_ir8 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 VFP_S_IR8( vfma.f32, vfma_f32_ir8 );
 #endif
 
 
 //----------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //----------------------------------
 NEON_D_IR8( vmul.f32, vmul_f32_ir8 );
 NEON_D_IR8( vadd.f32, vadd_f32_ir8 );
 NEON_D_IR8( vmla.f32, vmla_f32_ir8 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 NEON_D_IR8( vfma.f32, vfma_f32_ir8 );
 #endif
 
@@ -1102,7 +1102,7 @@ NEON_D_IR8( vfma.f32, vfma_f32_ir8 );
 NEON_Q_IR8( vmul.f32, vmul_f32_ir8 );
 NEON_Q_IR8( vadd.f32, vadd_f32_ir8 );
 NEON_Q_IR8( vmla.f32, vmla_f32_ir8 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 NEON_Q_IR8( vfma.f32, vfma_f32_ir8 );
 #endif
 //----------------------------------
@@ -1116,18 +1116,18 @@ NEON_Q_IR8( vfma.f32, vfma_f32_ir8 );
 VFP_S_IRS4( fmuls, fmuls_irs4 );
 VFP_S_IRS4( fadds, fadds_irs4 );
 VFP_S_IRS4( fmacs, fmacs_irs4 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 VFP_S_IRS4( vfma.f32, vfma_f32_irs4 );
 #endif
 
 
 //----------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //----------------------------------
 NEON_D_IRS4( vmul.f32, vmul_f32_irs4 );
 NEON_D_IRS4( vadd.f32, vadd_f32_irs4 );
 NEON_D_IRS4( vmla.f32, vmla_f32_irs4 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 NEON_D_IRS4( vfma.f32, vfma_f32_irs4 );
 #endif
 
@@ -1135,7 +1135,7 @@ NEON_D_IRS4( vfma.f32, vfma_f32_irs4 );
 NEON_Q_IRS4( vmul.f32, vmul_f32_irs4 );
 NEON_Q_IRS4( vadd.f32, vadd_f32_irs4 );
 NEON_Q_IRS4( vmla.f32, vmla_f32_irs4 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 NEON_Q_IRS4( vfma.f32, vfma_f32_irs4 );
 #endif
 //----------------------------------
@@ -1148,18 +1148,18 @@ NEON_Q_IRS4( vfma.f32, vfma_f32_irs4 );
 VFP_S_IR1( fmuls, fmuls_ir1 );
 VFP_S_IR1( fadds, fadds_ir1 );
 VFP_S_IR1( fmacs, fmacs_ir1 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 VFP_S_IR1( vfma.f32, vfma_f32_ir1 );
 #endif
 
 
 //----------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //----------------------------------
 NEON_D_IR1( vmul.f32, vmul_f32_ir1 );
 NEON_D_IR1( vadd.f32, vadd_f32_ir1 );
 NEON_D_IR1( vmla.f32, vmla_f32_ir1 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 NEON_D_IR1( vfma.f32, vfma_f32_ir1 );
 #endif
 
@@ -1167,7 +1167,7 @@ NEON_D_IR1( vfma.f32, vfma_f32_ir1 );
 NEON_Q_IR1( vmul.f32, vmul_f32_ir1 );
 NEON_Q_IR1( vadd.f32, vadd_f32_ir1 );
 NEON_Q_IR1( vmla.f32, vmla_f32_ir1 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 NEON_Q_IR1( vfma.f32, vfma_f32_ir1 );
 #endif
 //----------------------------------
@@ -1179,12 +1179,12 @@ NEON_Q_IR1( vfma.f32, vfma_f32_ir1 );
 
 
 //----------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //----------------------------------
 NEON_Q_IR12( vmul.f32, vmul_f32_ir12 );
 NEON_Q_IR12( vadd.f32, vadd_f32_ir12 );
 NEON_Q_IR12( vmla.f32, vmla_f32_ir12 );
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 NEON_Q_IR12( vfma.f32, vfma_f32_ir12 );
 #endif
 //----------------------------------
@@ -1218,7 +1218,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FMACS_IR8,	VFP_S_IR8_fmacs_ir8( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F32_IR8,	VFP_S_IR8_vfma_f32_ir8( Loop, sum ) );
 #endif
 	Progress++;
@@ -1228,7 +1228,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 
 	//------------------------------------------------------
 //----------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //----------------------------------
 
 	SetResult( RESULT_NEON_D_VMUL_F32_IR8,	NEON_D_IR8_vmul_f32_ir8( Loop, 10.0f	) );
@@ -1240,7 +1240,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_NEON_D_VMLA_F32_IR8,	NEON_D_IR8_vmla_f32_ir8( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_D_VFMA_F32_IR8,	NEON_D_IR8_vfma_f32_ir8( Loop, sum ) );
 #endif
 	Progress++;
@@ -1259,7 +1259,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_NEON_Q_VMLA_F32_IR8,	NEON_Q_IR8_vmla_f32_ir8( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_Q_VFMA_F32_IR8,	NEON_Q_IR8_vfma_f32_ir8( Loop, sum ) );
 #endif
 	Progress++;
@@ -1285,7 +1285,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FMACS_IRS4,	VFP_S_IRS4_fmacs_irs4( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F32_IRS4,	VFP_S_IRS4_vfma_f32_irs4( Loop, sum ) );
 #endif
 	Progress++;
@@ -1295,7 +1295,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 
 	//------------------------------------------------------
 //----------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //----------------------------------
 
 	SetResult( RESULT_NEON_D_VMUL_F32_IRS4,	NEON_D_IRS4_vmul_f32_irs4( Loop, 10.0f	) );
@@ -1307,7 +1307,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_NEON_D_VMLA_F32_IRS4,	NEON_D_IRS4_vmla_f32_irs4( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_D_VFMA_F32_IRS4,	NEON_D_IRS4_vfma_f32_irs4( Loop, sum ) );
 #endif
 	Progress++;
@@ -1326,7 +1326,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_NEON_Q_VMLA_F32_IRS4,	NEON_Q_IRS4_vmla_f32_irs4( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_Q_VFMA_F32_IRS4,	NEON_Q_IRS4_vfma_f32_irs4( Loop, sum ) );
 #endif
 	Progress++;
@@ -1350,7 +1350,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FMACS_IR1,	VFP_S_IR1_fmacs_ir1( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F32_IR1,	VFP_S_IR1_vfma_f32_ir1( Loop, sum ) );
 #endif
 	Progress++;
@@ -1360,7 +1360,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 
 	//------------------------------------------------------
 //----------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //----------------------------------
 
 	SetResult( RESULT_NEON_D_VMUL_F32_IR1,	NEON_D_IR1_vmul_f32_ir1( Loop, 10.0f	) );
@@ -1372,7 +1372,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_NEON_D_VMLA_F32_IR1,	NEON_D_IR1_vmla_f32_ir1( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_D_VFMA_F32_IR1,	NEON_D_IR1_vfma_f32_ir1( Loop, sum ) );
 #endif
 	Progress++;
@@ -1391,7 +1391,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_NEON_Q_VMLA_F32_IR1,	NEON_Q_IR1_vmla_f32_ir1( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_Q_VFMA_F32_IR1,	NEON_Q_IR1_vfma_f32_ir1( Loop, sum ) );
 #endif
 	Progress++;
@@ -1408,7 +1408,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	// IR12
 	//------------------------------------------------------
 //----------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //----------------------------------
 
 	SetResult( RESULT_NEON_Q_VMUL_F32_IR12,	NEON_Q_IR12_vmul_f32_ir12( Loop, 10.0f	) );
@@ -1420,7 +1420,7 @@ FL_LOG( "VFP loop=%d\n", Loop );
 	SetResult( RESULT_NEON_Q_VMLA_F32_IR12,	NEON_Q_IR12_vmla_f32_ir12( Loop, sum ) );
 	Progress++;
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 	SetResult( RESULT_NEON_Q_VFMA_F32_IR12,	NEON_Q_IR12_vfma_f32_ir12( Loop, sum ) );
 #endif
 	Progress++;

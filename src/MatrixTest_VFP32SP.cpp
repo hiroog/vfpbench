@@ -9,7 +9,7 @@
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_ARM7 || flCPU_ARM6
+#if FL_CPU_ARM7 || FL_CPU_ARM6
 //-----------------------------------------------------------------------------
 
 using namespace flatlib;
@@ -40,7 +40,7 @@ namespace VFP32SP {
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -267,7 +267,7 @@ inline void Mul_NEON_BD( math::Matrix4* p3, const math::Matrix4* p1, const math:
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 //-----------------------------------------------------------------------------
 
 
@@ -449,12 +449,12 @@ inline void Mul_NEON_BQ_FMA( math::Matrix4* p3, const math::Matrix4* p1, const m
 
 
 //-----------------------------------------------------------------------------
-#endif // flCPU_NEON
+#endif // FL_CPU_NEON
 //-----------------------------------------------------------------------------
 
 
 //-----------------------------------------------------------------------------
-#endif // flCPU_ARM7 || flCPU_ARM6
+#endif // FL_CPU_ARM7 || FL_CPU_ARM6
 //-----------------------------------------------------------------------------
 
 
@@ -465,7 +465,7 @@ inline void Mul_NEON_BQ_FMA( math::Matrix4* p3, const math::Matrix4* p1, const m
 
 
 //-----------------------------------------------------------------------------
-#if 0//flCPU_ARM64
+#if 0//FL_CPU_ARM64
 //-----------------------------------------------------------------------------
 
 
@@ -569,7 +569,7 @@ inline void Mul_NEON_BQ( math::Matrix4* p3, const math::Matrix4* p1, const math:
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-#if flCPU_ARM7 || flCPU_ARM6
+#if FL_CPU_ARM7 || FL_CPU_ARM6
 //-----------------------------------------------------------------------------
 
 
@@ -703,17 +703,17 @@ bool Matrix_Equal_VFP( const math::Matrix4& src1, const math::Matrix4& src2 )
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-#if flCPU_NEON
+#if FL_CPU_NEON
 //-----------------------------------------------------------------------------
 
 TEMPLATE_MUL( Mul_NEON_AQ, "NEON AQ" );
 TEMPLATE_MUL( Mul_NEON_BQ, "NEON BQ" );
 
-#if flCPU_ARM7
+#if FL_CPU_ARM7
 TEMPLATE_MUL( Mul_NEON_AD, "NEON AD" );
 TEMPLATE_MUL( Mul_NEON_BD, "NEON BD" );
 
-#if flCPU_VFPV4
+#if FL_CPU_VFPV4
 TEMPLATE_MUL( Mul_NEON_AQ_FMA, "FMA AQ" );
 TEMPLATE_MUL( Mul_NEON_BQ_FMA, "FMA BQ" );
 TEMPLATE_MUL( Mul_NEON_AQ_FMA_RN, "FMA AQ RN" );
@@ -788,10 +788,10 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_ARM7
+#if FL_CPU_ARM7
 //-----------------------------------------------------------------------------
 
-#if flCPU_NEON
+#if FL_CPU_NEON
 
 	if( Info.HasInstructionSet( CPUFeature::ARM_NEON ) ){
 
@@ -819,7 +819,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 
 		Progress++;
 
-# if flCPU_VFPV4
+# if FL_CPU_VFPV4
 
 		Result	result_AQ_FMA;
 		SetResult( RESULT_NEON_AQ_FMA, Matrix_Mul_NEON_AQ_FMA( result_AQ_FMA.dest,   src1, src2, Loop ) );
@@ -839,7 +839,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 
 		Progress++;
 
-#  if flDEBUG
+#  if FL_DEBUG
 		result_LIB.dest.Dump( "LIB" );
 		result_AQ.dest.Dump( "AQ" );
 		result_AQ_FMA.dest.Dump( "FMA" );
@@ -853,7 +853,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 #endif
 
 //-----------------------------------------------------------------------------
-#elif flCPU_ARM64
+#elif FL_CPU_ARM64
 //-----------------------------------------------------------------------------
 
 		Result	result_AQ;

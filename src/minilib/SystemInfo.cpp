@@ -24,7 +24,7 @@
 # include	<mach/mach_host.h>
 #endif
 
-#if (flCPU_X86 || flCPU_X64) && flCC_CLANG
+#if (FL_CPU_X86 || FL_CPU_X64) && FL_CC_CLANG
 # include	<cpuid.h>
 #endif
 
@@ -303,10 +303,10 @@ void SystemInfo::DecodeCpuInfo()
 //FL_LOG( "[%s]\n", linebuffer );
 		if( !info_feature ){
 			if(
-#if flCPU_ARM6 || flCPU_ARM7 || flCPU_ARM64
+#if FL_CPU_ARM6 || FL_CPU_ARM7 || FL_CPU_ARM64
 				!strncmp( linebuffer, "Features", 8 )
 #endif
-#if flCPU_X64 || flCPU_X86
+#if FL_CPU_X64 || FL_CPU_X86
 				!strncmp( linebuffer, "flags", 5 )
 #endif
 					){
@@ -320,7 +320,7 @@ void SystemInfo::DecodeCpuInfo()
 							*lp++= '\0';
 						}
   //FL_LOG( "word=[%s]\n", top );
-#if flCPU_ARM7 || flCPU_ARM64
+#if FL_CPU_ARM7 || FL_CPU_ARM64
 						if( !strcmp( top, "neon" ) ){
 							SetInstructionSet( CPUFeature::ARM_NEON );
 						}else if( !strcmp( top, "vfpv4" ) ){
@@ -358,7 +358,7 @@ void SystemInfo::DecodeCpuInfo()
 			}
 		}
 		if( !info_devname ){
-#if flCPU_ARM7 || flCPU_ARM64
+#if FL_CPU_ARM7 || FL_CPU_ARM64
 			if( !strncmp( linebuffer, "Hardware", 8 ) ){
 				char*	lp= SkipColon( linebuffer );
 				lp= SkipSpace( lp );
@@ -366,7 +366,7 @@ void SystemInfo::DecodeCpuInfo()
 				info_devname= true;
 			}
 #endif
-#if flCPU_X64 || flCPU_X86
+#if FL_CPU_X64 || FL_CPU_X86
 			if( !strncmp( linebuffer, "model name", 10 ) ){
 				char*	lp= SkipColon( linebuffer );
 				lp= SkipSpace( lp );
@@ -555,7 +555,7 @@ void SystemInfo::GetHWInfo()
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_X86 || flCPU_X64
+#if FL_CPU_X86 || FL_CPU_X64
 //-----------------------------------------------------------------------------
 
 enum {
@@ -618,11 +618,11 @@ struct RegCPUID {
 
 static void	GetCPUID( RegCPUID& reg, unsigned int index, unsigned int subindex= 0 )
 {
-#if flCC_VC
+#if FL_CC_VC
 //	__cpuid( reinterpret_cast<int*>(&reg.EAX), index );
 	__cpuidex( reinterpret_cast<int*>(&reg.EAX), index, subindex );
 #endif
-#if flCC_CLANG || flCC_GCC
+#if FL_CC_CLANG || FL_CC_GCC
 	unsigned int	a= 0;
 	unsigned int	b= 0;
 	unsigned int	c= 0;
@@ -733,12 +733,12 @@ FL_LOG( "80: %08x %08x %08x %08x\n", Feature80.EAX, Feature80.EBX, Feature80.ECX
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_ARM6 || flCPU_ARM7 || flCPU_ARM64
+#if FL_CPU_ARM6 || FL_CPU_ARM7 || FL_CPU_ARM64
 //-----------------------------------------------------------------------------
 
 void	SystemInfo::GetCPUSpecification()
 {
-#if flCPU_ARM64
+#if FL_CPU_ARM64
 	SetInstructionSet( CPUFeature::ARM_NEON );
 	SetInstructionSet( CPUFeature::ARM_VFPV4 );
 	SetInstructionSet( CPUFeature::ARM_64 );
@@ -751,7 +751,7 @@ void	SystemInfo::GetCPUSpecification()
 
 
 //-----------------------------------------------------------------------------
-#if flCPU_MIPS || flCPU_MIPS64
+#if FL_CPU_MIPS || FL_CPU_MIPS64
 //-----------------------------------------------------------------------------
 
 void	SystemInfo::GetCPUSpecification()
@@ -947,21 +947,21 @@ const char*	SystemInfo::GetDeviceName() const
 
 CPUArch	SystemInfo::GetArch() const
 {
-#if flCPU_ARM64
+#if FL_CPU_ARM64
 	return	CPUArch::CPU_ARM64;
-#elif flCPU_ARM7
+#elif FL_CPU_ARM7
 	return	CPUArch::CPU_ARM7;
-#elif flCPU_ARM5
+#elif FL_CPU_ARM5
 	return	CPUArch::CPU_ARM5;
-#elif flCPU_ARM6
+#elif FL_CPU_ARM6
 	return	CPUArch::CPU_ARM6;
-#elif flCPU_X86
+#elif FL_CPU_X86
 	return	CPUArch::CPU_X86;
-#elif flCPU_X64
+#elif FL_CPU_X64
 	return	CPUArch::CPU_X64;
-#elif flCPU_MIPS32
+#elif FL_CPU_MIPS32
 	return	CPUArch::CPU_MIPS32;
-#elif flCPU_MIPS64
+#elif FL_CPU_MIPS64
 	return	CPUArch::CPU_MIPS64;
 #else
 	return	CPUArch::CPU_UNKNOWN;
@@ -970,24 +970,24 @@ CPUArch	SystemInfo::GetArch() const
 
 const char* SystemInfo::GetArchNameLong() const
 {
-#if flCPU_ARM64
+#if FL_CPU_ARM64
 	if( HasInstructionSet( CPUFeature::ARM_FPHP ) ){
 		return	"ARMv8.2A AArch64";
 	}
 	return	"ARMv8A AArch64";
-#elif flCPU_ARM7
+#elif FL_CPU_ARM7
 	return	"ARMv7A";
-#elif flCPU_ARM5
+#elif FL_CPU_ARM5
 	return	"ARMv5TE";
-#elif flCPU_ARM6
+#elif FL_CPU_ARM6
 	return	"ARMv6";
-#elif flCPU_X86
+#elif FL_CPU_X86
 	return	"x86";
-#elif flCPU_X64
+#elif FL_CPU_X64
 	return	"x64 (x86_64)";
-#elif flCPU_MIPS32
+#elif FL_CPU_MIPS32
 	return	"MIPS32";
-#elif flCPU_MIPS64
+#elif FL_CPU_MIPS64
 	return	"MIPS64";
 #else
 	return	"Unknown";
@@ -996,21 +996,21 @@ const char* SystemInfo::GetArchNameLong() const
 
 const char* SystemInfo::GetArchNameShort() const
 {
-#if flCPU_ARM64
+#if FL_CPU_ARM64
 	return	"ARMv8A";
-#elif flCPU_ARM7
+#elif FL_CPU_ARM7
 	return	"ARMv7A";
-#elif flCPU_ARM5
+#elif FL_CPU_ARM5
 	return	"ARMv5TE";
-#elif flCPU_ARM6
+#elif FL_CPU_ARM6
 	return	"ARMv6";
-#elif flCPU_X86
+#elif FL_CPU_X86
 	return	"x86";
-#elif flCPU_X64
+#elif FL_CPU_X64
 	return	"x64";
-#elif flCPU_MIPS32
+#elif FL_CPU_MIPS32
 	return	"MIPS32";
-#elif flCPU_MIPS64
+#elif FL_CPU_MIPS64
 	return	"MIPS64";
 #else
 	return	"Unknown";

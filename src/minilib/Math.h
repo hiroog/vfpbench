@@ -7,44 +7,44 @@
 #include	<minilib/Platform.h>
 #include	<math.h>
 
-#if flCC_VC
+#if FL_CC_VC
 # include	<intrin.h>
-# if flCPU_X86 || flCPU_X64
-#  define	flCPU_SIMD_SSE	1
-#  define	flCPU_SIMD		1
+# if FL_CPU_X86 || FL_CPU_X64
+#  define	FL_CPU_SIMD_SSE	1
+#  define	FL_CPU_SIMD		1
 # endif
 #endif
 
-#if (flCC_GCC || flCC_CLANG) && (flCPU_X86 || flCPU_X64)
+#if (FL_CC_GCC || FL_CC_CLANG) && (FL_CPU_X86 || FL_CPU_X64)
 # include	<x86intrin.h>
-# define	flCPU_SIMD_SSE	1
-# define	flCPU_SIMD		1
+# define	FL_CPU_SIMD_SSE	1
+# define	FL_CPU_SIMD		1
 #endif
 
-#if (flCC_GCC || flCC_CLANG) && (flCPU_ARM7 || flCPU_ARM64)
+#if (FL_CC_GCC || FL_CC_CLANG) && (FL_CPU_ARM7 || FL_CPU_ARM64)
 # if __ARM_NEON__
 #  include	<arm_neon.h>
-#  if flCPU_ARM64
-#   define	flCPU_SIMD_NEON64	1
-#   define	flCPU_SIMD			1
+#  if FL_CPU_ARM64
+#   define	FL_CPU_SIMD_NEON64	1
+#   define	FL_CPU_SIMD			1
 #  else
-#   define	flCPU_SIMD_NEON		1
-#   define	flCPU_SIMD			1
+#   define	FL_CPU_SIMD_NEON		1
+#   define	FL_CPU_SIMD			1
 #  endif
 # endif
 #endif
 
-#ifndef	flCPU_SIMD_SSE
-# define	flCPU_SIMD_SSE		0
+#ifndef	FL_CPU_SIMD_SSE
+# define	FL_CPU_SIMD_SSE		0
 #endif
-#ifndef	flCPU_SIMD_AVX
-# define	flCPU_SIMD_AVX		0
+#ifndef	FL_CPU_SIMD_AVX
+# define	FL_CPU_SIMD_AVX		0
 #endif
-#ifndef	flCPU_SIMD_NEON
-# define	flCPU_SIMD_NEON		0
+#ifndef	FL_CPU_SIMD_NEON
+# define	FL_CPU_SIMD_NEON		0
 #endif
-#ifndef	flCPU_SIMD_NEON64
-# define	flCPU_SIMD_NEON64	0
+#ifndef	FL_CPU_SIMD_NEON64
+# define	FL_CPU_SIMD_NEON64	0
 #endif
 
 
@@ -57,13 +57,13 @@ namespace math {
 //-----------------------------------------------------------------------------
 
 
-#if flCPU_SIMD_AVX
+#if FL_CPU_SIMD_AVX
 typedef	__m128		flFloat32x4;
 typedef	__m256		flFloat32x8;
-#elif flCPU_SIMD_SSE
+#elif FL_CPU_SIMD_SSE
 typedef	__m128		flFloat32x4;
 struct flFloat32x8 { __m128 v[2]; };
-#elif flCPU_SIMD_NEON
+#elif FL_CPU_SIMD_NEON
 typedef	float32x4_t		flFloat32x4;
 typedef	float32x4x2_t	flFloat32x8;
 #else

@@ -20,7 +20,7 @@ namespace flatlib {
 //-----------------------------------------------------------------------------
 
 #ifndef	flENABLE_ASSERT
-# define	flENABLE_ASSERT		flDEBUG
+# define	flENABLE_ASSERT		FL_DEBUG
 #endif
 
 
