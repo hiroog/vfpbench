@@ -109,7 +109,7 @@ public:
 #else
 		unsigned int	test_count= 4;
 #endif
-		bool	half= flatlib::Info.HasInstructionSet( flatlib::CPUFeature::ARM_FPHP );
+		bool	half= flatlib::system::RCore().RSystemInfo().HasInstructionSet( flatlib::system::CPUFeature::ARM_FPHP );
 		if( half ){
 			test_count+= 2;
 		}
