@@ -37,7 +37,7 @@ public:
 
 	void	Run_Direct()
 	{
-		flASSERT( 0 );
+		FL_ASSERT( 0 );
 	}
 
 	void	Quit()

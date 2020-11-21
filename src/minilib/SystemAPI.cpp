@@ -125,7 +125,7 @@ void	SetAffinityMask( uint64_t cpu_mask )
 		FL_ERROR( "SetAffinityMask: Error %d\n", result );
 	}
 #else
-	flASSERT( 0 );
+	FL_ASSERT( 0 );
 #endif
 }
 
@@ -175,7 +175,7 @@ void	SetCpuAffinity( unsigned int cpu_index )
 	CPU_SET( cpu_index, &mask );
 	pid_t	tid= syscall(SYS_gettid);
 	unsigned int	count= CPU_COUNT( &mask );
-	flASSERT( count == 1 );
+	FL_ASSERT( count == 1 );
 	FL_LOG( "SET AFFINITY CPU=%d  CPU_COUNT=%d  (tid=%d)\n", cpu_index, count, tid );
 
 	int	result= sched_setaffinity( tid, sizeof(mask), &mask );
@@ -213,7 +213,7 @@ void	SetCpuAffinity( unsigned int cpu_index )
 
 
 #else
-	flASSERT( 0 );
+	FL_ASSERT( 0 );
 #endif
 }
 

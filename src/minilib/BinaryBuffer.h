@@ -62,7 +62,7 @@ public:
 			}while( Pointer + size > new_size );
 			FL_LOG( "Resize %zd -> %zd  req %zd ptr %zd\n", AllocSize, new_size, size, Pointer );
 			unsigned char*	new_buf= AFunc::AllocBuffer( new_size );
-			flASSERT( new_buf != nullptr );
+			FL_ASSERT( new_buf != nullptr );
 			if( AllocBuffer ){
 				memory::MemCopy( new_buf, AllocBuffer, Pointer );
 				AFunc::FreeBuffer( AllocBuffer );

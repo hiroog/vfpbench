@@ -90,7 +90,7 @@ public:
 	FixedArray& 	Init( SizeType count )
 	{
 		Clear();
-		flASSERT( Array == nullptr );
+		FL_ASSERT( Array == nullptr );
 		ArraySize= count;
 		if( count ){
 			Array= FL_MEMORY::NewArray<T>( count );
@@ -99,32 +99,32 @@ public:
 	}
 	const T& 	Get( SizeType index ) const
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		return	Array[index];
 	}
 	void 	Set( SizeType index, const T& value )
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		Array[index]= value;
 	}
 	void 	Set( SizeType index, T&& value )
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		Array[index]= FL_Move(value);
 	}
 	T& operator []( SizeType index )
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		return	Array[index];
 	}
 	const T& operator []( SizeType index ) const
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		return	Array[index];
 	}
 };
@@ -170,7 +170,7 @@ public:
 	}
 	FixedArrayPOD& 	Init( SizeType count )
 	{
-		flASSERT( Array == nullptr );
+		FL_ASSERT( Array == nullptr );
 		ArraySize= count;
 		if( count ){
 			Array= AFunc::AllocBuffer( count );
@@ -179,26 +179,26 @@ public:
 	}
 	const T 	Get( SizeType index ) const
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		return	Array[index];
 	}
 	void 	Set( SizeType index, const T& value )
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		Array[index]= value;
 	}
 	T& operator []( SizeType index )
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		return	Array[index];
 	}
 	const T& operator []( SizeType index ) const
 	{
-		flASSERT( Array != nullptr );
-		flASSERT( index >= 0 && index < ArraySize );
+		FL_ASSERT( Array != nullptr );
+		FL_ASSERT( index >= 0 && index < ArraySize );
 		return	Array[index];
 	}
 };

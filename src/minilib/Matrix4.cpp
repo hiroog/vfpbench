@@ -112,7 +112,7 @@ void  Matrix4::RotationZ_CS( float cs, float ss )
 
 void Matrix4::TransposeCopy_FPU( const Matrix4& mat0 )
 {
-	flASSERT( this != &mat0 );
+	FL_ASSERT( this != &mat0 );
 
 	_11= mat0._11;
 	_21= mat0._12;

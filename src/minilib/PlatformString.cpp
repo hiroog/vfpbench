@@ -14,7 +14,7 @@
 
 int strcpy_s( char* str, size_t bsize, const char* ptr )
 {
-	flASSERT( strlen(ptr) < bsize );
+	FL_ASSERT( strlen(ptr) < bsize );
 	::strncpy( str, ptr, bsize );
 	str[bsize-1]= '\0';
 	return	0;
@@ -23,7 +23,7 @@ int strcpy_s( char* str, size_t bsize, const char* ptr )
 
 int strcat_s( char* str, size_t bsize, const char* ptr )
 {
-	flASSERT( strlen(str) + strlen(ptr) < bsize );
+	FL_ASSERT( strlen(str) + strlen(ptr) < bsize );
 	::strcat( str, ptr );
 	str[bsize-1]= '\0';
 	return	0;
@@ -32,8 +32,8 @@ int strcat_s( char* str, size_t bsize, const char* ptr )
 
 int strncpy_s( char* str, size_t bsize, const char* ptr, size_t csize )
 {
-	flASSERT( strlen(ptr) < bsize );
-	flASSERT( bsize >= csize );
+	FL_ASSERT( strlen(ptr) < bsize );
+	FL_ASSERT( bsize >= csize );
 	::strncpy( str, ptr, csize );
 	str[bsize-1]= '\0';
 	return	0;
@@ -57,7 +57,7 @@ int _vscprintf( const char* format, va_list ap )
 	const int	wbufsize= 1024*32;
 	static char	workbuffer[wbufsize+8];
 	int	ret= ::vsnprintf( workbuffer, wbufsize, format, ap );
-	flASSERT( ret >= 0 );
+	FL_ASSERT( ret >= 0 );
 	return	ret;
 }
 
@@ -65,8 +65,8 @@ int _vscprintf( const char* format, va_list ap )
 int vsprintf_s( char* str, size_t size, const char* format, va_list ap )
 {
 	int	ret= ::vsnprintf( str, size, format, ap );
-	flASSERT( ret >= 0 );
-	flASSERT( static_cast<size_t>(ret) < size );
+	FL_ASSERT( ret >= 0 );
+	FL_ASSERT( static_cast<size_t>(ret) < size );
 	if( !(static_cast<size_t>(ret) < size) ){
 		// !!
 	}
@@ -97,7 +97,7 @@ namespace memory {
 
 void MemCopy( void* dest, const void* src, size_t copy_size )
 {
-	flASSERT( reinterpret_cast<uintptr_t>( dest ) + copy_size <= reinterpret_cast<uintptr_t>( src )
+	FL_ASSERT( reinterpret_cast<uintptr_t>( dest ) + copy_size <= reinterpret_cast<uintptr_t>( src )
 		|| reinterpret_cast<uintptr_t>( dest ) >= reinterpret_cast<uintptr_t>( src ) + copy_size );
 	memcpy( dest, src, copy_size );
 }

@@ -37,13 +37,13 @@ inline static void flatlib_assert( const char* text, const char* file, int line 
 {
     __android_log_assert( text, "flatlib", "Assertion failure (%s) %s line: %d\n", text, file, line );
 }
-# define	flASSERT(n)		if(!(n)){::flatlib::flatlib_assert( #n, __FILE__, __LINE__ );}
+# define	FL_ASSERT(n)		if(!(n)){::flatlib::flatlib_assert( #n, __FILE__, __LINE__ );}
 
 //--------------------------------------
 #else
 //--------------------------------------
 
-# define	flASSERT(n)		assert(n)
+# define	FL_ASSERT(n)		assert(n)
 
 //--------------------------------------
 #endif
@@ -52,7 +52,7 @@ inline static void flatlib_assert( const char* text, const char* file, int line 
 #if FL_OS_WINDOWS
 # define	flABORT()		DebugBreak()
 #else
-# define	flABORT()		flASSERT(0)
+# define	flABORT()		FL_ASSERT(0)
 #endif
 
 #define	flSTATIC_ASSERT(n,msg)	static_assert(n,msg)
@@ -63,7 +63,7 @@ inline static void flatlib_assert( const char* text, const char* file, int line 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-#define	flASSERT(n)
+#define	FL_ASSERT(n)
 #define	flSTATIC_ASSERT(n,msg)
 #define	flABORT()
 

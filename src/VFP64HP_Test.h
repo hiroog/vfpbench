@@ -82,7 +82,7 @@ public:
 		case InfoType::INFO_LOOP:
 			return	LoopCount;
 		}
-		flASSERT( 0 );
+		FL_ASSERT( 0 );
 		return	0;
 	}
 

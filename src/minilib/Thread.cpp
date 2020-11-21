@@ -46,7 +46,7 @@ void* Thread::ThreadFunc( void* arg )
 
 int  Thread::Run( void ( *exec)(void*), void* arg )
 {
-	flASSERT( exec != nullptr );
+	FL_ASSERT( exec != nullptr );
 
 	Arg= arg;
 	Func= exec;

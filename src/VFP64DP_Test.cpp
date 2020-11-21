@@ -48,7 +48,7 @@ typedef	unsigned long	CounterType;
 static void check_result( double ret, double ans )
 {
 	FL_LOG( "check: %f %f\n", ret, ans );
-	flASSERT( ret == ans );
+	FL_ASSERT( ret == ans );
 }
 
 //-----------------
@@ -1343,7 +1343,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	flASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -1624,8 +1624,8 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 
 const char*	FloatTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 

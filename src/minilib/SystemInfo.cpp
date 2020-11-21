@@ -776,7 +776,7 @@ SystemInfo::SystemInfo() :
 			CoreGroupCount( 1 ),
 			Initialized( false )
 {
-	flASSERT( (unsigned int)CPUFeature::FEATURE_MAX <= CPU_FEATURE_MAX );
+	FL_ASSERT( (unsigned int)CPUFeature::FEATURE_MAX <= CPU_FEATURE_MAX );
 	memory::MemClear( CoreList );
 	memory::MemClear( DeviceName );
 }
@@ -857,11 +857,11 @@ DEF_CPUFEATURE_NAME_MIPS( PS ),
 
 const char* SystemInfo::GetFeatureName( CPUFeature feature ) const
 {
-	flASSERT( sizeof(FeatureNameTable)/sizeof(CPUFeatureNameTable) == (int)CPUFeature::FEATURE_MAX );
+	FL_ASSERT( sizeof(FeatureNameTable)/sizeof(CPUFeatureNameTable) == (int)CPUFeature::FEATURE_MAX );
 	if( feature < CPUFeature::FEATURE_MAX ){
 		unsigned int	index= (unsigned int)feature;
 		const auto&	name= FeatureNameTable[index];
-		flASSERT( name.Feature == feature );
+		FL_ASSERT( name.Feature == feature );
 		return	name.FeatureName;
 	}
 	return	"Unknown";
@@ -930,13 +930,13 @@ uint64_t	SystemInfo::GetAffinityMask( unsigned int group_index ) const
 
 bool	SystemInfo::HasInstructionSet( CPUFeature feature ) const
 {
-	flASSERT( feature < CPUFeature::FEATURE_MAX );
+	FL_ASSERT( feature < CPUFeature::FEATURE_MAX );
 	return	(InstructionSet& (1<<(unsigned int)feature)) != 0;
 }
 
 void	SystemInfo::SetInstructionSet( CPUFeature feature )
 {
-	flASSERT( feature < CPUFeature::FEATURE_MAX );
+	FL_ASSERT( feature < CPUFeature::FEATURE_MAX );
 	InstructionSet|= 1<<(unsigned int)feature;
 }
 

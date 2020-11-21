@@ -62,11 +62,11 @@ void	MemoryFree( void* ptr )
 	FL_LOG( "Free=%8zd %4zd %p\n", fence->Size, TotalAllocCount, ptr );
 	if( fence->Fence != FENCE_BEGIN ){
 		FL_ERROR( "Memory fence-B Unmatch %p (%zd)\n", ptr, fence->Size );
-		flASSERT( 0 );
+		FL_ASSERT( 0 );
 	}
 	if( memcmp( reinterpret_cast<void*>((reinterpret_cast<uintptr_t>( ptr ) + fence->Size)), &FENCE_END, 4 ) ){
 		FL_ERROR( "Memory fence-E Unmatch %p (%zd)\n", ptr, fence->Size );
-		flASSERT( 0 );
+		FL_ASSERT( 0 );
 	}
 	fence->Fence= 0x0;
 	free( reinterpret_cast<void*>( reinterpret_cast<uintptr_t>( ptr ) - fence->Offset ) );

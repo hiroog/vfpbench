@@ -374,7 +374,7 @@ void	BenchApplication::LoadLine( ResultLine& line, const char* ptr )
 	if( strcmp( line.Title, word_buffer ) != 0 ){
 		return;
 	}
-	flASSERT( (&line.Max - &line.Time + 1) == 6 );
+	FL_ASSERT( (&line.Max - &line.Time + 1) == 6 );
 	double*	dptr= &line.Time;
 	for( int i= 0 ; i< 6 ; i++ ){
 		ptr= GetWord( word_buffer, WORD_BUFFER_SIZE, ptr );

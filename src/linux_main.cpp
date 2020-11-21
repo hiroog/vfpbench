@@ -246,8 +246,8 @@ int main( int argc, char** argv )
 
 	}
 	FL_LOG( "memory=%zd %zd\n", memory::GetAllocCount(), memory::GetAllocSize() );
-	flASSERT( memory::GetAllocCount() == 0 );
-	flASSERT( memory::GetAllocSize() == 0 );
+	FL_ASSERT( memory::GetAllocCount() == 0 );
+	FL_ASSERT( memory::GetAllocSize() == 0 );
 
 	return 0;
 }

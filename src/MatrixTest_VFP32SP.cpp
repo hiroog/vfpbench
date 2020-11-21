@@ -884,7 +884,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 
 	DoneFlag= true;
 
-//	flASSERT( err_count == 0 );
+//	FL_ASSERT( err_count == 0 );
 }
 
 
@@ -906,8 +906,8 @@ static const char*	Instruction_Title[]= {
 
 const char*	MatrixTest::GetInstructionName( unsigned int result_index ) const
 {
-	flASSERT( result_index < GetResultCount() );
-	flASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
+	FL_ASSERT( result_index < GetResultCount() );
+	FL_ASSERT( sizeof(Instruction_Title)/sizeof(const char*) == GetResultCount() );
 	return	Instruction_Title[result_index];
 }
 
