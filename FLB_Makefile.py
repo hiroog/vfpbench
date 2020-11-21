@@ -33,18 +33,7 @@ src_list= [
         'src/ResultData.cpp',
         'src/BenchApplication.cpp',
         'src/BenchmarkTest.cpp',
-
-#        'src/minilib/SystemAPI.cpp',
-#        'src/minilib/Thread.cpp',
-#        'src/minilib/MemoryAllocator.cpp',
-#        'src/minilib/Matrix4.cpp',
-#        'src/minilib/Math.cpp',
-#        'src/minilib/SystemInfo.cpp',
-#        'src/minilib/ConsoleLog.cpp',
-#        'src/minilib/PlatformString.cpp',
-#        'src/minilib/DateTime.cpp',
     ]
-
 #        'src/MatrixTest_SSESP.cpp',
 #        'src/MatrixTest_VFP32SP.cpp',
 #        'src/MatrixTest_VFP64SP.cpp',
@@ -276,7 +265,5 @@ class Converter:
         for root,dirs,files in os.walk( 'log' ):
             for file_name in files:
                 self.convet_filename_to_header( root, file_name )
-
-
 
 

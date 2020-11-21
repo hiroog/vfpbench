@@ -5,13 +5,10 @@
 #define	BENCHMARK_TEST_H_
 
 #include	<flatlib/core/CoreBase.h>
-//#include	<minilib/Platform.h>
 #include	"ThreadAdapter.h"
 #include	"MultiAdapter.h"
 #include	<flatlib/core/ut/FixedArray.h>
 #include	<flatlib/core/system/SystemInfo.h>
-//#include	<minilib/FixedArray.h>
-//#include	<minilib/SystemInfo.h>
 
 #define	USE_MATRIX_TEST		0
 
@@ -112,7 +109,7 @@ public:
 #else
 		unsigned int	test_count= 4;
 #endif
-		bool	half= flatlib::Info.HasInstructionSet( flatlib::CPUFeature::ARM_FPHP );
+		bool	half= flatlib::system::RCore().RSystemInfo().HasInstructionSet( flatlib::system::CPUFeature::ARM_FPHP );
 		if( half ){
 			test_count+= 2;
 		}
