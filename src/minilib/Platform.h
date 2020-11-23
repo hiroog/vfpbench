@@ -13,6 +13,8 @@
 #  define	FL_CPU_X86			1
 # elif defined(__x86_64__)
 #  define	FL_CPU_X64			1
+# elif defined(__arm64__)
+#  define	FL_CPU_ARM64		1
 # else
 #  error "macos"
 # endif

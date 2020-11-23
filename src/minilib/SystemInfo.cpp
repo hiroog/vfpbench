@@ -536,6 +536,12 @@ void SystemInfo::GetHWInfo()
 	SetInstructionSet( CPUFeature::ARM_VFPV4 );
 # endif
 
+# if defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC)
+	SetInstructionSet( CPUFeature::ARM_FPHP );
+# endif
+# if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC)
+	SetInstructionSet( CPUFeature::ARM_SIMDHP );
+# endif
 
 	DumpCpuGroup();
 }
@@ -796,6 +802,7 @@ void	SystemInfo::Init()
 #endif
 #if FL_OS_DARWIN
 		GetHWInfo();
+		//CoreList[0].CoreClock= 3200000;
 #endif
 	}
 	FL_LOG( "InstructionSet= %08x\n", InstructionSet );

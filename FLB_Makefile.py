@@ -86,7 +86,8 @@ def addCustomBuild( env, TargetName, src_list, config ):
     if env.getHostPlatform() == 'Linux':
         is_termux= env.isTermux()
     tool= env.tool
-    arch_list= env.getSupportArchList()
+    #arch_list= env.getSupportArchList()
+    arch_list= [ env.getHostArch() ]
     task_list= []
     for arch in arch_list:
         local_env= env.clone()
@@ -99,7 +100,8 @@ def addCustomBuild( env, TargetName, src_list, config ):
                 local_env.setTargetArch( 'x86' )
         if arch == 'arm64':
                 global get_arm64_arch
-                local_env.addCCFlags( ['-march=' + get_arm64_arch( env ) ] )
+                if local_env.getTargetPlatform() == 'Linux':
+                    local_env.addCCFlags( ['-march=' + get_arm64_arch( env ) ] )
         if config == 'Release':
             exe_name= TargetName
         else:
