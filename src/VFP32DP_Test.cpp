@@ -11,6 +11,10 @@
 #if FL_CPU_ARM7 || FL_CPU_ARM6
 //-----------------------------------------------------------------------------
 
+#if defined(__ARM_VFPV4__)
+# define	FL_CPU_VFPV4	1
+#endif
+
 using namespace flatlib;
 using system::CPUFeature;
 

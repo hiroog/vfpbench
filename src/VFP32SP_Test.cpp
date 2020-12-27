@@ -5,11 +5,22 @@
 #include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"VFP32SP_Test.h"
+#include	<flatlib/core/math/MathSIMD.h>
 
 
 //-----------------------------------------------------------------------------
 #if FL_CPU_ARM7 || FL_CPU_ARM6
 //-----------------------------------------------------------------------------
+
+#if defined(__ARM_NEON__) || defined(__ARM_NEON)
+# define	FL_CPU_NEON		1
+#else
+# define	FL_CPU_NEON		FL_CPU_SIMD_NEON
+#endif
+
+#if defined(__ARM_VFPV4__)
+# define	FL_CPU_VFPV4	1
+#endif
 
 using namespace flatlib;
 using system::CPUFeature;
