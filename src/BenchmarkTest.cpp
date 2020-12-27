@@ -25,7 +25,7 @@ void	BenchmarkTestBase::Quit()
 {
 	unsigned int	bench_count= BenchArray.GetDataSize();
 	for( unsigned int bi= 0 ; bi< bench_count ; bi++ ){
-		memory::ZDelete( BenchArray[bi] );
+		FL_MEMORY::ZDelete( BenchArray[bi] );
 	}
 }
 

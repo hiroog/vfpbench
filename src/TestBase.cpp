@@ -21,7 +21,9 @@ void	ITestBase::SetCpuAffinity()
 	unsigned int	thread_count= Info.GetThreadCount( group );
 	unsigned int	core_clock= Info.GetCoreClock( group );
 	auto			affinity_mask= Info.GetAffinityMask( group );
+#if !FL_OS_DARWIN
 	thread::SetAffinityMask( affinity_mask );
+#endif
 	FL_PRINT( "GROUP=%d  THREAD=%d  Affinity=%08llx  Clock=%d\n",
 					group,
 					thread_count,

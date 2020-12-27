@@ -232,7 +232,7 @@ int main( int argc, char** argv )
 			}
 		}
 
-		memory::ZRelease( context );
+		ZRelease( context );
 	}
 	memory::RAllocator().DumpStatus();
 	FL_ASSERT( memory::RAllocator().GetTotalCount() == 0 );

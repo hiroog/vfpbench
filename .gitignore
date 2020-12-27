@@ -21,6 +21,6 @@ run_bench.py
 ###
 .DS_Store
 ppo
-.processor_name
+.processor_name*
 table.txt
 save/

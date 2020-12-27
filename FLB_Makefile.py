@@ -67,13 +67,6 @@ env= tool.createTargetEnvironment()
 env.addIncludePaths( [ 'src', FLATLIB_ROOT ] )
 env.addLibraries( [ 'flatCore' ] )
 
-if env.getHostPlatform() == 'macOS':
-    env.addCCFlags( ['-DFL_PRESET_OSX=1'] )
-elif env.getHostPlatform() == 'Linux':
-    env.addCCFlags( ['-DFL_PRESET_LINUX=1'] )
-
-
-
 env.refresh()
 
 def addCustomBuild( env, TargetName, src_list, config ):
@@ -82,7 +75,8 @@ def addCustomBuild( env, TargetName, src_list, config ):
     if env.getHostPlatform() == 'Linux':
         is_termux= env.isTermux()
     tool= env.tool
-    arch_list= env.getSupportArchList()
+    #arch_list= env.getSupportArchList()
+    arch_list= [ env.getHostArch() ]
     task_list= []
     for arch in arch_list:
         local_env= env.clone()
@@ -94,7 +88,8 @@ def addCustomBuild( env, TargetName, src_list, config ):
             elif arch == 'x64':
                 local_env.setTargetArch( 'x86' )
         if arch == 'arm64':
-                global get_arm64_arch
+            global get_arm64_arch
+            if local_env.getTargetPlatform() == 'Linux':
                 local_env.addCCFlags( ['-march=' + get_arm64_arch( env ) ] )
         if config == 'Release':
             exe_name= TargetName

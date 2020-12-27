@@ -45,7 +45,7 @@ public:
 			FL_LOG( "ThreadAdapter Join\n" );
 			BenchThread->Join();
 			FL_LOG( "ThreadAdapter Join COMPLETE\n" );
-			flatlib::memory::ZDelete( BenchThread );
+			FL_MEMORY::ZDelete( BenchThread );
 		}
 	}
 

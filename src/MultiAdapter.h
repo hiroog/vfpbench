@@ -60,7 +60,7 @@ public:
 			if( ThreadArray[ci] ){
 				FL_LOG( "MultiAdapter JOIN %d\n", ci );
 				ThreadArray[ci]->Join();
-				flatlib::memory::ZDelete( ThreadArray[ci] );
+				FL_MEMORY::ZDelete( ThreadArray[ci] );
 				FL_LOG( "MultiAdapter JOIN QUIT %d\n", ci );
 			}
 		}
