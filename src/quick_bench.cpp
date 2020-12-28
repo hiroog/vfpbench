@@ -26,6 +26,7 @@ public:
 	void	Init( float loop_scale )
 	{
 		system::RCore().RSystemInfo().Init();
+		system::RCore().RSystemInfo().DumpSystemInfo();
 		auto	bcount= BenchmarkInstance.GetBenchCount();
 		App.Init( bcount );
 		for( unsigned int bi= 0 ; bi< bcount ; bi++ ){

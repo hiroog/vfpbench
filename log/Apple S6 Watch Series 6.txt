@@ -232,3 +232,52 @@ NEON fmla.2d (64bit x2) n12       :    0.580    12420.0     1552.5  (  8.0 0.0)
 Average                           :    0.473     7041.4     1827.1  (  4.2 0.0)
 Highest                           :    0.193    12439.0     3113.3  (  8.0 0.0)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+HW INFO: Machine = Watch6,4
+HW INFO: Model = N158bAP
+HW INFO: Arch = N158bAP
+HW INFO: NCPU = 2
+HW INFO: ByteOrder = 1234
+HW INFO: PhysMem = 1512226816
+HW INFO: UserMem = 1251524608
+HW INFO: PageSize = 16384
+HW INFO: Float = 0
+HW INFO: VectorUnit = 0
+HW INFO: BusFreq = 0
+HW INFO: CpuFreq = 0
+HW INFO: CacheLine = 64
+HW INFO: L1Size I = 98304
+HW INFO: L1Size D = 49152
+HW INFO: L2Settings = 0
+HW INFO: L2CacheSize = 4194304
+HW INFO: L3Settings = 0
+HW INFO: L3CacheSize = 0
+HW INFO: TB_FREQ = 24000000
+HW INFO: MemSize = 1512226816
+HW INFO: AvailCpu = 2
+*processor***********
+processor_count = 2 10 20 20 5
+   cpu_type    = 0100000c
+   cpu_subtype = 2
+   running     = 1
+   slot_num    = 0
+   is_master   = 1
+   cpu_type    = 0100000c
+   cpu_subtype = 2
+   running     = 1
+   slot_num    = 1
+   is_master   = 0
+*processor***********
+
