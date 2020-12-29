@@ -183,11 +183,15 @@ def ListLog( task ):
     thread_pat= re.compile( r'^CPU\s+Thread:\s+([0-9]+)' )
     core_pat=   re.compile( r'^CPU\s+Core\s+:\s+([0-9]+)' )
     clock_pat=  re.compile( r'^\s+Group\s+[0-9]+\s*:.*Clock=\s*([0-9.-]+)\s*GHz' )
+    ext_ignore= { '.swp' }
     device_list= []
     for log in log_list:
         score= []
         min_clock= 1e30
         max_clock= 0
+        _,ext= os.path.splitext(log)
+        if ext in ext_ignore:
+            continue
         with open( os.path.join( 'log', log ), 'r' ) as fi:
             for line in fi:
                 for p in plist:

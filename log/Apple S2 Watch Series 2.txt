@@ -160,3 +160,54 @@ VFP vfma.f64 (64bit x1) n1        :   10.659      225.2       56.3  (  4.0 0.0)
 Average                           :    5.448      446.4      180.0  (  3.0 0.0)
 Highest                           :    1.362      881.0      440.5  (  4.0 0.0)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+HW INFO: Machine = Watch2,4
+HW INFO: Model = N75AP
+HW INFO: Arch = N75AP
+HW INFO: NCPU = 2
+HW INFO: ByteOrder = 1234
+HW INFO: PhysMem = 522190848
+HW INFO: UserMem = 380850176
+HW INFO: PageSize = 16384
+HW INFO: Float = 0
+HW INFO: VectorUnit = 0
+HW INFO: BusFreq = 0
+HW INFO: CpuFreq = 0
+HW INFO: CacheLine = 64
+HW INFO: L1Size I = 32768
+HW INFO: L1Size D = 32768
+HW INFO: L2Settings = 1
+HW INFO: L2CacheSize = 524288
+HW INFO: L3Settings = 0
+HW INFO: L3CacheSize = 0
+HW INFO: TB_FREQ = 24000000
+HW INFO: MemSize = 522190848
+HW INFO: AvailCpu = 2
+*processor***********
+processor_count = 2 10 20 20 5
+   cpu_type    = 0000000c
+   cpu_subtype = 12
+   running     = 1
+   slot_num    = 0
+   is_master   = 1
+   cpu_type    = 0000000c
+   cpu_subtype = 12
+   running     = 1
+   slot_num    = 1
+   is_master   = 0
+*processor***********
+
