@@ -4,7 +4,7 @@
 #include	<flatlib/core/CoreBase.h>
 #include	<flatlib/core/system/CoreContext.h>
 #include	<flatlib/core/system/SystemInfo.h>
-#include	<flatlib/core/memory/MemoryCopy.h>
+#include	<flatlib/core/memory/MemoryAddress.h>
 #include	<flatlib/core/thread/Processor.h>
 #include	"TestBase.h"
 
