@@ -201,6 +201,11 @@ void SystemInfo::DecodeCpuTopologyImmediate()
 				core.CoreClock= atoi( line_buffer );
 			}
 
+			sprintf_s( path_buffer, MAX_PATH_SIZE-1, "/sys/devices/system/cpu/cpu%d/cpufreq/base_frequency", ci );
+			if( LoadOneLine( line_buffer, MAX_LINE_SIZE, path_buffer ) ){
+				core.BaseClock= atoi( line_buffer );
+			}
+
 			TotalThreadCount= ci + 1;
 		}
 	}
@@ -223,6 +228,29 @@ void SystemInfo::DecodeCpuTopologyImmediate()
 				if( group == group_map.end() ){
 					group_map[ core.ClusterMask ]= group_id++;
 				}
+			}
+		}
+		if( group_id == 1 ){
+			// AlderLake/RaptorLake
+			group_id= 0;
+			std::map<uint32_t,unsigned int>		clock_map;
+			std::map<uint32_t,uint64_t>			mask_map;
+			for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
+				auto&	core= CoreList[ci];
+				const auto&	clock= clock_map.find( core.BaseClock );
+				if( clock == clock_map.end() ){
+					clock_map[ core.BaseClock ]= group_id++;
+					mask_map[ core.BaseClock ]= 1uLL<<ci;
+				}else{
+					mask_map[ core.BaseClock ]|= 1uLL<<ci;
+				}
+			}
+			for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
+				auto&	core= CoreList[ci];
+				const auto&	mask= mask_map.find( core.BaseClock );
+				core.ClusterMask= mask->second;
+				const auto&	clock= clock_map.find( core.BaseClock );
+				group_map[ core.ClusterMask ]= clock->second;
 			}
 		}
 		PhysicalCoreCount= thread_id;

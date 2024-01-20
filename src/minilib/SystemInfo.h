@@ -75,11 +75,12 @@ struct CPUFeatureNameTable {
 
 struct CPUGroup {
 	uint64_t		ClusterMask;
-	uint64_t		ThreadMask;
-	unsigned int	Index;
+	uint64_t		ThreadMask;		// SMT Mask
+	unsigned int	Index;			// Thread ID
 	unsigned int	PhysicalCoreID;
 	unsigned int	ClusterGroupID;	// big.LITTLE
 	unsigned int	CoreClock;		// KHz	3600000 = 3.6GHz
+	unsigned int	BaseClock;		// KHz	2100000 = 2.1GHz
 };
 
 class SystemInfo {
@@ -87,7 +88,7 @@ public:
 	enum : unsigned int {
 		DEVICE_NAME_BUFFER_SIZE	=	256,
 		CPU_FEATURE_MAX			=	64,
-		CPU_COUNT_MAX			=	64,
+		CPU_COUNT_MAX			=	128,
 	};
 private:
 	CPUGroup		CoreList[CPU_COUNT_MAX];
