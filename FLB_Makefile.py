@@ -34,9 +34,6 @@ src_list= [
         'src/BenchApplication.cpp',
         'src/BenchmarkTest.cpp',
     ]
-#        'src/MatrixTest_SSESP.cpp',
-#        'src/MatrixTest_VFP32SP.cpp',
-#        'src/MatrixTest_VFP64SP.cpp',
 
 TargetName= 'vfpbench'
 
@@ -51,8 +48,12 @@ def get_arm64_arch( env ):
     if env.getTargetPlatform() == 'Linux':
         pat_fphp= re.compile( r'\bfphp\b' )
         pat_asimdhp= re.compile( r'\basimdhp\b' )
+        pat_sve2= re.compile( r'\bsve2\b' )
         with open( '/proc/cpuinfo', 'r' ) as fi:
             for line in fi:
+                pat3= pat_sve2.search( line )
+                if pat3:
+                    return  'armv9-a'
                 pat1= pat_fphp.search( line )
                 pat2= pat_asimdhp.search( line )
                 if pat1 and pat2:
@@ -90,7 +91,8 @@ def addCustomBuild( env, TargetName, src_list, config ):
         if arch == 'arm64':
             global get_arm64_arch
             if local_env.getTargetPlatform() == 'Linux':
-                local_env.addCCFlags( ['-march=' + get_arm64_arch( env ) ] )
+                arm64_arch= get_arm64_arch( env )
+                local_env.addCCFlags( ['-march=' + arm64_arch] )
         if config == 'Release':
             exe_name= TargetName
         else:

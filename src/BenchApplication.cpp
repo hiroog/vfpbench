@@ -109,6 +109,9 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 		if( Info.HasInstructionSet( CPUFeature::ARM_SVE ) ){
 			pool.AddFormat( " SVE" );
 		}
+		if( Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+			pool.AddFormat( " SVE2" );
+		}
 		pool.AddFormat( "\n" );
 		break;
 	case CPUArch::CPU_X86:
@@ -202,6 +205,8 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 		pool.AddFormat( "FPHP   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_FPHP ) ? "yes" : "no" );
 		pool.AddFormat( "SIMDHP : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDHP ) ? "yes" : "no" );
 		pool.AddFormat( "DotProd: %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDDP ) ? "yes" : "no" );
+		pool.AddFormat( "SVE    : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SVE ) ? "yes" : "no" );
+		pool.AddFormat( "SVE2   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ? "yes" : "no" );
 		break;
 	case CPUArch::CPU_X86:
 	case CPUArch::CPU_X64:
