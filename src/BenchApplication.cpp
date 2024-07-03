@@ -9,6 +9,10 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 
+#if __ARM_ARCH == 9
+# include	<arm_sve.h>
+#endif
+
 #define	USE_MAX_EXPORT	0
 
 using namespace flatlib;
@@ -225,6 +229,12 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 		break;
 	}
 
+	if( arch == CPUArch::CPU_ARM64 && Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+#if __ARM_ARCH == 9
+		uint64_t	vector_bit_length= svcntb() * 8;
+		pool.AddFormat( "SVE-LEN: %lld bit\n", vector_bit_length );
+#endif
+	}
 }
 
 
