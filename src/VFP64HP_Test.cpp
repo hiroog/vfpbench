@@ -12,8 +12,13 @@
 #if FL_CPU_ARM64
 //-----------------------------------------------------------------------------
 
-#ifdef __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
-# define	FL_CPU_FP16			1
+#if defined(__ARM_FEATURE_SVE2) && __ARM_FEATURE_SVE2
+# include   <arm_sve.h>
+# define    USE_ARM_SVE2    1
+#endif
+
+#if defined(__ARM_FEATURE_FP16_SCALAR_ARITHMETIC) && __ARM_FEATURE_FP16_SCALAR_ARITHMETIC
+# define	FL_CPU_FP16		1
 #endif
 
 using namespace flatlib;
@@ -1319,6 +1324,120 @@ static uint64_t NEON_V_IR12_##name( CounterType LoopCount, float answer ) \
 
 
 
+//=============================================================================
+// SVE
+//=============================================================================
+
+
+//-----------------
+#if USE_ARM_SVE2
+//-----------------
+
+#define SVE_REG_CLEAR() \
+        "dup    z0.b, #0\n"     \
+        "dup    z1.b, #0\n"     \
+        "dup    z2.b, #0\n"     \
+        "dup    z3.b, #0\n"     \
+        "dup    z4.b, #0\n"     \
+        "dup    z5.b, #0\n"     \
+        "dup    z6.b, #0\n"     \
+        "dup    z7.b, #0\n"     \
+        "dup    z8.b, #0\n"     \
+        "dup    z9.b, #0\n"     \
+        "dup    z10.b, #0\n"        \
+        "dup    z11.b, #0\n"        \
+        "dup    z12.b, #0\n"        \
+        "dup    z13.b, #0\n"        \
+        "dup    z14.b, #0\n"        \
+        "dup    z15.b, #0\n"        \
+        "ptrue  p0.s\n"     \
+
+
+//-----------------------------------------------------------------------------
+// Vector 16bit Interleave 12
+//-----------------------------------------------------------------------------
+
+#define SVE_V_IR12_12(op,size,pred) \
+            op " z4"  size pred ", z2" size ", z3" size " \n"   \
+            op " z5"  size pred ", z2" size ", z3" size " \n"   \
+            op " z6"  size pred ", z2" size ", z3" size " \n"   \
+            op " z7"  size pred ", z2" size ", z3" size " \n"   \
+            op " z8"  size pred ", z2" size ", z3" size " \n"   \
+            op " z9"  size pred ", z2" size ", z3" size " \n"   \
+            op " z10" size pred ", z2" size ", z3" size " \n"   \
+            op " z11" size pred ", z2" size ", z3" size " \n"   \
+            op " z12" size pred ", z2" size ", z3" size " \n"   \
+            op " z13" size pred ", z2" size ", z3" size " \n"   \
+            op " z14" size pred ", z2" size ", z3" size " \n"   \
+            op " z15" size pred ", z2" size ", z3" size " \n"   \
+
+
+#define SVE_V_IR12_0(op,size,name,pred) \
+static uint64_t SVE_V_IR12_##name( CounterType LoopCount, float answer ) \
+{ \
+    uint32_t	ret0, ret1, ret2, ret3, ret4, ret5, ret6, ret7; \
+    TimerClass  timer;          \
+    timer.Begin();              \
+    __asm__ __volatile__(       \
+        SVE_REG_CLEAR()         \
+        "mov    w2, #2  \n"     \
+        "mov    w3, #5  \n"     \
+        "dup    z2.h, w2\n" \
+        "scvtf  z2.h, p0/m, z2.h\n"     \
+        "dup    z3.h, w3\n" \
+        "scvtf  z3.h, p0/m, z3.h\n"     \
+        "mov    x0, %[loop]\n"  \
+        "mov    w0, w0\n"   \
+    "1:\n"  \
+        SVE_V_IR12_12( op, size, pred ) \
+        SVE_V_IR12_12( op, size, pred ) \
+        SVE_V_IR12_12( op, size, pred ) \
+        SVE_V_IR12_12( op, size, pred ) \
+        SVE_V_IR12_12( op, size, pred ) \
+        "subs   w0, w0, #1\n"   \
+        "b.ne   1b\n"       \
+        "str    h4, %[o0]\n"    \
+        "str    h5, %[o1]\n"    \
+        "str    h6, %[o2]\n"    \
+        "str    h7, %[o3]\n"    \
+        "str    h8, %[o4]\n"    \
+        "str    h9, %[o5]\n"    \
+        "str    h10, %[o6]\n"   \
+        "str    h11, %[o7]\n"   \
+    :   [o0]"=m"(ret0), \
+        [o1]"=m"(ret1), \
+        [o2]"=m"(ret2), \
+        [o3]"=m"(ret3), \
+        [o4]"=m"(ret4), \
+        [o5]"=m"(ret5), \
+        [o6]"=m"(ret6), \
+        [o7]"=m"(ret7)  \
+    : [loop]"r"(LoopCount)  \
+    : "cc","x0","w2","w3","p0", \
+    "z0","z1","z2","z3","z4","z5","z6","z7","z8","z9","z10","z11","z12","z13","z14","z15" ); \
+\
+    timer.End();        \
+    timer.Dump( op );   \
+    check_result( ret0, answer );   \
+    check_result( ret1, answer );   \
+    check_result( ret2, answer );   \
+    check_result( ret3, answer );   \
+    check_result( ret4, answer );   \
+    check_result( ret5, answer );   \
+    check_result( ret6, answer );   \
+    check_result( ret7, answer );   \
+    return  timer.Result(); \
+}
+
+#define SVE_V_IR12(op,size,name,pred) SVE_V_IR12_0(#op,#size,name,pred)
+
+
+
+//-----------------
+#endif
+//-----------------
+
+
 
 #endif
 //-----------------------------------------------------------------------------
@@ -1370,6 +1489,10 @@ static const char*	Instruction_Title[]= {
 	"NEON fadd.8h (16bit x8) n12",
 	"NEON fmla.8h (16bit x8) n12",
 
+
+	"SVE fmul.h (16bit xN) n12",
+	"SVE fadd.h (16bit xN) n12",
+	"SVE fmla.h (16bit xN) n12",
 };
 
 
@@ -1390,13 +1513,13 @@ FloatTest::FloatTest()
 	SetOp2( RESULT_VFP_FADD_IR8,		PER_LOOP_INST, 1	);
 	SetOp2( RESULT_VFP_FMADD_IR8,		PER_LOOP_INST, 2	);
 
-	SetOp2( RESULT_NEON_FMUL_S2_IR8,	PER_LOOP_INST, 4	);
-	SetOp2( RESULT_NEON_FADD_S2_IR8,	PER_LOOP_INST, 4	);
-	SetOp2( RESULT_NEON_FMLA_S2_IR8,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FMUL_H4_IR8,	PER_LOOP_INST, 4	);
+	SetOp2( RESULT_NEON_FADD_H4_IR8,	PER_LOOP_INST, 4	);
+	SetOp2( RESULT_NEON_FMLA_H4_IR8,	PER_LOOP_INST, 8	);
 
-	SetOp2( RESULT_NEON_FMUL_S4_IR8,	PER_LOOP_INST, 8	);
-	SetOp2( RESULT_NEON_FADD_S4_IR8,	PER_LOOP_INST, 8	);
-	SetOp2( RESULT_NEON_FMLA_S4_IR8,	PER_LOOP_INST, 16	);
+	SetOp2( RESULT_NEON_FMUL_H8_IR8,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FADD_H8_IR8,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FMLA_H8_IR8,	PER_LOOP_INST, 16	);
 
 
 
@@ -1404,13 +1527,13 @@ FloatTest::FloatTest()
 	SetOp2( RESULT_VFP_FADD_IRS4,		PER_LOOP_INST, 1	);
 	SetOp2( RESULT_VFP_FMADD_IRS4,		PER_LOOP_INST, 2	);
 
-	SetOp2( RESULT_NEON_FMUL_S2_IRS4,	PER_LOOP_INST, 4	);
-	SetOp2( RESULT_NEON_FADD_S2_IRS4,	PER_LOOP_INST, 4	);
-	SetOp2( RESULT_NEON_FMLA_S2_IRS4,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FMUL_H4_IRS4,	PER_LOOP_INST, 4	);
+	SetOp2( RESULT_NEON_FADD_H4_IRS4,	PER_LOOP_INST, 4	);
+	SetOp2( RESULT_NEON_FMLA_H4_IRS4,	PER_LOOP_INST, 8	);
 
-	SetOp2( RESULT_NEON_FMUL_S4_IRS4,	PER_LOOP_INST, 8	);
-	SetOp2( RESULT_NEON_FADD_S4_IRS4,	PER_LOOP_INST, 8	);
-	SetOp2( RESULT_NEON_FMLA_S4_IRS4,	PER_LOOP_INST, 16	);
+	SetOp2( RESULT_NEON_FMUL_H8_IRS4,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FADD_H8_IRS4,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FMLA_H8_IRS4,	PER_LOOP_INST, 16	);
 
 
 
@@ -1418,20 +1541,43 @@ FloatTest::FloatTest()
 	SetOp2( RESULT_VFP_FADD_IR1,		PER_LOOP_INST, 1	);
 	SetOp2( RESULT_VFP_FMADD_IR1,		PER_LOOP_INST, 2	);
 
-	SetOp2( RESULT_NEON_FMUL_S2_IR1,	PER_LOOP_INST, 4	);
-	SetOp2( RESULT_NEON_FADD_S2_IR1,	PER_LOOP_INST, 4	);
-	SetOp2( RESULT_NEON_FMLA_S2_IR1,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FMUL_H4_IR1,	PER_LOOP_INST, 4	);
+	SetOp2( RESULT_NEON_FADD_H4_IR1,	PER_LOOP_INST, 4	);
+	SetOp2( RESULT_NEON_FMLA_H4_IR1,	PER_LOOP_INST, 8	);
 
-	SetOp2( RESULT_NEON_FMUL_S4_IR1,	PER_LOOP_INST, 8	);
-	SetOp2( RESULT_NEON_FADD_S4_IR1,	PER_LOOP_INST, 8	);
-	SetOp2( RESULT_NEON_FMLA_S4_IR1,	PER_LOOP_INST, 16	);
+	SetOp2( RESULT_NEON_FMUL_H8_IR1,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FADD_H8_IR1,	PER_LOOP_INST, 8	);
+	SetOp2( RESULT_NEON_FMLA_H8_IR1,	PER_LOOP_INST, 16	);
 
 
 
-	SetOp2( RESULT_NEON_FMUL_S4_IR12,	PER_LOOP_INST_12, 8	);
-	SetOp2( RESULT_NEON_FADD_S4_IR12,	PER_LOOP_INST_12, 8	);
-	SetOp2( RESULT_NEON_FMLA_S4_IR12,	PER_LOOP_INST_12, 16	);
+	SetOp2( RESULT_NEON_FMUL_H8_IR12,	PER_LOOP_INST_12, 8	);
+	SetOp2( RESULT_NEON_FADD_H8_IR12,	PER_LOOP_INST_12, 8	);
+	SetOp2( RESULT_NEON_FMLA_H8_IR12,	PER_LOOP_INST_12, 16	);
 
+
+
+	SetOp2( RESULT_NEON_FMUL_H8_IR12,	PER_LOOP_INST_12, 8	);
+	SetOp2( RESULT_NEON_FADD_H8_IR12,	PER_LOOP_INST_12, 8	);
+	SetOp2( RESULT_NEON_FMLA_H8_IR12,	PER_LOOP_INST_12, 16	);
+
+
+
+#if USE_ARM_SVE2
+    if( Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+        uint32_t    vector_length= (uint32_t)( svcnth() );
+        FL_LOG( "half vlen=%d\n", vector_length );
+        SetOp( RESULT_SVE_FMUL_H_IR12,  PER_LOOP_INST_12 * vector_length, vector_length );
+        SetOp( RESULT_SVE_FADD_H_IR12,  PER_LOOP_INST_12 * vector_length, vector_length );
+        SetOp( RESULT_SVE_FMLA_H_IR12,  PER_LOOP_INST_12 * vector_length*2, vector_length*2 );
+    }else
+#endif
+
+    {
+        SetOp( RESULT_SVE_FMUL_H_IR12,  PER_LOOP_INST_12 * 8, 8 );
+        SetOp( RESULT_SVE_FADD_H_IR12,  PER_LOOP_INST_12 * 8, 8 );
+        SetOp( RESULT_SVE_FMLA_H_IR12,  PER_LOOP_INST_12 * 16, 16 );
+    }
 }
 
 
@@ -1463,27 +1609,27 @@ MAD_S_IR8( fmadd, fmadd_ir8 );
 #if USE_ANDROID_GCC
 //-----------------
 
-NEON_V_IR8( fmul, .4h, fmul_2s_ir8 );
-NEON_V_IR8( fadd, .4h, fadd_2s_ir8 );
-NEON_V_IR8( fmla, .4h, fmla_2s_ir8 );
+NEON_V_IR8( fmul, .4h, fmul_4h_ir8 );
+NEON_V_IR8( fadd, .4h, fadd_4h_ir8 );
+NEON_V_IR8( fmla, .4h, fmla_4h_ir8 );
 
 
-NEON_V_IR8( fmul, .8h, fmul_4s_ir8 );
-NEON_V_IR8( fadd, .8h, fadd_4s_ir8 );
-NEON_V_IR8( fmla, .8h, fmla_4s_ir8 );
+NEON_V_IR8( fmul, .8h, fmul_8h_ir8 );
+NEON_V_IR8( fadd, .8h, fadd_8h_ir8 );
+NEON_V_IR8( fmla, .8h, fmla_8h_ir8 );
 
 //-----------------
 #else
 //-----------------
 
-NEON_V_IR8( fmul.4h, fmul_2s_ir8 );
-NEON_V_IR8( fadd.4h, fadd_2s_ir8 );
-NEON_V_IR8( fmla.4h, fmla_2s_ir8 );
+NEON_V_IR8( fmul.4h, fmul_4h_ir8 );
+NEON_V_IR8( fadd.4h, fadd_4h_ir8 );
+NEON_V_IR8( fmla.4h, fmla_4h_ir8 );
 
 
-NEON_V_IR8( fmul.8h, fmul_4s_ir8 );
-NEON_V_IR8( fadd.8h, fadd_4s_ir8 );
-NEON_V_IR8( fmla.8h, fmla_4s_ir8 );
+NEON_V_IR8( fmul.8h, fmul_8h_ir8 );
+NEON_V_IR8( fadd.8h, fadd_8h_ir8 );
+NEON_V_IR8( fmla.8h, fmla_8h_ir8 );
 
 //-----------------
 #endif
@@ -1499,27 +1645,27 @@ MAD_S_IRS4( fmadd, fmadd_irs4 );
 #if USE_ANDROID_GCC
 //-----------------
 
-NEON_V_IRS4( fmul, .4h, fmul_2s_irs4 );
-NEON_V_IRS4( fadd, .4h, fadd_2s_irs4 );
-NEON_V_IRS4( fmla, .4h, fmla_2s_irs4 );
+NEON_V_IRS4( fmul, .4h, fmul_4h_irs4 );
+NEON_V_IRS4( fadd, .4h, fadd_4h_irs4 );
+NEON_V_IRS4( fmla, .4h, fmla_4h_irs4 );
 
 
-NEON_V_IRS4( fmul, .8h, fmul_4s_irs4 );
-NEON_V_IRS4( fadd, .8h, fadd_4s_irs4 );
-NEON_V_IRS4( fmla, .8h, fmla_4s_irs4 );
+NEON_V_IRS4( fmul, .8h, fmul_8h_irs4 );
+NEON_V_IRS4( fadd, .8h, fadd_8h_irs4 );
+NEON_V_IRS4( fmla, .8h, fmla_8h_irs4 );
 
 //-----------------
 #else
 //-----------------
 
-NEON_V_IRS4( fmul.4h, fmul_2s_irs4 );
-NEON_V_IRS4( fadd.4h, fadd_2s_irs4 );
-NEON_V_IRS4( fmla.4h, fmla_2s_irs4 );
+NEON_V_IRS4( fmul.4h, fmul_4h_irs4 );
+NEON_V_IRS4( fadd.4h, fadd_4h_irs4 );
+NEON_V_IRS4( fmla.4h, fmla_4h_irs4 );
 
 
-NEON_V_IRS4( fmul.8h, fmul_4s_irs4 );
-NEON_V_IRS4( fadd.8h, fadd_4s_irs4 );
-NEON_V_IRS4( fmla.8h, fmla_4s_irs4 );
+NEON_V_IRS4( fmul.8h, fmul_8h_irs4 );
+NEON_V_IRS4( fadd.8h, fadd_8h_irs4 );
+NEON_V_IRS4( fmla.8h, fmla_8h_irs4 );
 
 //-----------------
 #endif
@@ -1535,45 +1681,56 @@ MAD_S_IR1( fmadd, fmadd_ir1 );
 #if USE_ANDROID_GCC
 //-----------------
 
-NEON_V_IR1( fmul, .4h, fmul_2s_ir1 );
-NEON_V_IR1( fadd, .4h, fadd_2s_ir1 );
-NEON_V_IR1( fmla, .4h, fmla_2s_ir1 );
+NEON_V_IR1( fmul, .4h, fmul_4h_ir1 );
+NEON_V_IR1( fadd, .4h, fadd_4h_ir1 );
+NEON_V_IR1( fmla, .4h, fmla_4h_ir1 );
 
 
-NEON_V_IR1( fmul, .8h, fmul_4s_ir1 );
-NEON_V_IR1( fadd, .8h, fadd_4s_ir1 );
-NEON_V_IR1( fmla, .8h, fmla_4s_ir1 );
+NEON_V_IR1( fmul, .8h, fmul_8h_ir1 );
+NEON_V_IR1( fadd, .8h, fadd_8h_ir1 );
+NEON_V_IR1( fmla, .8h, fmla_8h_ir1 );
 
 
 
-NEON_V_IR12( fmul, .8h, fmul_4s_ir12 );
-NEON_V_IR12( fadd, .8h, fadd_4s_ir12 );
-NEON_V_IR12( fmla, .8h, fmla_4s_ir12 );
+NEON_V_IR12( fmul, .8h, fmul_8h_ir12 );
+NEON_V_IR12( fadd, .8h, fadd_8h_ir12 );
+NEON_V_IR12( fmla, .8h, fmla_8h_ir12 );
 
 //-----------------
 #else
 //-----------------
 
-NEON_V_IR1( fmul.4h, fmul_2s_ir1 );
-NEON_V_IR1( fadd.4h, fadd_2s_ir1 );
-NEON_V_IR1( fmla.4h, fmla_2s_ir1 );
+NEON_V_IR1( fmul.4h, fmul_4h_ir1 );
+NEON_V_IR1( fadd.4h, fadd_4h_ir1 );
+NEON_V_IR1( fmla.4h, fmla_4h_ir1 );
 
 
-NEON_V_IR1( fmul.8h, fmul_4s_ir1 );
-NEON_V_IR1( fadd.8h, fadd_4s_ir1 );
-NEON_V_IR1( fmla.8h, fmla_4s_ir1 );
+NEON_V_IR1( fmul.8h, fmul_8h_ir1 );
+NEON_V_IR1( fadd.8h, fadd_8h_ir1 );
+NEON_V_IR1( fmla.8h, fmla_8h_ir1 );
 
 
 
-NEON_V_IR12( fmul.8h, fmul_4s_ir12 );
-NEON_V_IR12( fadd.8h, fadd_4s_ir12 );
-NEON_V_IR12( fmla.8h, fmla_4s_ir12 );
+NEON_V_IR12( fmul.8h, fmul_8h_ir12 );
+NEON_V_IR12( fadd.8h, fadd_8h_ir12 );
+NEON_V_IR12( fmla.8h, fmla_8h_ir12 );
 
 //-----------------
 #endif
 //-----------------
 
 
+//-----------------
+#if USE_ARM_SVE2
+//-----------------
+
+SVE_V_IR12( fmul, .h, fmul_h_ir12, " " );
+SVE_V_IR12( fadd, .h, fadd_h_ir12, " " );
+SVE_V_IR12( fmla, .h, fmla_h_ir12, ", p0/m" );
+
+//-----------------
+#endif
+//-----------------
 
 
 
@@ -1613,13 +1770,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 
 	//------------------------------------------------------
 
-	SetResult( RESULT_NEON_FMUL_S2_IR8,	NEON_V_IR8_fmul_2s_ir8( Loop, 10.0f	) );
+	SetResult( RESULT_NEON_FMUL_H4_IR8,	NEON_V_IR8_fmul_4h_ir8( Loop, 10.0f	) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FADD_S2_IR8,	NEON_V_IR8_fadd_2s_ir8( Loop, 7.0f		) );
+	SetResult( RESULT_NEON_FADD_H4_IR8,	NEON_V_IR8_fadd_4h_ir8( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FMLA_S2_IR8,	NEON_V_IR8_fmla_2s_ir8( Loop, sum_2 ) );
+	SetResult( RESULT_NEON_FMLA_H4_IR8,	NEON_V_IR8_fmla_4h_ir8( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
@@ -1627,13 +1784,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 
 	//------------------------------------------------------
 
-	SetResult( RESULT_NEON_FMUL_S4_IR8,	NEON_V_IR8_fmul_4s_ir8( Loop, 10.0f	) );
+	SetResult( RESULT_NEON_FMUL_H8_IR8,	NEON_V_IR8_fmul_8h_ir8( Loop, 10.0f	) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FADD_S4_IR8,	NEON_V_IR8_fadd_4s_ir8( Loop, 7.0f		) );
+	SetResult( RESULT_NEON_FADD_H8_IR8,	NEON_V_IR8_fadd_8h_ir8( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FMLA_S4_IR8,	NEON_V_IR8_fmla_4s_ir8( Loop, sum_2 ) );
+	SetResult( RESULT_NEON_FMLA_H8_IR8,	NEON_V_IR8_fmla_8h_ir8( Loop, sum_2 ) );
 	Progress.Increment();
 
 
@@ -1660,13 +1817,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 
 	//------------------------------------------------------
 
-	SetResult( RESULT_NEON_FMUL_S2_IRS4,		NEON_V_IRS4_fmul_2s_irs4( Loop, 10.0f	) );
+	SetResult( RESULT_NEON_FMUL_H4_IRS4,		NEON_V_IRS4_fmul_4h_irs4( Loop, 10.0f	) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FADD_S2_IRS4,		NEON_V_IRS4_fadd_2s_irs4( Loop, 7.0f		) );
+	SetResult( RESULT_NEON_FADD_H4_IRS4,		NEON_V_IRS4_fadd_4h_irs4( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FMLA_S2_IRS4,		NEON_V_IRS4_fmla_2s_irs4( Loop, sum_2 ) );
+	SetResult( RESULT_NEON_FMLA_H4_IRS4,		NEON_V_IRS4_fmla_4h_irs4( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
@@ -1674,13 +1831,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 
 	//------------------------------------------------------
 
-	SetResult( RESULT_NEON_FMUL_S4_IRS4,		NEON_V_IRS4_fmul_4s_irs4( Loop, 10.0f	) );
+	SetResult( RESULT_NEON_FMUL_H8_IRS4,		NEON_V_IRS4_fmul_8h_irs4( Loop, 10.0f	) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FADD_S4_IRS4,		NEON_V_IRS4_fadd_4s_irs4( Loop, 7.0f		) );
+	SetResult( RESULT_NEON_FADD_H8_IRS4,		NEON_V_IRS4_fadd_8h_irs4( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FMLA_S4_IRS4,		NEON_V_IRS4_fmla_4s_irs4( Loop, sum_2 ) );
+	SetResult( RESULT_NEON_FMLA_H8_IRS4,		NEON_V_IRS4_fmla_8h_irs4( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
@@ -1704,13 +1861,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 
 	//------------------------------------------------------
 
-	SetResult( RESULT_NEON_FMUL_S2_IR1,	NEON_V_IR1_fmul_2s_ir1( Loop, 10.0f	) );
+	SetResult( RESULT_NEON_FMUL_H4_IR1,	NEON_V_IR1_fmul_4h_ir1( Loop, 10.0f	) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FADD_S2_IR1,	NEON_V_IR1_fadd_2s_ir1( Loop, 7.0f		) );
+	SetResult( RESULT_NEON_FADD_H4_IR1,	NEON_V_IR1_fadd_4h_ir1( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FMLA_S2_IR1,	NEON_V_IR1_fmla_2s_ir1( Loop, sum_2 ) );
+	SetResult( RESULT_NEON_FMLA_H4_IR1,	NEON_V_IR1_fmla_4h_ir1( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
@@ -1718,13 +1875,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 
 	//------------------------------------------------------
 
-	SetResult( RESULT_NEON_FMUL_S4_IR1,	NEON_V_IR1_fmul_4s_ir1( Loop, 10.0f	) );
+	SetResult( RESULT_NEON_FMUL_H8_IR1,	NEON_V_IR1_fmul_8h_ir1( Loop, 10.0f	) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FADD_S4_IR1,	NEON_V_IR1_fadd_4s_ir1( Loop, 7.0f		) );
+	SetResult( RESULT_NEON_FADD_H8_IR1,	NEON_V_IR1_fadd_8h_ir1( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FMLA_S4_IR1,	NEON_V_IR1_fmla_4s_ir1( Loop, sum_2 ) );
+	SetResult( RESULT_NEON_FMLA_H8_IR1,	NEON_V_IR1_fmla_8h_ir1( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
@@ -1736,16 +1893,44 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	// IR12
 	//------------------------------------------------------
 
-	SetResult( RESULT_NEON_FMUL_S4_IR12,		NEON_V_IR12_fmul_4s_ir12( Loop, 10.0f	) );
+	SetResult( RESULT_NEON_FMUL_H8_IR12,		NEON_V_IR12_fmul_8h_ir12( Loop, 10.0f	) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FADD_S4_IR12,		NEON_V_IR12_fadd_4s_ir12( Loop, 7.0f		) );
+	SetResult( RESULT_NEON_FADD_H8_IR12,		NEON_V_IR12_fadd_8h_ir12( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_NEON_FMLA_S4_IR12,		NEON_V_IR12_fmla_4s_ir12( Loop, sum_2 ) );
+	SetResult( RESULT_NEON_FMLA_H8_IR12,		NEON_V_IR12_fmla_8h_ir12( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
+
+
+
+    //------------------------------------------------------
+    // SVE
+    //------------------------------------------------------
+
+#if USE_ARM_SVE2
+    if( Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+
+        SetResult( RESULT_SVE_FMUL_H_IR12,      SVE_V_IR12_fmul_h_ir12( Loop, 10.0f ) );
+        Progress.Increment();
+
+        SetResult( RESULT_SVE_FADD_H_IR12,      SVE_V_IR12_fadd_h_ir12( Loop, 7.0f      ) );
+        Progress.Increment();
+
+        SetResult( RESULT_SVE_FMLA_H_IR12,      SVE_V_IR12_fmla_h_ir12( Loop, sum_2 ) );
+        Progress.Increment();
+
+    }else
+#endif
+    {
+        Progress.Increment();
+        Progress.Increment();
+        Progress.Increment();
+    }
+
+    //------------------------------------------------------
 
 
 	DoneFlag= true;

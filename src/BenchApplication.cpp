@@ -9,8 +9,9 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 
-#if __ARM_ARCH == 9
+#if defined(__ARM_FEATURE_SVE2) && __ARM_FEATURE_SVE2
 # include	<arm_sve.h>
+# define	USE_ARM_SVE2	1
 #endif
 
 #define	USE_MAX_EXPORT	0
@@ -230,8 +231,12 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 	}
 
 	if( arch == CPUArch::CPU_ARM64 && Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
-#if __ARM_ARCH == 9
+#if USE_ARM_SVE2
 		uint64_t	vector_bit_length= svcntb() * 8;
+		FL_LOG( "svcntb=%d\n", svcntb() );
+		FL_LOG( "svcnth=%d\n", svcnth() );
+		FL_LOG( "svcntw=%d\n", svcntw() );
+		FL_LOG( "svcntd=%d\n", svcntd() );
 		pool.AddFormat( "SVE-LEN: %lld bit\n", vector_bit_length );
 #endif
 	}
