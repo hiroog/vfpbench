@@ -1578,13 +1578,14 @@ void FloatTest::Run()
 
 FL_LOG( "SSE loop=%d\n", Loop );
 
+#if 0
 	double	sum= 0;
 	double	sum_2= 0;
 	for( unsigned int i= 0 ; i< Loop * 5 ; i++ ){
 		sum+= 2.0f;
 		sum_2+= 10.0f;
 	}
-
+#endif
 
 
 
