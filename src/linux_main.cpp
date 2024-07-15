@@ -192,7 +192,7 @@ int main( int argc, char** argv )
 					btype= atoi( *argv + 2 );
 					break;
 				case 'c':
-					loop_scale= atof( *argv + 3 );
+					loop_scale= atof( *argv+2 );
 					break;
 				case '-': {
 						char	ch= (*argv)[2];

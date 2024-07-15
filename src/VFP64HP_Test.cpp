@@ -87,19 +87,6 @@ static void check_result( uint32_t iret, float ans )
 		"orr	v14.16b, v0.16b, v0.16b\n"	\
 		"orr	v15.16b, v0.16b, v0.16b\n"	\
 
-
-#if 0
-		"orr	v16.16b, v0.16b, v0.16b\n"	\
-		"orr	v17.16b, v0.16b, v0.16b\n"	\
-		"orr	v18.16b, v0.16b, v0.16b\n"	\
-		"orr	v19.16b, v0.16b, v0.16b\n"	\
-		"orr	v20.16b, v0.16b, v0.16b\n"	\
-		"orr	v21.16b, v0.16b, v0.16b\n"	\
-		"orr	v22.16b, v0.16b, v0.16b\n"	\
-		"orr	v23.16b, v0.16b, v0.16b\n"	\
-
-#endif
-
 //-----------------
 #else
 //-----------------
@@ -121,18 +108,6 @@ static void check_result( uint32_t iret, float ans )
 		"orr.16b	v13, v0, v0\n"	\
 		"orr.16b	v14, v0, v0\n"	\
 		"orr.16b	v15, v0, v0\n"	\
-
-#if 0
-		"orr.16b	v16, v0, v0\n"	\
-		"orr.16b	v17, v0, v0\n"	\
-		"orr.16b	v18, v0, v0\n"	\
-		"orr.16b	v19, v0, v0\n"	\
-		"orr.16b	v20, v0, v0\n"	\
-		"orr.16b	v21, v0, v0\n"	\
-		"orr.16b	v22, v0, v0\n"	\
-		"orr.16b	v23, v0, v0\n"	\
-
-#endif
 
 //-----------------
 #endif
@@ -433,14 +408,14 @@ static uint64_t VFP_S_IRS4_##name( CounterType LoopCount, float answer ) \
 //-----------------------------------------------------------------------------
 
 #define MAD_S_IR1_8(op) \
-			op " h0, h0, h8, h9 \n"		\
-			op " h0, h0, h8, h9 \n"		\
-			op " h0, h0, h8, h9 \n"		\
-			op " h0, h0, h8, h9 \n"		\
-			op " h0, h0, h8, h9 \n"		\
-			op " h0, h0, h8, h9 \n"		\
-			op " h0, h0, h8, h9 \n"		\
-			op " h0, h0, h8, h9 \n"
+			op " h0, h8, h9, h0 \n"		\
+			op " h0, h8, h9, h0 \n"		\
+			op " h0, h8, h9, h0 \n"		\
+			op " h0, h8, h9, h0 \n"		\
+			op " h0, h8, h9, h0 \n"		\
+			op " h0, h8, h9, h0 \n"		\
+			op " h0, h8, h9, h0 \n"		\
+			op " h0, h8, h9, h0 \n"
 
 
 
@@ -452,8 +427,8 @@ static uint64_t MAD_S_IR1_##name( CounterType LoopCount, float answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	h8, w2\n"		\
 		"scvtf	h9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -495,14 +470,14 @@ static uint64_t MAD_S_IR1_##name( CounterType LoopCount, float answer ) \
 
 
 #define MAD_S_IR8_8(op) \
-			op " h0, h0, h8, h9 \n"		\
-			op " h1, h1, h8, h9 \n"		\
-			op " h2, h2, h8, h9 \n"		\
-			op " h3, h3, h8, h9 \n"		\
-			op " h4, h4, h8, h9 \n"		\
-			op " h5, h5, h8, h9 \n"		\
-			op " h6, h6, h8, h9 \n"		\
-			op " h7, h7, h8, h9 \n"
+			op " h0, h8, h9, h0 \n"		\
+			op " h1, h8, h9, h1 \n"		\
+			op " h2, h8, h9, h2 \n"		\
+			op " h3, h8, h9, h3 \n"		\
+			op " h4, h8, h9, h4 \n"		\
+			op " h5, h8, h9, h5 \n"		\
+			op " h6, h8, h9, h6 \n"		\
+			op " h7, h8, h9, h7 \n"
 
 
 
@@ -514,8 +489,8 @@ static uint64_t MAD_S_IR8_##name( CounterType LoopCount, float answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	h8, w2\n"		\
 		"scvtf	h9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -573,14 +548,14 @@ static uint64_t MAD_S_IR8_##name( CounterType LoopCount, float answer ) \
 //-----------------------------------------------------------------------------
 
 #define MAD_S_IRS4_8(op) \
-			op " h0, h0, h8, h4 \n"		\
-			op " h1, h1, h8, h5 \n"		\
-			op " h2, h2, h8, h6 \n"		\
-			op " h3, h3, h8, h7 \n"		\
-			op " h4, h4, h8, h0 \n"		\
-			op " h5, h5, h8, h1 \n"		\
-			op " h6, h6, h8, h2 \n"		\
-			op " h7, h7, h8, h3 \n"
+			op " h0, h8, h4, h0 \n"		\
+			op " h1, h8, h5, h1 \n"		\
+			op " h2, h8, h6, h2 \n"		\
+			op " h3, h8, h7, h3 \n"		\
+			op " h4, h8, h0, h4 \n"		\
+			op " h5, h8, h1, h5 \n"		\
+			op " h6, h8, h2, h6 \n"		\
+			op " h7, h8, h3, h7 \n"
 
 
 
@@ -592,8 +567,8 @@ static uint64_t MAD_S_IRS4_##name( CounterType LoopCount, float answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	h8, w2\n"		\
 		"scvtf	h9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -1745,11 +1720,10 @@ void FloatTest::Run()
 
 FL_LOG( "VFP64 loop=%d\n", Loop );
 
-	float	sum= 0;
 	float	sum_2= 0;
 	for( unsigned int i= 0 ; i< Loop * 5 ; i++ ){
-		sum+= 2.0f;
 		sum_2+= 10.0f;
+		__asm__ __volatile__( "nop\n": : : "cc", "x0" );
 	}
 
 	//------------------------------------------------------
@@ -1762,7 +1736,7 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FADD_IR8,		VFP_S_IR8_fadd_ir8( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IR8,	MAD_S_IR8_fmadd_ir8( Loop, sum ) );
+	SetResult( RESULT_VFP_FMADD_IR8,	MAD_S_IR8_fmadd_ir8( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
@@ -1809,7 +1783,7 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FADD_IRS4,	VFP_S_IRS4_fadd_irs4( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IRS4,	MAD_S_IRS4_fmadd_irs4( Loop, sum ) );
+	SetResult( RESULT_VFP_FMADD_IRS4,	MAD_S_IRS4_fmadd_irs4( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
@@ -1853,7 +1827,7 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	SetResult( RESULT_VFP_FADD_IR1,		VFP_S_IR1_fadd_ir1( Loop, 7.0f		) );
 	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IR1,	MAD_S_IR1_fmadd_ir1( Loop, sum ) );
+	SetResult( RESULT_VFP_FMADD_IR1,	MAD_S_IR1_fmadd_ir1( Loop, sum_2 ) );
 	Progress.Increment();
 
 	//------------------------------------------------------
