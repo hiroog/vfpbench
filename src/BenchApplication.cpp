@@ -169,6 +169,9 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 				pool.AddFormat( "/BF16" );
 			}
 		}
+		if( Info.HasInstructionSet( CPUFeature::IA_AVXVNNI ) ){
+			pool.AddFormat( " AVXVNNI" );
+		}
 		pool.AddFormat( "\n" );
 		break;
 	case CPUArch::CPU_MIPS32:
@@ -215,11 +218,13 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 		break;
 	case CPUArch::CPU_X86:
 	case CPUArch::CPU_X64:
-		pool.AddFormat( "SSE   : %s\n", Info.HasInstructionSet( CPUFeature::IA_SSE2 ) ? "yes" : "no" );
-		pool.AddFormat( "AVX   : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX ) ? "yes" : "no" );
-		pool.AddFormat( "FMA   : %s\n", Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ? "yes" : "no" );
-		pool.AddFormat( "F16C  : %s\n", Info.HasInstructionSet( CPUFeature::IA_F16C ) ? "yes" : "no" );
-		pool.AddFormat( "AVX512: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ? "yes" : "no" );
+		pool.AddFormat( "SSE    : %s\n", Info.HasInstructionSet( CPUFeature::IA_SSE2 ) ? "yes" : "no" );
+		pool.AddFormat( "AVX    : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX ) ? "yes" : "no" );
+		pool.AddFormat( "FMA    : %s\n", Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ? "yes" : "no" );
+		pool.AddFormat( "F16C   : %s\n", Info.HasInstructionSet( CPUFeature::IA_F16C ) ? "yes" : "no" );
+		pool.AddFormat( "AVXVNNI: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVXVNNI ) ? "yes" : "no" );
+		pool.AddFormat( "AVX512 : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ? "yes" : "no" );
+		pool.AddFormat( "512VNNI: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512VNNI ) ? "yes" : "no" );
 		break;
 	case CPUArch::CPU_MIPS32:
 	case CPUArch::CPU_MIPS64:
