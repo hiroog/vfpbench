@@ -1711,6 +1711,7 @@ static const char*	Instruction_Title[]= {
 	"AVX512 vfmaddps (32bit x16) n12",
 	"AVX512 vfma+mps (32bit x16) n12",
 	"AVX512 vfma+aps (32bit x16) n12",
+	"AVX512 vml+adps (32bit x16) n12",
 
 	"AVX512 vmulps (32bit x8) n12",
 	"AVX512 vaddps (32bit x8) n12",
@@ -1820,6 +1821,7 @@ FloatTest::FloatTest()
 	SetOp2( RESULT_AVX512_VFMADDPS_IR12,	PER_LOOP_INST_12, 32	);
 	SetOp2f( RESULT_AVX512_FMA_MUL_IR12,	PER_LOOP_INST_12, (32+16)/2.0f	);
 	SetOp2f( RESULT_AVX512_FMA_ADD_IR12,	PER_LOOP_INST_12, (32+16)/2.0f	);
+	SetOp2f( RESULT_AVX512_MUL_ADD_IR12,	PER_LOOP_INST_12, (16+16)/2.0f	);
 
 	SetOp2( RESULT_AVX512_YMM_VMULPS_IR12,		PER_LOOP_INST_12, 8	);
 	SetOp2( RESULT_AVX512_YMM_VADDPS_IR12,		PER_LOOP_INST_12, 8	);
@@ -1894,6 +1896,7 @@ AVX512_S_IR12( vaddps,  vaddps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vfmadd231ps,	vfmaddps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vmulps,		vfmaddps_vmulps_ir12 );
 AVX512_M_IR12( vfmadd231ps,  vaddps,		vfmaddps_vaddps_ir12 );
+AVX512_M_IR12( vmulps,  	vaddps,			vmulps_vaddps_ir12 );
 
 AVX512_YMM_S_IR12( vmulps,  vmulps_ir12 );
 AVX512_YMM_S_IR12( vaddps,  vaddps_ir12 );
@@ -2107,6 +2110,9 @@ return;
 		SetResult( RESULT_AVX512_FMA_ADD_IR12,	AVX512_M_IR12_vfmaddps_vaddps_ir12( Loop, 0.0f		) );
 		Progress.Increment();
 
+		SetResult( RESULT_AVX512_MUL_ADD_IR12,	AVX512_M_IR12_vmulps_vaddps_ir12( Loop, 0.0f		) );
+		Progress.Increment();
+
 
 
 		SetResult( RESULT_AVX512_YMM_VMULPS_IR12,	AVX512_YMM_S_IR12_vmulps_ir12( Loop, 0.0f		) );
@@ -2121,7 +2127,7 @@ return;
 	}else
 #endif
 	{
-		Progress.LoadAdd( 8 );
+		Progress.LoadAdd( 9 );
 	}
 
 	//------------------------------------------------------
