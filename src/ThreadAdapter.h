@@ -52,7 +52,7 @@ public:
 	void	Run() override
 	{
 		BenchThread= flatlib::thread::CreateThreadFunction(
-			[=](){
+			[=,this](){
 				FL_LOG( "Run : In Thread\n" );
 				this->SetCpuAffinity();
 				this->Instance.SetIsMultithread( false );
@@ -62,7 +62,7 @@ public:
 		BenchThread->Run();
 	}
 
-	volatile unsigned int	IsDone() override
+	unsigned int	IsDone() override
 	{
 		if( Instance.IsDone() ){
 			Join();
@@ -70,7 +70,7 @@ public:
 		}
 		return	false;
 	}
-	volatile unsigned int	GetProgress() override
+	unsigned int	GetProgress() override
 	{
 		return	Instance.GetProgress();
 	}

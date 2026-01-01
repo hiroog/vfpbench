@@ -64,12 +64,12 @@ void	TestBase::SetLoop( unsigned int loop )
 	LoopCount= loop;
 }
 
-volatile unsigned int	TestBase::GetProgress()
+unsigned int	TestBase::GetProgress()
 {
 	return	Progress.Get();
 }
 
-volatile unsigned int	TestBase::IsDone()
+unsigned int	TestBase::IsDone()
 {
 	return	DoneFlag.Get();
 }

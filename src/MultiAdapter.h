@@ -72,7 +72,7 @@ FL_PRINT( "CORE=%d\n", core );
 		unsigned int	thread_count= ThreadArray.GetDataSize();
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
 			ThreadArray[ci]= flatlib::thread::CreateThreadFunction(
-				[=](){
+				[=,this]{
 					FL_LOG( "Run : In MultiThread %d\n", ci );
 					this->SetCpuAffinity();
 					this->InstanceArray[ci].SetIsMultithread( true );
@@ -85,7 +85,7 @@ FL_PRINT( "CORE=%d\n", core );
 		}
 	}
 
-	volatile unsigned int	IsDone() override
+	unsigned int	IsDone() override
 	{
 		unsigned int	thread_count= InstanceArray.GetDataSize();
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
@@ -96,7 +96,7 @@ FL_PRINT( "CORE=%d\n", core );
 		Join();
 		return	true;
 	}
-	volatile unsigned int	GetProgress() override
+	unsigned int	GetProgress() override
 	{
 		unsigned int	thread_count= InstanceArray.GetDataSize();
 		if( thread_count == 0 ){
