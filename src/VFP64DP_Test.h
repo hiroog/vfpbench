@@ -19,7 +19,7 @@ public:
 		PER_LOOP_INST	=	5 * 8,
 		PER_LOOP_INST_12=	5 * 12,
 	};
-	enum {
+	enum : unsigned int {
 		RESULT_VFP_FMUL_IR8,
 		RESULT_VFP_FADD_IR8,
 		RESULT_VFP_FMADD_IR8,

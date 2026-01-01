@@ -1464,7 +1464,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( (unsigned int)RESULT_MAX <= (unsigned int)RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
