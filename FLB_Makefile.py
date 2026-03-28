@@ -90,14 +90,16 @@ flatlib_base_list= [
         'flatlib/core/text/TextPool.cpp',
     ]
 
-flatlib_src_list= [ os.path.join( FLATLIB_ROOT, src ) for src in flatlib_base_list ]
-src_list.extend( flatlib_src_list )
-
 #------------------------------------------------------------------------------
 
 env= tool.createTargetEnvironment()
 env.addIncludePaths( [ 'src', FLATLIB_ROOT ] )
 env.addCCFlags( ['-DFL_USE_FILESYSTEM=0', '-DFL_USE_DATABASE=0', '-DFL_USE_VECT4=0'] )
+
+if env.getHostPlatform() == 'macOS':
+    flatlib_base_list.append( 'flatlib/core/system/SystemInfo_darwin.mm' )
+flatlib_src_list= [ os.path.join( FLATLIB_ROOT, src ) for src in flatlib_base_list ]
+src_list.extend( flatlib_src_list )
 
 env.refresh()
 
