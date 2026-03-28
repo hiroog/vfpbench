@@ -37,6 +37,7 @@ src_list= [
 
 TargetName= 'vfpbench'
 
+
 #------------------------------------------------------------------------------
 
 tool.addCleanTask( genv, 'clean' )
@@ -62,11 +63,41 @@ def get_arm64_arch( env ):
 
 #------------------------------------------------------------------------------
 
-FLATLIB_ROOT= tool.findPath( '../../flatlib5', 'FLATLIB5' )
+if os.path.exists( 'src/flatlib' ):
+    FLATLIB_ROOT= 'src'
+else:
+    FLATLIB_ROOT= tool.findPath( '../../flatlib5', 'FLATLIB5' )
+
+flatlib_base_list= [
+        'flatlib/core/memory/MemoryBuffer.cpp',
+        'flatlib/core/memory/MemoryAllocator.cpp',
+        'flatlib/core/memory/MemoryAddress.cpp',
+        'flatlib/core/system/ConsoleLog.cpp',
+        'flatlib/core/system/Assert.cpp',
+        'flatlib/core/system/CoreContext.cpp',
+        'flatlib/core/system/SystemInfo.cpp',
+        'flatlib/core/time/DateTime.cpp',
+        'flatlib/core/time/SystemClock.cpp',
+        'flatlib/core/thread/Sleep.cpp',
+        'flatlib/core/thread/Mutex.cpp',
+        'flatlib/core/thread/CriticalSection.cpp',
+        'flatlib/core/thread/ThreadInstance.cpp',
+        'flatlib/core/thread/Processor.cpp',
+        'flatlib/core/math/Float.cpp',
+        'flatlib/core/math/Matrix4.cpp',
+        'flatlib/core/ut/BinaryPool.cpp',
+        'flatlib/core/platform/WinString.cpp',
+        'flatlib/core/text/TextPool.cpp',
+    ]
+
+flatlib_src_list= [ os.path.join( FLATLIB_ROOT, src ) for src in flatlib_base_list ]
+src_list.extend( flatlib_src_list )
+
+#------------------------------------------------------------------------------
 
 env= tool.createTargetEnvironment()
 env.addIncludePaths( [ 'src', FLATLIB_ROOT ] )
-env.addLibraries( [ 'flatCore' ] )
+env.addCCFlags( ['-DFL_USE_FILESYSTEM=0', '-DFL_USE_DATABASE=0', '-DFL_USE_VECT4=0'] )
 
 env.refresh()
 
@@ -98,9 +129,6 @@ def addCustomBuild( env, TargetName, src_list, config ):
         else:
             local_env.addCCFlags( ['-DDEBUG=1'] )
             exe_name= env.getExeName( TargetName + '_' + env.getTargetArch() + '_' + env.getConfig() )
-        local_env.addLibPaths( [
-                local_env.getOutputPath( os.path.join( FLATLIB_ROOT, 'lib' ) )
-            ] )
         local_env.refresh()
         task= tool.addExeTask( local_env, None, src_list, target=exe_name )
         task_list.append( task )

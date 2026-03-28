@@ -3,7 +3,7 @@
 
 #include	<flatlib/core/CoreBase.h>
 #include	<flatlib/core/system/SystemInfo.h>
-#include	<flatlib/core/math/math.h>
+#include	<flatlib/core/math/Float.h>
 #include	"TimerClass.h"
 #include	"VFP64HP_Test.h"
 
