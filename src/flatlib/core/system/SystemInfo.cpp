@@ -614,10 +614,10 @@ void SystemInfo::DecodeCpuInfo()
 #if FL_CPU_ARM7 || FL_CPU_ARM64
 						if( !strcmp( top, "neon" ) ){
 							SetInstructionSet( CPUFeature::ARM_NEON );
-						}else if( !strcmp( top, "vfpv4" ) ){
-							SetInstructionSet( CPUFeature::ARM_VFPV4 );
 						}else if( !strcmp( top, "asimd" ) ){
 							SetInstructionSet( CPUFeature::ARM_NEON );
+						}else if( !strcmp( top, "vfpv4" ) ){
+							SetInstructionSet( CPUFeature::ARM_VFPV4 );
 						}else if( !strcmp( top, "fphp" ) ){
 							SetInstructionSet( CPUFeature::ARM_FPHP );
 						}else if( !strcmp( top, "asimdhp" ) ){
@@ -642,6 +642,14 @@ void SystemInfo::DecodeCpuInfo()
 							SetInstructionSet( CPUFeature::ARM_SHA512 );
 						}else if( !strcmp( top, "aes" ) ){
 							SetInstructionSet( CPUFeature::ARM_AES );
+						}else if( !strcmp( top, "i8mm" ) ){
+							SetInstructionSet( CPUFeature::ARM_I8MM );
+						}else if( !strcmp( top, "bf16" ) ){
+							SetInstructionSet( CPUFeature::ARM_BF16 );
+						}else if( !strcmp( top, "svei8mm" ) ){
+							SetInstructionSet( CPUFeature::ARM_SVEI8MM );
+						}else if( !strcmp( top, "svebf16" ) ){
+							SetInstructionSet( CPUFeature::ARM_SVEBF16 );
 						}
 #else
 						if( !strcmp( top, "aes" ) ){
@@ -698,57 +706,57 @@ void SystemInfo::DecodeVersion()
 #if FL_CPU_X86 || FL_CPU_X64
 //-----------------------------------------------------------------------------
 
-enum {
+enum : uint32_t {
 	//-- id=1 ECX
-	CPUID_1_ECX_FEATURE_SSE3		=	(1<< 0),
-	CPUID_1_ECX_FEATURE_MONITOR		=	(1<< 3),
-	CPUID_1_ECX_FEATURE_SSSE3		=	(1<< 9),
-	CPUID_1_ECX_FEATURE_FMA3		=	(1<<12),
-	CPUID_1_ECX_FEATURE_SSE41		=	(1<<19),
-	CPUID_1_ECX_FEATURE_SSE42		=	(1<<20),
-	CPUID_1_ECX_FEATURE_AES			=	(1<<25),
-	CPUID_1_ECX_FEATURE_AVX			=	(1<<28),
-	CPUID_1_ECX_FEATURE_F16C		=	(1<<29),
-	CPUID_1_ECX_FEATURE_RAND		=	(1<<30),
+	CPUID_1_ECX_FEATURE_SSE3		=	(1u<< 0),
+	CPUID_1_ECX_FEATURE_MONITOR		=	(1u<< 3),
+	CPUID_1_ECX_FEATURE_SSSE3		=	(1u<< 9),
+	CPUID_1_ECX_FEATURE_FMA3		=	(1u<<12),
+	CPUID_1_ECX_FEATURE_SSE41		=	(1u<<19),
+	CPUID_1_ECX_FEATURE_SSE42		=	(1u<<20),
+	CPUID_1_ECX_FEATURE_AES			=	(1u<<25),
+	CPUID_1_ECX_FEATURE_AVX			=	(1u<<28),
+	CPUID_1_ECX_FEATURE_F16C		=	(1u<<29),
+	CPUID_1_ECX_FEATURE_RAND		=	(1u<<30),
 	//-- id=1 EDX
-	CPUID_1_EDX_FEATURE_MMX			=	(1<<23),
-	CPUID_1_EDX_FEATURE_SSE			=	(1<<25),
-	CPUID_1_EDX_FEATURE_SSE2		=	(1<<26),
-	CPUID_1_EDX_FEATURE_HT			=	(1<<28),
+	CPUID_1_EDX_FEATURE_MMX			=	(1u<<23),
+	CPUID_1_EDX_FEATURE_SSE			=	(1u<<25),
+	CPUID_1_EDX_FEATURE_SSE2		=	(1u<<26),
+	CPUID_1_EDX_FEATURE_HT			=	(1u<<28),
 	//-- id=7,0 EBX
-	CPUID_7_EBX_FEATURE_AVX2		=	(1<< 5),
-	CPUID_7_EBX_FEATURE_AVX512F		=	(1<<16),	// Foundation
-	CPUID_7_EBX_FEATURE_AVX512DQ	=	(1<<17),	// Doubleword and Quadword instructions
-	CPUID_7_EBX_FEATURE_AVX512IFMA	=	(1<<21),	// 
-	CPUID_7_EBX_FEATURE_AVX512PF	=	(1<<26),	//
-	CPUID_7_EBX_FEATURE_AVX512ER	=	(1<<27),	//
-	CPUID_7_EBX_FEATURE_AVX512CD	=	(1<<28),	//
-	CPUID_7_EBX_FEATURE_SHA			=	(1<<29),
-	CPUID_7_EBX_FEATURE_AVX512BW	=	(1<<30),	// Byte and Word instructions
-	CPUID_7_EBX_FEATURE_AVX512VL	=	(1<<31),	// Vector Length extensions
+	CPUID_7_EBX_FEATURE_AVX2		=	(1u<< 5),
+	CPUID_7_EBX_FEATURE_AVX512F		=	(1u<<16),	// Foundation
+	CPUID_7_EBX_FEATURE_AVX512DQ	=	(1u<<17),	// Doubleword and Quadword instructions
+	CPUID_7_EBX_FEATURE_AVX512IFMA	=	(1u<<21),	// 
+	CPUID_7_EBX_FEATURE_AVX512PF	=	(1u<<26),	//
+	CPUID_7_EBX_FEATURE_AVX512ER	=	(1u<<27),	//
+	CPUID_7_EBX_FEATURE_AVX512CD	=	(1u<<28),	//
+	CPUID_7_EBX_FEATURE_SHA			=	(1u<<29),
+	CPUID_7_EBX_FEATURE_AVX512BW	=	(1u<<30),	// Byte and Word instructions
+	CPUID_7_EBX_FEATURE_AVX512VL	=	(1u<<31),	// Vector Length extensions
 	//-- id=7,0 ECX
-	CPUID_7_ECX_FEATURE_AVX512VBMI	=	(1<< 1),	//
-	CPUID_7_ECX_FEATURE_AVX512VBMI2	=	(1<< 6),	//
-	CPUID_7_ECX_FEATURE_GFNI		=	(1<< 8),	//
-	CPUID_7_ECX_FEATURE_VAES		=	(1<< 9),	//
-	CPUID_7_ECX_FEATURE_AVX512VNNI	=	(1<<11),	// Neural Network Instructions
-	CPUID_7_ECX_FEATURE_AVX512BITALG=	(1<<12),	//
-	CPUID_7_ECX_FEATURE_AVX512VPOPCNTDQ=(1<<14),	//
+	CPUID_7_ECX_FEATURE_AVX512VBMI	=	(1u<< 1),	//
+	CPUID_7_ECX_FEATURE_AVX512VBMI2	=	(1u<< 6),	//
+	CPUID_7_ECX_FEATURE_GFNI		=	(1u<< 8),	//
+	CPUID_7_ECX_FEATURE_VAES		=	(1u<< 9),	//
+	CPUID_7_ECX_FEATURE_AVX512VNNI	=	(1u<<11),	// Neural Network Instructions
+	CPUID_7_ECX_FEATURE_AVX512BITALG=	(1u<<12),	//
+	CPUID_7_ECX_FEATURE_AVX512VPOPCNTDQ=(1u<<14),	//
 	//-- id=7,0 EDX
-	CPUID_7_EDX_FEATURE_AVX5124VNNIW=	(1<< 2),	//
-	CPUID_7_EDX_FEATURE_AVX5124FMAPS=	(1<< 3),	//
-	CPUID_7_EDX_FEATURE_AVX512VP2INTERSECT=	(1<< 8),	//
-	CPUID_7_EDX_FEATURE_AVX512FP16=		(1<< 23),	// FP16
+	CPUID_7_EDX_FEATURE_AVX5124VNNIW=	(1u<< 2),	//
+	CPUID_7_EDX_FEATURE_AVX5124FMAPS=	(1u<< 3),	//
+	CPUID_7_EDX_FEATURE_AVX512VP2INTERSECT=	(1u<< 8),	//
+	CPUID_7_EDX_FEATURE_AVX512FP16=		(1u<< 23),	// FP16
 	//-- id=7,1 EAX
-	CPUID_7_1_EAX_FEATURE_AVXVNNI=		(1<< 4),	// AVX-VNNI
-	CPUID_7_1_EAX_FEATURE_AVX512BFLOAT16=	(1<< 5),	// BFloat16
+	CPUID_7_1_EAX_FEATURE_AVXVNNI=		(1u<< 4),	// AVX-VNNI
+	CPUID_7_1_EAX_FEATURE_AVX512BFLOAT16=	(1u<< 5),	// BFloat16
 	//-- id=0x80000001 ECX
-	CPUID_80_ECX_FEATURE_SSE4A		=	(1<< 6),
-	CPUID_80_ECX_FEATURE_FMA4		=	(1<<16),
+	CPUID_80_ECX_FEATURE_SSE4A		=	(1u<< 6),
+	CPUID_80_ECX_FEATURE_FMA4		=	(1u<<16),
 	//-- id=0x80000001 EDX
-	CPUID_80_EDX_FEATURE_X64		=	(1<<29),	// Long Mode
-	CPUID_80_EDX_FEATURE_3DNOWEXT	=	(1<<30),
-	CPUID_80_EDX_FEATURE_3DNOW		=	(1<<31),
+	CPUID_80_EDX_FEATURE_X64		=	(1u<<29),	// Long Mode
+	CPUID_80_EDX_FEATURE_3DNOWEXT	=	(1u<<30),
+	CPUID_80_EDX_FEATURE_3DNOW		=	(1u<<31),
 };
 
 struct RegCPUID {
@@ -889,7 +897,7 @@ void	SystemInfo::GetCPUSpecification()
 {
 #if FL_CPU_ARM64
 	SetInstructionSet( CPUFeature::ARM_NEON );
-	SetInstructionSet( CPUFeature::ARM_VFPV4 );
+	//SetInstructionSet( CPUFeature::ARM_VFPV4 );
 	SetInstructionSet( CPUFeature::ARM_64 );
 #endif
 }
@@ -1077,6 +1085,13 @@ DEF_CPUFEATURE_NAME_ARM( SHA3 ),
 DEF_CPUFEATURE_NAME_ARM( SHA512 ),
 DEF_CPUFEATURE_NAME_ARM( AES ),
 DEF_CPUFEATURE_NAME_ARM( 64 ),
+DEF_CPUFEATURE_NAME_ARM( I8MM ),
+DEF_CPUFEATURE_NAME_ARM( BF16 ),
+DEF_CPUFEATURE_NAME_ARM( SVEI8MM ),
+DEF_CPUFEATURE_NAME_ARM( SVEBF16 ),
+DEF_CPUFEATURE_NAME_ARM( SME ),
+DEF_CPUFEATURE_NAME_ARM( SME2 ),
+
 DEF_CPUFEATURE_NAME_MIPS( MSA ),
 DEF_CPUFEATURE_NAME_MIPS( F64 ),
 DEF_CPUFEATURE_NAME_MIPS( PS ),

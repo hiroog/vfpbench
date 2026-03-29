@@ -315,6 +315,45 @@ static void dumpSysString( int hw_id, const char* msg )
 }
 
 //-----------------------------------------------------------------------------
+
+static int	getSystemInt( const char* msg )
+{
+	int	result= 0;
+	size_t	len= sizeof(result);
+	if( sysctlbyname( msg, &result, &len, nullptr, 0 ) == 0 ){
+		return	result;
+	}
+	return	-1;
+}
+
+static bool	getSystemString( const char* msg, char* buffer, size_t buffer_len )
+{
+	if( sysctlbyname( msg, buffer, &buffer_len, nullptr, 0 ) == 0 ){
+		return	true;
+	}
+	return	false;
+}
+
+static int	dumpSystemInt( const char* msg )
+{
+	int	result= getSystemInt( msg );
+	FL_LOG( "HW INFO: %s = %d\n", msg, result );
+	return	result;
+}
+
+#if 0
+static void dumpSystemString( const char* msg )
+{
+	const int	STRING_BUF_SIZE= 128;
+	char	buf[STRING_BUF_SIZE];
+	size_t	len= STRING_BUF_SIZE;
+	if( getSystemString( msg, buf, len ) ){
+		FL_LOG( "HW INFO: %s = %s\n", msg, buf );
+	}
+}
+#endif
+
+//-----------------------------------------------------------------------------
 }
 
 void SystemInfo::DecodeCpuTopology()
@@ -355,6 +394,28 @@ void SystemInfo::DecodeCpuTopology()
 		dumpSysInt( HW_TB_FREQ,		"TB_FREQ" );
 		dumpSysLong( HW_MEMSIZE,	"MemSize" );
 		dumpSysInt( HW_AVAILCPU,	"AvailCpu" );
+
+#if 0
+		dumpSystemInt( "hw.optional.arm.AdvSIMD" );
+		dumpSystemInt( "hw.optional.arm.AdvSIMD_HPFPCvt" );
+		dumpSystemInt( "hw.optional.arm.FEAT_BF16" );
+		dumpSystemInt( "hw.optional.arm.FEAT_DotProd" );
+		dumpSystemInt( "hw.optional.arm.FEAT_FHM" );
+		dumpSystemInt( "hw.optional.arm.FEAT_FP16" );
+		dumpSystemInt( "hw.optional.arm.FEAT_I8MM" );
+		dumpSystemInt( "hw.optional.arm.FEAT_SME" );
+		dumpSystemInt( "hw.optional.arm.FEAT_SME2" );
+		dumpSystemInt( "hw.optional.arm.SME_F32F32" );
+		dumpSystemInt( "hw.optional.arm.SME_BI32I32" );
+		dumpSystemInt( "hw.optional.arm.SME_B16F32" );
+		dumpSystemInt( "hw.optional.arm.SME_F16F32" );
+		dumpSystemInt( "hw.optional.arm.SME_I16I32" );
+		dumpSystemInt( "hw.optional.arm.FEAT_SME_F16F16" );
+		dumpSystemInt( "hw.optional.arm.FEAT_SME_B16B16" );
+		dumpSystemInt( "hw.optional.neon" );
+		dumpSystemInt( "hw.optional.neon_hpfp" );
+		dumpSystemInt( "hw.optional.neon_fp16" );
+#endif
 	}
 
 	{
@@ -371,6 +432,9 @@ void SystemInfo::DecodeCpuTopology()
 		}
 		FL_PRINT( "CORE=%d  ACTIVE=%d  MEMORY=%lld\n", cpu_count, active_count, physical_memory );
 #endif
+	}
+
+	{
 #if !(FL_OS_WATCHOS || FL_OS_TVOS)
 		host_basic_info	basic_info;
 		mach_msg_type_number_t	info_count= HOST_BASIC_INFO_COUNT;
@@ -401,6 +465,7 @@ void SystemInfo::DecodeCpuTopology()
 #endif
 	}
 
+#if 0
 	{
 		host_t	host= mach_host_self();
 		processor_basic_info_t	info_ptr= nullptr;
@@ -423,6 +488,37 @@ void SystemInfo::DecodeCpuTopology()
 		vm_deallocate( mach_task_self(), (vm_address_t)info_ptr, (vm_size_t)( info_count * sizeof(natural_t) ) );
 		FL_LOG( "*processor***********\n" );
 	}
+#endif
+
+#if FL_OS_MACOS
+
+	if( dumpSystemInt( "hw.optional.arm64" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_64 );
+	}
+	if( dumpSystemInt( "hw.optional.arm.AdvSIMD" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_NEON );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_FP16" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_FPHP );
+		SetInstructionSet( CPUFeature::ARM_SIMDHP );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_BF16" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_BF16 );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_DotProd" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SIMDDP );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_I8MM" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_I8MM );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_SME" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SME );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_SME2" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SME2 );
+	}
+
+#else
 
 # if __ARM_NEON__
 	SetInstructionSet( CPUFeature::ARM_NEON );
@@ -453,6 +549,53 @@ void SystemInfo::DecodeCpuTopology()
 	SetInstructionSet( CPUFeature::ARM_SVE2 );
 # endif
 
+#endif
+
+#if FL_OS_MACOS
+	{
+		constexpr size_t	PERF_NAME_MAX= 32;
+		constexpr int		PERF_MAX_GROUP= 4;
+		char	perf_physical[PERF_NAME_MAX];
+		char	perf_logical[PERF_NAME_MAX];
+		char	perf_name[PERF_NAME_MAX];
+		char	prev_ch= '0';
+		strncpy( perf_physical, "hw.perflevel0.physicalcpu", PERF_NAME_MAX-1 );
+		strncpy( perf_logical, "hw.perflevel0.logicalcpu", PERF_NAME_MAX-1 );
+		strncpy( perf_name, "hw.perflevel0.name", PERF_NAME_MAX-1 );
+		constexpr int	group_id_index= 12;
+		FL_ASSERT( perf_physical[group_id_index] == '0' );
+		FL_ASSERT( perf_logical[group_id_index] == '0' );
+		FL_ASSERT( perf_name[group_id_index] == '0' );
+		const auto*	info= FindCPUInfo( DeviceName );
+		unsigned int	base_cpu_index= 0;
+		unsigned int	group_index= 0;
+		for( int i= 0 ; i< PERF_MAX_GROUP ; i++ ){
+			if( perf_physical[group_id_index] == prev_ch ){
+				constexpr size_t	CPU_NAME_MAX= 64;
+				char	cpu_name[CPU_NAME_MAX];
+				prev_ch= '0' + i;
+				perf_physical[group_id_index]= prev_ch;
+				perf_logical[group_id_index]= prev_ch;
+				perf_name[group_id_index]= prev_ch;
+				int	physical_count= dumpSystemInt( perf_physical );
+				int	logical_count= dumpSystemInt( perf_logical );
+				bool	result= getSystemString( perf_name, cpu_name, CPU_NAME_MAX );
+				if( physical_count > 0 && logical_count > 0 && result ){
+					FL_LOG( "%s = %dC %dT, %s\n", perf_name, physical_count, logical_count, cpu_name );
+					int	step= logical_count/physical_count;
+					unsigned int	freq= core_clock;
+					if( info ){
+						freq= info->Group[group_index].CPU_Freq;
+					}
+					SetCoreInfo( base_cpu_index, logical_count, group_index, base_cpu_index/step, freq, step );
+					group_index++;
+					base_cpu_index+= logical_count;
+				}
+			}
+		}
+		CoreGroupCount= group_index;
+	}
+#else
 	{
 		bool	need_setup= true;
 		const auto*	info= FindCPUInfo( DeviceName );
@@ -484,7 +627,7 @@ void SystemInfo::DecodeCpuTopology()
 			SetCoreInfo( 0, TotalThreadCount, 0, 0, core_clock, step );
 		}
 	}
-
+#endif
 
 	DumpCpuGroup();
 }

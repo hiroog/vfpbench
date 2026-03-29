@@ -70,6 +70,12 @@ enum class CPUFeature : unsigned int {
 	ARM_SHA512,
 	ARM_AES,
 	ARM_64,
+	ARM_I8MM,
+	ARM_BF16,
+	ARM_SVEI8MM,
+	ARM_SVEBF16,
+	ARM_SME,
+	ARM_SME2,
 	//--
 	MIPS_MSA,
 	MIPS_F64,

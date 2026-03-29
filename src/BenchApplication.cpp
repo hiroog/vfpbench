@@ -207,14 +207,18 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 	case CPUArch::CPU_ARM5:
 	case CPUArch::CPU_ARM6:
 	case CPUArch::CPU_ARM7:
+		pool.AddFormat( "FMA    : %s\n", Info.HasInstructionSet( CPUFeature::ARM_VFPV4 ) ? "yes" : "no" );
 	case CPUArch::CPU_ARM64:
 		pool.AddFormat( "NEON   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_NEON ) ? "yes" : "no" );
-		pool.AddFormat( "FMA    : %s\n", Info.HasInstructionSet( CPUFeature::ARM_VFPV4 ) ? "yes" : "no" );
 		pool.AddFormat( "FPHP   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_FPHP ) ? "yes" : "no" );
 		pool.AddFormat( "SIMDHP : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDHP ) ? "yes" : "no" );
 		pool.AddFormat( "DotProd: %s\n", Info.HasInstructionSet( CPUFeature::ARM_SIMDDP ) ? "yes" : "no" );
 		pool.AddFormat( "SVE    : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SVE ) ? "yes" : "no" );
 		pool.AddFormat( "SVE2   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ? "yes" : "no" );
+		pool.AddFormat( "BF16   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_BF16 ) ? "yes" : "no" );
+		pool.AddFormat( "I8MM   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_I8MM ) ? "yes" : "no" );
+		pool.AddFormat( "SME    : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SME  ) ? "yes" : "no" );
+		pool.AddFormat( "SME2   : %s\n", Info.HasInstructionSet( CPUFeature::ARM_SME2 ) ? "yes" : "no" );
 		break;
 	case CPUArch::CPU_X86:
 	case CPUArch::CPU_X64:
