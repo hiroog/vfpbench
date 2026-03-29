@@ -4,7 +4,7 @@
 #ifndef	SSE64DP_TEST_H_
 #define	SSE64DP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace SSE64DP {
@@ -19,7 +19,7 @@ public:
 		PER_LOOP_INST_9	=	5 * 9,		// 45
 		PER_LOOP_INST_12=	5 * 12,		// 60
 	};
-	enum {
+	enum : unsigned int {
 
 
 		RESULT_SSE_MULSD_IR8,

@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"VFP64DP_Test.h"
 
@@ -11,7 +11,13 @@
 #if FL_CPU_ARM64
 //-----------------------------------------------------------------------------
 
+#if defined(__ARM_FEATURE_SVE2) && __ARM_FEATURE_SVE2
+# include   <arm_sve.h>
+# define    USE_ARM_SVE2    1
+#endif
+
 using namespace flatlib;
+using system::CPUFeature;
 
 namespace VFP64DP {
 //-----------------------------------------------------------------------------
@@ -388,20 +394,19 @@ static uint64_t VFP_S_IRS4_##name( CounterType LoopCount, double answer ) \
 
 
 
-
 //-----------------------------------------------------------------------------
 // Single Interleave 1 MAD
 //-----------------------------------------------------------------------------
 
 #define MAD_S_IR1_8(op) \
-			op " d0, d0, d8, d9 \n"		\
-			op " d0, d0, d8, d9 \n"		\
-			op " d0, d0, d8, d9 \n"		\
-			op " d0, d0, d8, d9 \n"		\
-			op " d0, d0, d8, d9 \n"		\
-			op " d0, d0, d8, d9 \n"		\
-			op " d0, d0, d8, d9 \n"		\
-			op " d0, d0, d8, d9 \n"
+			op " d0, d8, d9, d0 \n"		\
+			op " d0, d8, d9, d0 \n"		\
+			op " d0, d8, d9, d0 \n"		\
+			op " d0, d8, d9, d0 \n"		\
+			op " d0, d8, d9, d0 \n"		\
+			op " d0, d8, d9, d0 \n"		\
+			op " d0, d8, d9, d0 \n"		\
+			op " d0, d8, d9, d0 \n"
 
 
 
@@ -413,8 +418,8 @@ static uint64_t MAD_S_IR1_##name( CounterType LoopCount, double answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	d8, w2\n"		\
 		"scvtf	d9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -456,14 +461,14 @@ static uint64_t MAD_S_IR1_##name( CounterType LoopCount, double answer ) \
 
 
 #define MAD_S_IR8_8(op) \
-			op " d0, d0, d8, d9 \n"		\
-			op " d1, d1, d8, d9 \n"		\
-			op " d2, d2, d8, d9 \n"		\
-			op " d3, d3, d8, d9 \n"		\
-			op " d4, d4, d8, d9 \n"		\
-			op " d5, d5, d8, d9 \n"		\
-			op " d6, d6, d8, d9 \n"		\
-			op " d7, d7, d8, d9 \n"
+			op " d0, d8, d9, d0 \n"		\
+			op " d1, d8, d9, d1 \n"		\
+			op " d2, d8, d9, d2 \n"		\
+			op " d3, d8, d9, d3 \n"		\
+			op " d4, d8, d9, d4 \n"		\
+			op " d5, d8, d9, d5 \n"		\
+			op " d6, d8, d9, d6 \n"		\
+			op " d7, d8, d9, d7 \n"
 
 
 
@@ -475,8 +480,8 @@ static uint64_t MAD_S_IR8_##name( CounterType LoopCount, double answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	d8, w2\n"		\
 		"scvtf	d9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -534,14 +539,14 @@ static uint64_t MAD_S_IR8_##name( CounterType LoopCount, double answer ) \
 //-----------------------------------------------------------------------------
 
 #define MAD_S_IRS4_8(op) \
-			op " d0, d0, d8, d4 \n"		\
-			op " d1, d1, d8, d5 \n"		\
-			op " d2, d2, d8, d6 \n"		\
-			op " d3, d3, d8, d7 \n"		\
-			op " d4, d4, d8, d0 \n"		\
-			op " d5, d5, d8, d1 \n"		\
-			op " d6, d6, d8, d2 \n"		\
-			op " d7, d7, d8, d3 \n"
+			op " d0, d8, d4, d0 \n"		\
+			op " d1, d8, d5, d1 \n"		\
+			op " d2, d8, d6, d2 \n"		\
+			op " d3, d8, d7, d3 \n"		\
+			op " d4, d8, d0, d4 \n"		\
+			op " d5, d8, d1, d5 \n"		\
+			op " d6, d8, d2, d6 \n"		\
+			op " d7, d8, d3, d7 \n"
 
 
 
@@ -553,8 +558,8 @@ static uint64_t MAD_S_IRS4_##name( CounterType LoopCount, double answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	d8, w2\n"		\
 		"scvtf	d9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -622,7 +627,6 @@ static uint64_t MAD_S_IRS4_##name( CounterType LoopCount, double answer ) \
 // NEON
 //=============================================================================
 
-
 //-----------------
 #if USE_ANDROID_GCC
 //-----------------
@@ -673,11 +677,10 @@ static uint64_t MAD_S_IRS4_##name( CounterType LoopCount, double answer ) \
 
 
 
+
 //-----------------------------------------------------------------------------
 // Vector 32x2 32x4 Interleave 1
 //-----------------------------------------------------------------------------
-
-
 
 //-----------------
 #if USE_ANDROID_GCC
@@ -871,6 +874,7 @@ static uint64_t NEON_V_IR8_##name( CounterType LoopCount, double answer ) \
 }
 
 #define NEON_V_IR8(op,size,name) NEON_V_IR8_0(#op,#size,name)
+
 
 //-----------------
 #else
@@ -1288,6 +1292,123 @@ static uint64_t NEON_V_IR12_##name( CounterType LoopCount, double answer ) \
 
 
 
+//=============================================================================
+// SVE
+//=============================================================================
+
+//-----------------
+#if USE_ARM_SVE2
+//-----------------
+
+#define SVE_REG_CLEAR() \
+        "dup    z0.b, #0\n"     \
+        "dup    z1.b, #0\n"     \
+        "dup    z2.b, #0\n"     \
+        "dup    z3.b, #0\n"     \
+        "dup    z4.b, #0\n"     \
+        "dup    z5.b, #0\n"     \
+        "dup    z6.b, #0\n"     \
+        "dup    z7.b, #0\n"     \
+        "dup    z8.b, #0\n"     \
+        "dup    z9.b, #0\n"     \
+        "dup    z10.b, #0\n"        \
+        "dup    z11.b, #0\n"        \
+        "dup    z12.b, #0\n"        \
+        "dup    z13.b, #0\n"        \
+        "dup    z14.b, #0\n"        \
+        "dup    z15.b, #0\n"        \
+        "ptrue  p0.s\n"     \
+
+
+//-----------------------------------------------------------------------------
+// Vector 64bit Interleave 12
+//-----------------------------------------------------------------------------
+
+
+#define SVE_V_IR12_12(op,size,pred) \
+            op " z4"  size pred ", z2" size ", z3" size " \n"   \
+            op " z5"  size pred ", z2" size ", z3" size " \n"   \
+            op " z6"  size pred ", z2" size ", z3" size " \n"   \
+            op " z7"  size pred ", z2" size ", z3" size " \n"   \
+            op " z8"  size pred ", z2" size ", z3" size " \n"   \
+            op " z9"  size pred ", z2" size ", z3" size " \n"   \
+            op " z10" size pred ", z2" size ", z3" size " \n"   \
+            op " z11" size pred ", z2" size ", z3" size " \n"   \
+            op " z12" size pred ", z2" size ", z3" size " \n"   \
+            op " z13" size pred ", z2" size ", z3" size " \n"   \
+            op " z14" size pred ", z2" size ", z3" size " \n"   \
+            op " z15" size pred ", z2" size ", z3" size " \n"   \
+
+
+
+
+
+#define SVE_V_IR12_0(op,size,name,pred) \
+static uint64_t SVE_V_IR12_##name( CounterType LoopCount, double answer ) \
+{ \
+    double   ret0, ret1, ret2, ret3, ret4, ret5, ret6, ret7; \
+    TimerClass  timer;          \
+    timer.Begin();              \
+    __asm__ __volatile__(       \
+        SVE_REG_CLEAR()         \
+        "mov    x2, #2  \n"     \
+        "mov    x3, #5  \n"     \
+        "dup    z2.d, x2\n" \
+        "scvtf  z2.d, p0/m, z2.d\n"     \
+        "dup    z3.d, x3\n" \
+        "scvtf  z3.d, p0/m, z3.d\n"     \
+        "mov    x0, %[loop]\n"  \
+        "mov    w0, w0\n"   \
+    "1:\n"  \
+        SVE_V_IR12_12( op, size, pred ) \
+        SVE_V_IR12_12( op, size, pred ) \
+        SVE_V_IR12_12( op, size, pred ) \
+        SVE_V_IR12_12( op, size, pred ) \
+        SVE_V_IR12_12( op, size, pred ) \
+        "subs   w0, w0, #1\n"   \
+        "b.ne   1b\n"       \
+        "str    d4, %[o0]\n"    \
+        "str    d5, %[o1]\n"    \
+        "str    d6, %[o2]\n"    \
+        "str    d7, %[o3]\n"    \
+        "str    d8, %[o4]\n"    \
+        "str    d9, %[o5]\n"    \
+        "str    d10, %[o6]\n"    \
+        "str    d11, %[o7]\n"    \
+    :   [o0]"=m"(ret0), \
+        [o1]"=m"(ret1), \
+        [o2]"=m"(ret2), \
+        [o3]"=m"(ret3), \
+        [o4]"=m"(ret4), \
+        [o5]"=m"(ret5), \
+        [o6]"=m"(ret6), \
+        [o7]"=m"(ret7)  \
+    : [loop]"r"(LoopCount)  \
+    : "cc","x0","x2","x3","p0", \
+    "z0","z1","z2","z3","z4","z5","z6","z7","z8","z9","z10","z11","z12","z13","z14","z15" ); \
+\
+    timer.End();        \
+    timer.Dump( op );   \
+    check_result( ret0, answer );   \
+    check_result( ret1, answer );   \
+    check_result( ret2, answer );   \
+    check_result( ret3, answer );   \
+    check_result( ret4, answer );   \
+    check_result( ret5, answer );   \
+    check_result( ret6, answer );   \
+    check_result( ret7, answer );   \
+    return  timer.Result(); \
+}
+
+#define SVE_V_IR12(op,size,name,pred) SVE_V_IR12_0(#op,#size,name,pred)
+
+
+
+
+//-----------------
+#endif
+//-----------------
+
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -1305,8 +1426,6 @@ static const char*	Instruction_Title[]= {
 	"NEON fmla.2d (64bit x2) n8",
 
 
-
-
 	"FPU fmul (64bit x1) ns4",
 	"FPU fadd (64bit x1) ns4",
 	"FPU fmadd (64bit x1) ns4",
@@ -1314,7 +1433,6 @@ static const char*	Instruction_Title[]= {
 	"NEON fmul.2d (64bit x2) ns4",
 	"NEON fadd.2d (64bit x2) ns4",
 	"NEON fmla.2d (64bit x2) ns4",
-
 
 
 	"FPU fmul (64bit x1) n1",
@@ -1326,11 +1444,14 @@ static const char*	Instruction_Title[]= {
 	"NEON fmla.2d (64bit x2) n1",
 
 
-
 	"NEON fmul.2d (64bit x2) n12",
 	"NEON fadd.2d (64bit x2) n12",
 	"NEON fmla.2d (64bit x2) n12",
 
+
+	"SVE fmul.d (64bit xN) n12",
+	"SVE fadd.d (64bit xN) n12",
+	"SVE fmla.d (64bit xN) n12",
 };
 
 
@@ -1343,7 +1464,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( (unsigned int)RESULT_MAX <= (unsigned int)RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -1378,15 +1499,27 @@ FloatTest::FloatTest()
 
 
 
-
 	SetOp( RESULT_NEON_FMUL_D2_IR12,	PER_LOOP_INST_12 * 2, 2	);
 	SetOp( RESULT_NEON_FADD_D2_IR12,	PER_LOOP_INST_12 * 2, 2	);
 	SetOp( RESULT_NEON_FMLA_D2_IR12,	PER_LOOP_INST_12 * 4, 4	);
 
+
+#if USE_ARM_SVE2
+    if( Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+        uint32_t    vector_length= (uint32_t)( svcntd() );
+		FL_LOG( "double vlen=%d\n", vector_length );
+        SetOp( RESULT_SVE_FMUL_D_IR12,  PER_LOOP_INST_12 * vector_length, vector_length );
+        SetOp( RESULT_SVE_FADD_D_IR12,  PER_LOOP_INST_12 * vector_length, vector_length );
+        SetOp( RESULT_SVE_FMLA_D_IR12,  PER_LOOP_INST_12 * vector_length*2, vector_length*2 );
+    }else
+#endif
+
+    {
+        SetOp( RESULT_SVE_FMUL_D_IR12,  PER_LOOP_INST_12 * 2, 2 );
+        SetOp( RESULT_SVE_FADD_D_IR12,  PER_LOOP_INST_12 * 2, 2 );
+        SetOp( RESULT_SVE_FMLA_D_IR12,  PER_LOOP_INST_12 * 4, 4 );
+    }
 }
-
-
-
 
 
 
@@ -1487,7 +1620,17 @@ NEON_V_IR12( fmla.2d, fmla_2d_ir12 );
 //-----------------
 
 
+//-----------------
+#if USE_ARM_SVE2
+//-----------------
 
+SVE_V_IR12( fmul, .d, fmul_d_ir12, " " );
+SVE_V_IR12( fadd, .d, fadd_d_ir12, " " );
+SVE_V_IR12( fmla, .d, fmla_d_ir12, ", p0/m" );
+
+//-----------------
+#endif
+//-----------------
 
 
 
@@ -1498,11 +1641,10 @@ void FloatTest::Run()
 
 FL_LOG( "VFP64DP loop=%d\n", Loop );
 
-	double	sum= 0;
 	double	sum_2= 0;
 	for( unsigned int i= 0 ; i< Loop * 5 ; i++ ){
-		sum+= 2.0f;
 		sum_2+= 10.0f;
+		__asm__ __volatile__( "nop\n": : : "cc", "x0" );
 	}
 
 	//------------------------------------------------------
@@ -1510,13 +1652,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IR8,		VFP_S_IR8_fmul_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IR8,		VFP_S_IR8_fadd_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IR8,	MAD_S_IR8_fmadd_ir8( Loop, sum ) );
-	Progress++;
+	SetResult( RESULT_VFP_FMADD_IR8,	MAD_S_IR8_fmadd_ir8( Loop, sum_2 ) );
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1524,13 +1666,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_D2_IR8,	NEON_V_IR8_fmul_2d_ir8( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_D2_IR8,	NEON_V_IR8_fadd_2d_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_D2_IR8,	NEON_V_IR8_fmla_2d_ir8( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1543,13 +1685,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IRS4,	VFP_S_IRS4_fmul_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IRS4,	VFP_S_IRS4_fadd_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IRS4,	MAD_S_IRS4_fmadd_irs4( Loop, sum ) );
-	Progress++;
+	SetResult( RESULT_VFP_FMADD_IRS4,	MAD_S_IRS4_fmadd_irs4( Loop, sum_2 ) );
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1557,13 +1699,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_D2_IRS4,		NEON_V_IRS4_fmul_2d_irs4( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_D2_IRS4,		NEON_V_IRS4_fadd_2d_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_D2_IRS4,		NEON_V_IRS4_fmla_2d_irs4( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1575,13 +1717,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IR1,		VFP_S_IR1_fmul_ir1( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IR1,		VFP_S_IR1_fadd_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IR1,	MAD_S_IR1_fmadd_ir1( Loop, sum ) );
-	Progress++;
+	SetResult( RESULT_VFP_FMADD_IR1,	MAD_S_IR1_fmadd_ir1( Loop, sum_2 ) );
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1589,13 +1731,13 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_D2_IR1,	NEON_V_IR1_fmul_2d_ir1( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_D2_IR1,	NEON_V_IR1_fadd_2d_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_D2_IR1,	NEON_V_IR1_fmla_2d_ir1( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1607,13 +1749,40 @@ FL_LOG( "VFP64DP loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_D2_IR12,		NEON_V_IR12_fmul_2d_ir12( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_D2_IR12,		NEON_V_IR12_fadd_2d_ir12( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_D2_IR12,		NEON_V_IR12_fmla_2d_ir12( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
+
+	//------------------------------------------------------
+
+
+
+	//------------------------------------------------------
+	// SVE
+	//------------------------------------------------------
+
+#if USE_ARM_SVE2
+    if( Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+        SetResult( RESULT_SVE_FMUL_D_IR12,      SVE_V_IR12_fmul_d_ir12( Loop, 10.0f ) );
+        Progress.Increment();
+
+        SetResult( RESULT_SVE_FADD_D_IR12,      SVE_V_IR12_fadd_d_ir12( Loop, 7.0f      ) );
+        Progress.Increment();
+
+        SetResult( RESULT_SVE_FMLA_D_IR12,      SVE_V_IR12_fmla_d_ir12( Loop, sum_2 ) );
+        Progress.Increment();
+
+    }else
+#endif
+    {
+        Progress.Increment();
+        Progress.Increment();
+        Progress.Increment();
+    }
 
 	//------------------------------------------------------
 

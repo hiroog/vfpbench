@@ -4,7 +4,13 @@
 #ifndef	TEST_BASE_H_
 #define	TEST_BASE_H_
 
-#include	<minilib/AtomicValue.h>
+#include	<flatlib/core/thread/AtomicValue.h>
+
+namespace flatlib {
+	namespace system {
+		class SystemInfo;
+	}
+}
 
 enum class InfoType : unsigned int {
 	INFO_COUNT,
@@ -42,8 +48,8 @@ public:
 
 	virtual void					Run()= 0;
 	virtual void					SetLoop( unsigned int loop )= 0;
-	virtual volatile unsigned int	GetProgress()= 0;
-	virtual volatile unsigned int	IsDone()= 0;
+	virtual unsigned int			GetProgress()= 0;
+	virtual unsigned int			IsDone()= 0;
 	virtual unsigned int			GetResultInfo( InfoType index ) const= 0;
 
 	virtual unsigned int			GetResult( unsigned int result_index ) const= 0;
@@ -83,10 +89,9 @@ public:
 };
 
 
-
 class TestBase : public ITestBase {
 protected:
-	enum {
+	enum : unsigned int {
 		//BASE_DEFAULT_LOOP_MATRIX	=	500000,
 		BASE_DEFAULT_LOOP_MATRIX	=	1000000,
 		//BASE_DEFAULT_LOOP_FPU		=	10000000,
@@ -97,6 +102,7 @@ protected:
 
 	flatlib::thread::AtomicValue<unsigned int>	Progress;
 	flatlib::thread::AtomicValue<unsigned int>	DoneFlag;
+	flatlib::system::SystemInfo&	Info;
 	unsigned int			LoopCount;
 protected:
 	void	SetOp( unsigned int index, unsigned int lop, unsigned int fop );
@@ -113,18 +119,13 @@ public:
 	}
 
 	virtual void					SetLoop( unsigned int loop ) override;
-	virtual volatile unsigned int	GetProgress() override;
-	virtual volatile unsigned int	IsDone() override;
+	virtual unsigned int			GetProgress() override;
+	virtual unsigned int			IsDone() override;
 
 	virtual unsigned int			GetResult( unsigned int result_index ) const override;
 	virtual unsigned int			GetLoopOp( unsigned int result_index ) const override;
 	virtual float					GetInstFop( unsigned int result_index ) const override;
-
-
 };
 
-
-
 #endif
-
 

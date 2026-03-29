@@ -1,18 +1,14 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemAPI.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/system/CoreContext.h>
+#include	<flatlib/core/thread/Sleep.h>
 #include	"BenchmarkTest.h"
 #include	"BenchApplication.h"
-
 #include	<stdio.h>
 #include	<stdlib.h>
 
-
 using namespace flatlib;
-
 
 enum : unsigned int {
 	BTYPE_ALL	=	1000,
@@ -23,7 +19,6 @@ enum : unsigned int {
 	INFO_CPU,
 	INFO_LOG,
 };
-
 
 class AppModule {
 private:
@@ -38,7 +33,7 @@ public:
 	}
 	void	Init( float loop_scale, const char* save_file= ".save.log" )
 	{
-		Info.Init();
+		system::RCore().RSystemInfo().Init();
 		auto	bcount= BenchmarkInstance.GetBenchCount();
 		App.Init( bcount );
 		for( unsigned int bi= 0 ; bi< bcount ; bi++ ){
@@ -49,31 +44,31 @@ public:
 	}
 	void	PrintInfo()
 	{
-		ut::BinaryBuffer	buffer;
-		App.ExportCPUInfo( buffer );
-		*reinterpret_cast<char*>(buffer.Alloc( 1 ))= '\0';
-		FL_PRINT( "%s\n", buffer.GetTop() );
+		text::TextPool	pool;
+		App.ExportCPUInfo( pool );
+		pool.AddChar( '\0' );
+		FL_PRINT( "%s\n", pool.GetText() );
 	}
 	void	PrintLog()
 	{
-		ut::BinaryBuffer	buffer;
-		App.ExportLog( buffer );
-		*reinterpret_cast<char*>(buffer.Alloc( 1 ))= '\0';
-		FL_OUTPUT( reinterpret_cast<const char*>(buffer.GetTop()) );
+		text::TextPool	pool;
+		App.ExportLog( pool );
+		pool.AddChar( '\0' );
+		system::RConsoleLog().LogString( pool.GetText() );
 	}
 	void	PrintFlops()
 	{
-		ut::BinaryBuffer	buffer;
-		App.ExportFlops( buffer );
-		*reinterpret_cast<char*>(buffer.Alloc( 1 ))= '\0';
-		FL_PRINT( "%s\n", buffer.GetTop() );
+		text::TextPool	pool;
+		App.ExportFlops( pool );
+		pool.AddChar( '\0' );
+		FL_PRINT( "%s\n", pool.GetText() );
 	}
 	void	List( unsigned int info_mode )
 	{
 		switch( info_mode ){
 		case INFO_CPU:
 			PrintInfo();
-			Info.DumpSystemInfo();
+			system::RCore().RSystemInfo().DumpSystemInfo();
 			break;
 		case INFO_BENCH: {
 				auto	bcount= BenchmarkInstance.GetBenchCount();
@@ -88,7 +83,6 @@ public:
 			break;
 		}
 	}
-
 	void Dump( unsigned int btype )
 	{
 		FL_PRINT( "-------------------\n" );
@@ -96,7 +90,6 @@ public:
 		FL_PRINT( "-------------------\n" );
 		FL_PRINT( "\n" );
 	}
-
 	void Wait( unsigned int btype )
 	{
 		auto*	bench= BenchmarkInstance.GetBenchmark( btype );
@@ -105,12 +98,11 @@ public:
 			if( bench->IsDone() ){
 				break;
 			}
-			time::SleepMS( 1000 );
+			thread::SleepThread( 1.0f );
 		}
 		App.UpdateResult( btype, bench );
 		Dump( btype );
 	}
-
 	void RunBenchmark_All( unsigned int btype )
 	{
 		if( btype != BTYPE_ALL ){
@@ -122,7 +114,6 @@ public:
 			}
 		}
 	}
-
 	void RunBenchmark( unsigned int btype, const char* log_file )
 	{
 		PrintInfo();
@@ -131,12 +122,12 @@ public:
 		App.SaveFile( ".save.log" );
 
 		if( log_file ){
-			ut::BinaryBuffer	buffer;
-			App.ExportLog( buffer );
+			text::TextPool	pool;
+			App.ExportLog( pool );
 
 			FILE*	fp= fopen( log_file, "wb" );
 			if( fp ){
-				fwrite( buffer.GetTop(), buffer.GetSize(), 1, fp );
+				fwrite( pool.GetBuffer(), pool.GetDataSize(), 1, fp );
 				fclose( fp );
 			}else{
 				FL_ERROR( "write error %s\n", log_file );
@@ -150,10 +141,7 @@ public:
 		PrintFlops();
 #endif
 	}
-
 };
-
-
 
 
 static void usage()
@@ -171,12 +159,12 @@ static void usage()
 	exit( 1 );
 }
 
-
-
 int main( int argc, char** argv )
 {
+	auto*	context= system::CreateContext();
+	context->RConsoleLog().SetConsoleOutputMode( true );
 	{
-		Info.Init();
+		system::RCore().RSystemInfo().Init();
 		float	loop_scale= 1.0f;
 		unsigned int	btype= BTYPE_ALL;
 		const char*		log_file= "output_log.txt";
@@ -204,7 +192,7 @@ int main( int argc, char** argv )
 					btype= atoi( *argv + 2 );
 					break;
 				case 'c':
-					loop_scale= atof( *argv + 3 );
+					loop_scale= atof( *argv+2 );
 					break;
 				case '-': {
 						char	ch= (*argv)[2];
@@ -244,13 +232,11 @@ int main( int argc, char** argv )
 			}
 		}
 
+		ZRelease( context );
 	}
-	FL_LOG( "memory=%zd %zd\n", memory::GetAllocCount(), memory::GetAllocSize() );
-	FL_ASSERT( memory::GetAllocCount() == 0 );
-	FL_ASSERT( memory::GetAllocSize() == 0 );
-
+	memory::RAllocator().DumpStatus();
+	FL_ASSERT( memory::RAllocator().GetTotalCount() == 0 );
 	return 0;
 }
-
 
 

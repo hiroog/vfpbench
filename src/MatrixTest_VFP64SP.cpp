@@ -414,7 +414,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 	SetResult( RESULT_LIB, Matrix_Mul_LIB_A( result_LIB.dest, src1, src2, Loop ) );
 
 
-	Progress++;
+	Progress.Increment();
 
 
 //-----------------------------------------------------------------------------
@@ -424,13 +424,13 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 	SetResult( RESULT_NEON_AQ, Matrix_Mul_NEON_AQ( result_AQ.dest, src1, src2, Loop ) );
 	CHECK_( result_AQ );
 
-	Progress++;
+	Progress.Increment();
 
 	Result	result_BQ;
 	SetResult( RESULT_NEON_BQ, Matrix_Mul_NEON_BQ( result_BQ.dest, src1, src2, Loop ) );
 	CHECK_( result_BQ );
 
-	Progress++;
+	Progress.Increment();
 
 	Progress+= 5;
 

@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"VFP32DP_Test.h"
 
@@ -11,7 +11,12 @@
 #if FL_CPU_ARM7 || FL_CPU_ARM6
 //-----------------------------------------------------------------------------
 
+#if defined(__ARM_VFPV4__)
+# define	FL_CPU_VFPV4	1
+#endif
+
 using namespace flatlib;
+using system::CPUFeature;
 
 namespace VFP32DP {
 //-----------------------------------------------------------------------------
@@ -385,10 +390,10 @@ FL_LOG( "VFP2(dp) loop=%d\n", Loop );
 	//---------------------------------------
 
 	SetResult( RESULT_VFP_FMULD_IR8,	VFP_D_IR8_fmuld_ir8( Loop, 10.0		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADDD_IR8,	VFP_D_IR8_faddd_ir8( Loop, 7.0		) );
-	Progress++;
+	Progress.Increment();
 
 	double	sum= 0;
 	for( unsigned int i= 0 ; i< Loop * 5 ; i++ ){
@@ -396,12 +401,12 @@ FL_LOG( "VFP2(dp) loop=%d\n", Loop );
 	}
 
 	SetResult( RESULT_VFP_FMACD_IR8,	VFP_D_IR8_fmacd_ir8( Loop, sum ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F64_IR8,	VFP_D_IR8_vfma_f64_ir8( Loop, sum ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//---------------------------------------
 	// IRS4
@@ -409,18 +414,18 @@ FL_LOG( "VFP2(dp) loop=%d\n", Loop );
 
 
 	SetResult( RESULT_VFP_FMULD_IRS4,	VFP_D_IRS4_fmuld_irs4( Loop, 10.0		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADDD_IRS4,	VFP_D_IRS4_faddd_irs4( Loop, 7.0		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FMACD_IRS4,	VFP_D_IRS4_fmacd_irs4( Loop, 0.0 ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F64_IRS4,	VFP_D_IRS4_vfma_f64_irs4( Loop, 0.0 ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//---------------------------------------
 	// IR1
@@ -428,18 +433,18 @@ FL_LOG( "VFP2(dp) loop=%d\n", Loop );
 
 
 	SetResult( RESULT_VFP_FMULD_IR1,	VFP_D_IR1_fmuld_ir1( Loop, 10.0		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADDD_IR1,	VFP_D_IR1_faddd_ir1( Loop, 7.0		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FMACD_IR1,	VFP_D_IR1_fmacd_ir1( Loop, 0.0 ) );
-	Progress++;
+	Progress.Increment();
 
 #if FL_CPU_VFPV4
 	SetResult( RESULT_VFP_VFMA_F64_IR1,	VFP_D_IR1_vfma_f64_ir1( Loop, 0.0 ) );
 #endif
-	Progress++;
+	Progress.Increment();
 
 	//---------------------------------------
 	//---------------------------------------

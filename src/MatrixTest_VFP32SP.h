@@ -4,7 +4,7 @@
 #ifndef	MATRIX_TEST_VFP32SP_H_
 #define	MATRIX_TEST_VFP32SP_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace VFP32SP {

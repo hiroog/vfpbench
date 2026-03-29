@@ -4,7 +4,7 @@
 #ifndef	VFP32DP_TEST_H_
 #define	VFP32DP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace VFP32DP {

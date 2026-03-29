@@ -4,11 +4,11 @@
 #ifndef	BENCHMARK_TEST_H_
 #define	BENCHMARK_TEST_H_
 
-#include	<minilib/Platform.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/ut/FixedArray.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"ThreadAdapter.h"
 #include	"MultiAdapter.h"
-#include	<minilib/FixedArray.h>
-#include	<minilib/SystemInfo.h>
 
 #define	USE_MATRIX_TEST		0
 
@@ -17,7 +17,7 @@
 
 class BenchmarkTestBase {
 public:
-	flatlib::ut::FixedArrayPOD<ITestBase*>	BenchArray;
+	flatlib::ut::FixedArray<ITestBase*>	BenchArray;
 	unsigned int	BenchIndex= 0;
 private:
 	void	Quit();
@@ -109,7 +109,7 @@ public:
 #else
 		unsigned int	test_count= 4;
 #endif
-		bool	half= flatlib::Info.HasInstructionSet( flatlib::CPUFeature::ARM_FPHP );
+		bool	half= flatlib::system::RCore().RSystemInfo().HasInstructionSet( flatlib::system::CPUFeature::ARM_FPHP );
 		if( half ){
 			test_count+= 2;
 		}
@@ -250,15 +250,5 @@ public:
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-
-
-
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-
 #endif
-
-
 

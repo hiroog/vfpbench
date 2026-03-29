@@ -4,7 +4,7 @@
 #ifndef	SSE64SP_TEST_H_
 #define	SSE64SP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace SSE64SP {
@@ -19,7 +19,7 @@ public:
 		PER_LOOP_INST_9	=	5 * 9,		// 45
 		PER_LOOP_INST_12=	5 * 12,		// 60
 	};
-	enum {
+	enum : unsigned int {
 
 
 		RESULT_SSE_MULSS_IR8,
@@ -64,6 +64,7 @@ public:
 		RESULT_AVX512_VFMADDPS_IR12,
 		RESULT_AVX512_FMA_MUL_IR12,
 		RESULT_AVX512_FMA_ADD_IR12,
+		RESULT_AVX512_MUL_ADD_IR12,
 
 		RESULT_AVX512_YMM_VMULPS_IR12,
 		RESULT_AVX512_YMM_VADDPS_IR12,

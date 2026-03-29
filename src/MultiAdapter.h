@@ -4,9 +4,11 @@
 #ifndef	MULTI_ADAPTER_H_
 #define	MULTI_ADAPTER_H_
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/Thread.h>
-#include	<minilib/FixedArray.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/CoreContext.h>
+#include	<flatlib/core/system/SystemInfo.h>
+#include	<flatlib/core/thread/ThreadInstance.h>
+#include	<flatlib/core/ut/FixedArray.h>
 #include	"TestBase.h"
 
 
@@ -15,16 +17,19 @@ class MultiAdapter : public ITestBase {
 public:
 private:
 	flatlib::ut::FixedArray<T>	InstanceArray;
-	flatlib::ut::FixedArrayPOD<flatlib::thread::ThreadFunctionBase*>	ThreadArray;
+	flatlib::ut::FixedArray<flatlib::thread::ThreadInstance*>	ThreadArray;
 public:
 
 	MultiAdapter( unsigned int group ) : ITestBase( true, group )
 	{
-		unsigned int	core= flatlib::Info.GetThreadCount( group );
-		InstanceArray.Init( core );
-		ThreadArray.Init( core );
-		ThreadArray.ClearZero();
-		unsigned int	instance_count= InstanceArray.GetSize();
+		unsigned int	core= flatlib::system::RCore().RSystemInfo().GetThreadCount( group );
+FL_PRINT( "CORE=%d\n", core );
+		InstanceArray.SetArraySize( core );
+		ThreadArray.SetArraySize( core );
+		for( unsigned int ti= 0 ; ti< core ; ti++ ){
+			ThreadArray[ti]= nullptr;
+		}
+		unsigned int	instance_count= InstanceArray.GetDataSize();
 		for( unsigned int ci= 0 ; ci< instance_count ; ci++ ){
 			InstanceArray[ci].SetIsMultithread( true );
 			InstanceArray[ci].SetCoreGroup( group );
@@ -44,19 +49,19 @@ public:
 	{
 		FL_LOG( "MultiAdapter QUIT\n" );
 		Join();
-		InstanceArray.Clear();
-		ThreadArray.Clear();
+		InstanceArray.Finalize();
+		ThreadArray.Finalize();
 		FL_LOG( "MultiAdapter QUIT COMPLETE\n" );
 	}
 
 	void	Join()
 	{
-		unsigned int	thread_count= ThreadArray.GetSize();
+		unsigned int	thread_count= ThreadArray.GetDataSize();
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
 			if( ThreadArray[ci] ){
 				FL_LOG( "MultiAdapter JOIN %d\n", ci );
 				ThreadArray[ci]->Join();
-				flatlib::memory::ZDelete( ThreadArray[ci] );
+				FL_MEMORY::ZDelete( ThreadArray[ci] );
 				FL_LOG( "MultiAdapter JOIN QUIT %d\n", ci );
 			}
 		}
@@ -64,10 +69,10 @@ public:
 
 	void	Run() override
 	{
-		unsigned int	thread_count= ThreadArray.GetSize();
+		unsigned int	thread_count= ThreadArray.GetDataSize();
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
 			ThreadArray[ci]= flatlib::thread::CreateThreadFunction(
-				[=](){
+				[=,this]{
 					FL_LOG( "Run : In MultiThread %d\n", ci );
 					this->SetCpuAffinity();
 					this->InstanceArray[ci].SetIsMultithread( true );
@@ -76,13 +81,13 @@ public:
 				});
 		}
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
-			ThreadArray[ci]->Run();
+			ThreadArray[ci]->Start();
 		}
 	}
 
-	volatile unsigned int	IsDone() override
+	unsigned int	IsDone() override
 	{
-		unsigned int	thread_count= InstanceArray.GetSize();
+		unsigned int	thread_count= InstanceArray.GetDataSize();
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
 			if( !InstanceArray[ci].IsDone() ){
 				return	false;
@@ -91,9 +96,9 @@ public:
 		Join();
 		return	true;
 	}
-	volatile unsigned int	GetProgress() override
+	unsigned int	GetProgress() override
 	{
-		unsigned int	thread_count= InstanceArray.GetSize();
+		unsigned int	thread_count= InstanceArray.GetDataSize();
 		if( thread_count == 0 ){
 			return	0;
 		}
@@ -101,14 +106,14 @@ public:
 	}
 	void SetLoop( unsigned int loop ) override
 	{
-		unsigned int	thread_count= InstanceArray.GetSize();
+		unsigned int	thread_count= InstanceArray.GetDataSize();
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
 			InstanceArray[ci].SetLoop( loop );
 		}
 	}
 	unsigned int	GetResult( unsigned int index ) const override
 	{
-		unsigned int	thread_count= InstanceArray.GetSize();
+		unsigned int	thread_count= InstanceArray.GetDataSize();
 		uint64_t	total_time= 0;
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
 			unsigned int	time= InstanceArray[ci].GetResult( index );
@@ -118,7 +123,7 @@ public:
 	}
 	unsigned int	GetResultInfo( InfoType index ) const override
 	{
-		unsigned int	thread_count= InstanceArray.GetSize();
+		unsigned int	thread_count= InstanceArray.GetDataSize();
 		if( thread_count == 0 ){
 			return	0;
 		}
@@ -126,7 +131,7 @@ public:
 	}
 	unsigned int	GetLoopOp( unsigned int index ) const override
 	{
-		unsigned int	thread_count= InstanceArray.GetSize();
+		unsigned int	thread_count= InstanceArray.GetDataSize();
 		unsigned int	total_op= 0;
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
 			total_op+= InstanceArray[ci].GetLoopOp( index );
@@ -135,7 +140,7 @@ public:
 	}
 	float	GetInstFop( unsigned int index ) const override
 	{
-		unsigned int	thread_count= InstanceArray.GetSize();
+		unsigned int	thread_count= InstanceArray.GetDataSize();
 		unsigned int	total_op= 0;
 		for( unsigned int ci= 0 ; ci< thread_count ; ci++ ){
 			total_op+= InstanceArray[ci].GetInstFop( index );
@@ -160,9 +165,5 @@ public:
 	}
 };
 
-
-
 #endif
-
-
 

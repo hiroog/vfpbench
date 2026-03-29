@@ -1,8 +1,8 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"VFP64SP_Test.h"
 
@@ -11,7 +11,13 @@
 #if FL_CPU_ARM64
 //-----------------------------------------------------------------------------
 
+#if defined(__ARM_FEATURE_SVE2) && __ARM_FEATURE_SVE2
+# include	<arm_sve.h>
+# define	USE_ARM_SVE2	1
+#endif
+
 using namespace flatlib;
+using system::CPUFeature;
 
 namespace VFP64SP {
 //-----------------------------------------------------------------------------
@@ -46,9 +52,9 @@ typedef	unsigned long	CounterType;
 // VFP
 //=============================================================================
 
-static void check_result( float ret, float ans )
+static void check_result( float ret, float ans, const char* name )
 {
-	FL_LOG( "check: %f %f\n", ret, ans );
+	FL_LOG( "check: %s : %f %f\n", name, ret, ans );
 	FL_ASSERT( ret == ans );
 }
 
@@ -148,7 +154,7 @@ static uint64_t VFP_S_IR1_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	/*check_result( ret0, answer );*/	\
+	check_result( ret0, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -226,14 +232,14 @@ static uint64_t VFP_S_IR8_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );	\
+	check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -310,14 +316,14 @@ static uint64_t VFP_S_IRS4_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	/*check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );*/	\
+	/*check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );*/	\
 	return	timer.Result();	\
 }
 
@@ -361,7 +367,6 @@ static uint64_t VFP_S_IRS4_##name( CounterType LoopCount, float answer ) \
 		"orr	v14.16b, v0.16b, v0.16b\n"	\
 		"orr	v15.16b, v0.16b, v0.16b\n"	\
 
-
 //-----------------
 #else
 //-----------------
@@ -389,19 +394,20 @@ static uint64_t VFP_S_IRS4_##name( CounterType LoopCount, float answer ) \
 //-----------------
 
 
+
 //-----------------------------------------------------------------------------
 // Single Interleave 1 MAD
 //-----------------------------------------------------------------------------
 
 #define MAD_S_IR1_8(op) \
-			op " s0, s0, s8, s9 \n"		\
-			op " s0, s0, s8, s9 \n"		\
-			op " s0, s0, s8, s9 \n"		\
-			op " s0, s0, s8, s9 \n"		\
-			op " s0, s0, s8, s9 \n"		\
-			op " s0, s0, s8, s9 \n"		\
-			op " s0, s0, s8, s9 \n"		\
-			op " s0, s0, s8, s9 \n"
+			op " s0, s8, s9, s0 \n"		\
+			op " s0, s8, s9, s0 \n"		\
+			op " s0, s8, s9, s0 \n"		\
+			op " s0, s8, s9, s0 \n"		\
+			op " s0, s8, s9, s0 \n"		\
+			op " s0, s8, s9, s0 \n"		\
+			op " s0, s8, s9, s0 \n"		\
+			op " s0, s8, s9, s0 \n"
 
 
 
@@ -413,8 +419,8 @@ static uint64_t MAD_S_IR1_##name( CounterType LoopCount, float answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	s8, w2\n"		\
 		"scvtf	s9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -435,7 +441,7 @@ static uint64_t MAD_S_IR1_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	/*check_result( ret0, answer );*/	\
+	check_result( ret0, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -454,16 +460,15 @@ static uint64_t MAD_S_IR1_##name( CounterType LoopCount, float answer ) \
 // Single Interleave 8 MAD
 //----------------------------
 
-
 #define MAD_S_IR8_8(op) \
-			op " s0, s0, s8, s9 \n"		\
-			op " s1, s1, s8, s9 \n"		\
-			op " s2, s2, s8, s9 \n"		\
-			op " s3, s3, s8, s9 \n"		\
-			op " s4, s4, s8, s9 \n"		\
-			op " s5, s5, s8, s9 \n"		\
-			op " s6, s6, s8, s9 \n"		\
-			op " s7, s7, s8, s9 \n"
+			op " s0, s8, s9, s0 \n"		\
+			op " s1, s8, s9, s1 \n"		\
+			op " s2, s8, s9, s2 \n"		\
+			op " s3, s8, s9, s3 \n"		\
+			op " s4, s8, s9, s4 \n"		\
+			op " s5, s8, s9, s5 \n"		\
+			op " s6, s8, s9, s6 \n"		\
+			op " s7, s8, s9, s7 \n"
 
 
 
@@ -475,8 +480,8 @@ static uint64_t MAD_S_IR8_##name( CounterType LoopCount, float answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	s8, w2\n"		\
 		"scvtf	s9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -511,14 +516,14 @@ static uint64_t MAD_S_IR8_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );	\
+	check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -534,14 +539,14 @@ static uint64_t MAD_S_IR8_##name( CounterType LoopCount, float answer ) \
 //-----------------------------------------------------------------------------
 
 #define MAD_S_IRS4_8(op) \
-			op " s0, s0, s8, s4 \n"		\
-			op " s1, s1, s8, s5 \n"		\
-			op " s2, s2, s8, s6 \n"		\
-			op " s3, s3, s8, s7 \n"		\
-			op " s4, s4, s8, s0 \n"		\
-			op " s5, s5, s8, s1 \n"		\
-			op " s6, s6, s8, s2 \n"		\
-			op " s7, s7, s8, s3 \n"
+			op " s0, s8, s4, s0 \n"		\
+			op " s1, s8, s5, s1 \n"		\
+			op " s2, s8, s6, s2 \n"		\
+			op " s3, s8, s7, s3 \n"		\
+			op " s4, s8, s0, s4 \n"		\
+			op " s5, s8, s1, s5 \n"		\
+			op " s6, s8, s2, s6 \n"		\
+			op " s7, s8, s3, s7 \n"
 
 
 
@@ -553,8 +558,8 @@ static uint64_t MAD_S_IRS4_##name( CounterType LoopCount, float answer ) \
 	timer.Begin();				\
 	__asm__ __volatile__(		\
 		MAD_REG_CLEAR()			\
-		"mov	w2, #1\n"		\
-		"mov	w3, #2\n"		\
+		"mov	w2, #2\n"		\
+		"mov	w3, #5\n"		\
 		"scvtf	s8, w2\n"		\
 		"scvtf	s9, w3\n"		\
 		"mov	x0, %[loop]\n"	\
@@ -589,14 +594,14 @@ static uint64_t MAD_S_IRS4_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	/*check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );*/	\
+	/*check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );*/	\
 	return	timer.Result();	\
 }
 
@@ -726,7 +731,7 @@ static uint64_t NEON_V_IR1_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	/*check_result( ret0, answer );*/	\
+	check_result( ret0, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -781,7 +786,7 @@ static uint64_t NEON_V_IR1_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	/*check_result( ret0, answer );*/	\
+	check_result( ret0, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -858,14 +863,14 @@ static uint64_t NEON_V_IR8_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );	\
+	check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -935,14 +940,14 @@ static uint64_t NEON_V_IR8_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );	\
+	check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -1021,14 +1026,14 @@ static uint64_t NEON_V_IRS4_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	/*check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );*/	\
+	/*check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );*/	\
 	return	timer.Result();	\
 }
 
@@ -1096,14 +1101,14 @@ static uint64_t NEON_V_IRS4_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	/*check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );*/	\
+	/*check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );*/	\
 	return	timer.Result();	\
 }
 
@@ -1187,14 +1192,14 @@ static uint64_t NEON_V_IR12_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );	\
+	check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -1266,14 +1271,14 @@ static uint64_t NEON_V_IR12_##name( CounterType LoopCount, float answer ) \
 \
 	timer.End();		\
 	timer.Dump( op );	\
-	check_result( ret0, answer );	\
-	check_result( ret1, answer );	\
-	check_result( ret2, answer );	\
-	check_result( ret3, answer );	\
-	check_result( ret4, answer );	\
-	check_result( ret5, answer );	\
-	check_result( ret6, answer );	\
-	check_result( ret7, answer );	\
+	check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );	\
 	return	timer.Result();	\
 }
 
@@ -1284,6 +1289,120 @@ static uint64_t NEON_V_IR12_##name( CounterType LoopCount, float answer ) \
 //-----------------
 
 
+
+
+//=============================================================================
+// SVE
+//=============================================================================
+
+//-----------------
+#if USE_ARM_SVE2
+//-----------------
+
+#define SVE_REG_CLEAR() \
+		"dup	z0.b, #0\n"		\
+		"dup	z1.b, #0\n"		\
+		"dup	z2.b, #0\n"		\
+		"dup	z3.b, #0\n"		\
+		"dup	z4.b, #0\n"		\
+		"dup	z5.b, #0\n"		\
+		"dup	z6.b, #0\n"		\
+		"dup	z7.b, #0\n"		\
+		"dup	z8.b, #0\n"		\
+		"dup	z9.b, #0\n"		\
+		"dup	z10.b, #0\n"		\
+		"dup	z11.b, #0\n"		\
+		"dup	z12.b, #0\n"		\
+		"dup	z13.b, #0\n"		\
+		"dup	z14.b, #0\n"		\
+		"dup	z15.b, #0\n"		\
+		"ptrue	p0.s\n"		\
+
+
+//-----------------------------------------------------------------------------
+// Vector 32bit Interleave 12
+//-----------------------------------------------------------------------------
+
+#define SVE_V_IR12_12(op,size,pred) \
+			op " z4"  size pred ", z2" size ", z3" size " \n"	\
+			op " z5"  size pred ", z2" size ", z3" size " \n"	\
+			op " z6"  size pred ", z2" size ", z3" size " \n"	\
+			op " z7"  size pred ", z2" size ", z3" size " \n"	\
+			op " z8"  size pred ", z2" size ", z3" size " \n"	\
+			op " z9"  size pred ", z2" size ", z3" size " \n"	\
+			op " z10" size pred ", z2" size ", z3" size " \n"	\
+			op " z11" size pred ", z2" size ", z3" size " \n"	\
+			op " z12" size pred ", z2" size ", z3" size " \n"	\
+			op " z13" size pred ", z2" size ", z3" size " \n"	\
+			op " z14" size pred ", z2" size ", z3" size " \n"	\
+			op " z15" size pred ", z2" size ", z3" size " \n"	\
+
+
+#define SVE_V_IR12_0(op,size,name,pred) \
+static uint64_t SVE_V_IR12_##name( CounterType LoopCount, float answer ) \
+{ \
+	float	ret0, ret1, ret2, ret3, ret4, ret5, ret6, ret7;	\
+	TimerClass	timer;			\
+	timer.Begin();				\
+	__asm__ __volatile__(		\
+		SVE_REG_CLEAR()			\
+		"mov	w2, #2  \n"		\
+		"mov	w3, #5  \n"		\
+		"dup	z2.s, w2\n"	\
+		"scvtf	z2.s, p0/m, z2.s\n"		\
+		"dup	z3.s, w3\n"	\
+		"scvtf	z3.s, p0/m, z3.s\n"		\
+		"mov	x0, %[loop]\n"	\
+		"mov	w0, w0\n"	\
+	"1:\n"	\
+		SVE_V_IR12_12( op, size, pred )	\
+		SVE_V_IR12_12( op, size, pred )	\
+		SVE_V_IR12_12( op, size, pred )	\
+		SVE_V_IR12_12( op, size, pred )	\
+		SVE_V_IR12_12( op, size, pred )	\
+		"subs	w0, w0, #1\n"	\
+		"b.ne	1b\n"	 	\
+		"str	s4, %[o0]\n"	\
+		"str	s5, %[o1]\n"	\
+		"str	s6, %[o2]\n"	\
+		"str	s7, %[o3]\n"	\
+		"str	s8, %[o4]\n"	\
+		"str	s9, %[o5]\n"	\
+		"str	s10, %[o6]\n"	\
+		"str	s11, %[o7]\n"	\
+	:	[o0]"=m"(ret0),	\
+		[o1]"=m"(ret1),	\
+		[o2]"=m"(ret2),	\
+		[o3]"=m"(ret3),	\
+		[o4]"=m"(ret4),	\
+		[o5]"=m"(ret5),	\
+		[o6]"=m"(ret6),	\
+		[o7]"=m"(ret7)	\
+	: [loop]"r"(LoopCount)	\
+	: "cc","x0","w2","w3","p0",	\
+	"z0","z1","z2","z3","z4","z5","z6","z7","z8","z9","z10","z11","z12","z13","z14","z15" ); \
+\
+	timer.End();		\
+	timer.Dump( op );	\
+	check_result( ret0, answer, #name );	\
+	check_result( ret1, answer, #name );	\
+	check_result( ret2, answer, #name );	\
+	check_result( ret3, answer, #name );	\
+	check_result( ret4, answer, #name );	\
+	check_result( ret5, answer, #name );	\
+	check_result( ret6, answer, #name );	\
+	check_result( ret7, answer, #name );	\
+	return	timer.Result();	\
+}
+
+#define SVE_V_IR12(op,size,name,pred) SVE_V_IR12_0(#op,#size,name,pred)
+
+
+
+
+//-----------------
+#endif
+//-----------------
 
 
 //-----------------------------------------------------------------------------
@@ -1335,6 +1454,10 @@ static const char*	Instruction_Title[]= {
 	"NEON fadd.4s (32bit x4) n12",
 	"NEON fmla.4s (32bit x4) n12",
 
+
+	"SVE fmul.s (32bit xN) n12",
+	"SVE fadd.s (32bit xN) n12",
+	"SVE fmla.s (32bit xN) n12",
 };
 
 
@@ -1346,7 +1469,7 @@ static const char*	Instruction_Title[]= {
 
 FloatTest::FloatTest()
 {
-	FL_ASSERT( RESULT_MAX <= RESULT_BUFFER_MAX );
+	FL_ASSERT( (unsigned int)RESULT_MAX <= (unsigned int)RESULT_BUFFER_MAX );
 	LoopCount= DEFAULT_LOOP;
 	ClearResult();
 
@@ -1397,6 +1520,23 @@ FloatTest::FloatTest()
 	SetOp( RESULT_NEON_FADD_S4_IR12,	PER_LOOP_INST_12 * 4, 4	);
 	SetOp( RESULT_NEON_FMLA_S4_IR12,	PER_LOOP_INST_12 * 8, 8	);
 
+
+
+#if USE_ARM_SVE2
+	if( Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+		uint32_t	vector_length= (uint32_t)( svcntw() );
+		FL_LOG( "single vlen=%d\n", vector_length );
+		SetOp( RESULT_SVE_FMUL_S_IR12,	PER_LOOP_INST_12 * vector_length, vector_length	);
+		SetOp( RESULT_SVE_FADD_S_IR12,	PER_LOOP_INST_12 * vector_length, vector_length	);
+		SetOp( RESULT_SVE_FMLA_S_IR12,	PER_LOOP_INST_12 * vector_length*2, vector_length*2	);
+	}else
+#endif
+
+	{
+		SetOp( RESULT_SVE_FMUL_S_IR12,	PER_LOOP_INST_12 * 4, 4	);
+		SetOp( RESULT_SVE_FADD_S_IR12,	PER_LOOP_INST_12 * 4, 4	);
+		SetOp( RESULT_SVE_FMLA_S_IR12,	PER_LOOP_INST_12 * 8, 8	);
+	}
 }
 
 
@@ -1538,7 +1678,17 @@ NEON_V_IR12( fmla.4s, fmla_4s_ir12 );
 //-----------------
 
 
+//-----------------
+#if USE_ARM_SVE2
+//-----------------
 
+SVE_V_IR12( fmul, .s, fmul_s_ir12, " " );
+SVE_V_IR12( fadd, .s, fadd_s_ir12, " " );
+SVE_V_IR12( fmla, .s, fmla_s_ir12, ", p0/m" );
+
+//-----------------
+#endif
+//-----------------
 
 
 
@@ -1549,11 +1699,82 @@ void FloatTest::Run()
 
 FL_LOG( "VFP64 loop=%d\n", Loop );
 
-	float	sum= 0;
+
+#if 0
+{
+struct fpack {
+	float	x, y, z, w;
+};
+svuint32x4_t	ret1;
+svuint32x4_t	ret2;
+float	ret0= 0.0f;
+fpack	src0;
+fpack	src1;
+src0.x= 1.0f;
+src0.y= 2.0f;
+src0.z= 3.0f;
+src0.w= 4.0f;
+src1.x= 2.0f;
+src1.y= 3.0f;
+src1.z= 4.0f;
+src1.w= 5.0f;
+__asm__ __volatile__(
+
+"dup  z0.b,#0\n"
+"dup  z1.b,#0\n"
+"dup  z2.b,#0\n"
+"mov	w2, #99  \n"	
+"mov	w3, #5  \n"	
+"dup	z4.s, w2\n"
+"ptrue p0.s\n"
+"scvtf	z4.s, p0/m, z4.s\n"	
+"ld1w {z1.s}, p0/z, %[i0]\n"
+"ld1w {z2.s}, p0/z, %[i1]\n"
+"fmla z0.s, p0/m, z1.s, z2.s\n"
+"str  z0,%[o1]\n"
+"str  z4,%[o2]\n"
+: [o0]"=m"(ret0), [o1]"=m"(ret1), [o2]"=m"(ret2)
+: [loop]"r"(LoopCount), [i0]"m"(src0), [i1]"m"(src1)
+: "cc","x0","w2","w3","p0",
+  "z0",
+  "z1",
+  "z2",
+  "z3",
+  "z4",
+  "z5",
+  "z6",
+  "z7",
+  "z8",
+  "z9",
+  "z10",
+  "z11",
+  "z12",
+  "z13",
+  "z14",
+  "z15" );
+
+
+for( int a= 0 ; a< 16 ; a++ ){
+	uint8_t	data= ((const uint8_t*)(&ret1))[a];
+FL_PRINT( "%d: %02x\n", a, (int)data );
+}
+for( int a= 0 ; a< 4 ; a++ ){
+	float	data= ((const float*)(&ret1))[a];
+FL_PRINT( "%d: %f\n", a, data );
+}
+for( int a= 0 ; a< 4 ; a++ ){
+	float	data= ((const float*)(&ret2))[a];
+FL_PRINT( "%d: %f\n", a, data );
+}
+
+}
+#endif
+
+
 	float	sum_2= 0;
 	for( unsigned int i= 0 ; i< Loop * 5 ; i++ ){
-		sum+= 2.0f;
 		sum_2+= 10.0f;
+		__asm__ __volatile__( "nop\n": : : "cc", "x0" );
 	}
 
 	//------------------------------------------------------
@@ -1561,13 +1782,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IR8,		VFP_S_IR8_fmul_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IR8,		VFP_S_IR8_fadd_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IR8,	MAD_S_IR8_fmadd_ir8( Loop, sum ) );
-	Progress++;
+	SetResult( RESULT_VFP_FMADD_IR8,	MAD_S_IR8_fmadd_ir8( Loop, sum_2 ) );
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1575,13 +1796,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_S2_IR8,	NEON_V_IR8_fmul_2s_ir8( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_S2_IR8,	NEON_V_IR8_fadd_2s_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_S2_IR8,	NEON_V_IR8_fmla_2s_ir8( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1589,17 +1810,16 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_S4_IR8,	NEON_V_IR8_fmul_4s_ir8( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_S4_IR8,	NEON_V_IR8_fadd_4s_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_S4_IR8,	NEON_V_IR8_fmla_4s_ir8( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 
 	//------------------------------------------------------
-
 
 
 
@@ -1608,13 +1828,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IRS4,	VFP_S_IRS4_fmul_irs4( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IRS4,	VFP_S_IRS4_fadd_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IRS4,	MAD_S_IRS4_fmadd_irs4( Loop, sum ) );
-	Progress++;
+	SetResult( RESULT_VFP_FMADD_IRS4,	MAD_S_IRS4_fmadd_irs4( Loop, sum_2 ) );
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1622,13 +1842,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_S2_IRS4,		NEON_V_IRS4_fmul_2s_irs4( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_S2_IRS4,		NEON_V_IRS4_fadd_2s_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_S2_IRS4,		NEON_V_IRS4_fmla_2s_irs4( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1636,13 +1856,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_S4_IRS4,		NEON_V_IRS4_fmul_4s_irs4( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_S4_IRS4,		NEON_V_IRS4_fadd_4s_irs4( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_S4_IRS4,		NEON_V_IRS4_fmla_4s_irs4( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1652,13 +1872,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_VFP_FMUL_IR1,		VFP_S_IR1_fmul_ir1( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_VFP_FADD_IR1,		VFP_S_IR1_fadd_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
-	SetResult( RESULT_VFP_FMADD_IR1,	MAD_S_IR1_fmadd_ir1( Loop, sum ) );
-	Progress++;
+	SetResult( RESULT_VFP_FMADD_IR1,	MAD_S_IR1_fmadd_ir1( Loop, sum_2 ) );
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1666,13 +1886,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_S2_IR1,	NEON_V_IR1_fmul_2s_ir1( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_S2_IR1,	NEON_V_IR1_fadd_2s_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_S2_IR1,	NEON_V_IR1_fmla_2s_ir1( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1680,13 +1900,13 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_S4_IR1,	NEON_V_IR1_fmul_4s_ir1( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_S4_IR1,	NEON_V_IR1_fadd_4s_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_S4_IR1,	NEON_V_IR1_fmla_4s_ir1( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
 
 	//------------------------------------------------------
 
@@ -1698,13 +1918,41 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
 	//------------------------------------------------------
 
 	SetResult( RESULT_NEON_FMUL_S4_IR12,		NEON_V_IR12_fmul_4s_ir12( Loop, 10.0f	) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FADD_S4_IR12,		NEON_V_IR12_fadd_4s_ir12( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_NEON_FMLA_S4_IR12,		NEON_V_IR12_fmla_4s_ir12( Loop, sum_2 ) );
-	Progress++;
+	Progress.Increment();
+
+	//------------------------------------------------------
+
+
+
+	//------------------------------------------------------
+	// SVE
+	//------------------------------------------------------
+
+#if USE_ARM_SVE2
+	if( Info.HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+
+		SetResult( RESULT_SVE_FMUL_S_IR12,		SVE_V_IR12_fmul_s_ir12( Loop, 10.0f	) );
+		Progress.Increment();
+
+		SetResult( RESULT_SVE_FADD_S_IR12,		SVE_V_IR12_fadd_s_ir12( Loop, 7.0f		) );
+		Progress.Increment();
+
+		SetResult( RESULT_SVE_FMLA_S_IR12,		SVE_V_IR12_fmla_s_ir12( Loop, sum_2 ) );
+		Progress.Increment();
+
+	}else
+#endif
+	{
+		Progress.Increment();
+		Progress.Increment();
+		Progress.Increment();
+	}
 
 	//------------------------------------------------------
 

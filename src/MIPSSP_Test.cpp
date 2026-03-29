@@ -1,8 +1,8 @@
 // 2015 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"MIPSSP_Test.h"
 
@@ -12,6 +12,7 @@
 //-----------------------------------------------------------------------------
 
 using namespace flatlib;
+using system::CPUFeature;
 
 namespace MIPSSP {
 //-----------------------------------------------------------------------------
@@ -451,26 +452,26 @@ FL_LOG( "MIPS loop=%d\n", Loop );
 	// IR8
 	//------------------------------------------------------
 	SetResult( RESULT_FPU_MULS_IR8,	FPU_S_IR8_muls_ir8( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_FPU_ADDS_IR8,	FPU_S_IR8_adds_ir8( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_FPU_MADDS_IR8,FPU_S_IR8_madds_ir8( Loop, sum_2	) );
-	Progress++;
+	Progress.Increment();
 
 
 	//------------------------------------------------------
 	// IR1
 	//------------------------------------------------------
 	SetResult( RESULT_FPU_MULS_IR1,	FPU_S_IR1_muls_ir1( Loop, 10.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_FPU_ADDS_IR1,	FPU_S_IR1_adds_ir1( Loop, 7.0f		) );
-	Progress++;
+	Progress.Increment();
 
 	SetResult( RESULT_FPU_MADDS_IR1,	FPU_S_IR1_madds_ir1( Loop, 0.0f		) );
-	Progress++;
+	Progress.Increment();
 
 
 	//------------------------------------------------------

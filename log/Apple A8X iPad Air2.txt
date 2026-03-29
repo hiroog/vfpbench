@@ -1,0 +1,223 @@
+Date: 20201229 200600
+ARCH: ARMv8A AArch64
+FPU : ASIMD(AArch64 NEON)
+Name: iPad5,3
+CPU Thread:  3
+CPU Core  :  3
+CPU Group :  1
+  Group 0: Thread= 3  Clock=1.500000 GHz  (mask:7)
+NEON   : yes
+FMA    : yes
+FPHP   : no
+SIMDHP : no
+DotProd: no
+
+Total:
+SingleThread HP max: -
+SingleThread SP max:   23.997 GFLOPS
+SingleThread DP max:   11.971 GFLOPS
+MultiThread  HP max: -
+MultiThread  SP max:   71.878 GFLOPS
+MultiThread  DP max:   35.941 GFLOPS
+
+Group 0:  Thread=3  Clock=1.500000 GHz  (mask:7)
+  SingleThread HP max: -
+  SingleThread SP max:   23.997 GFLOPS
+  SingleThread DP max:   11.971 GFLOPS
+  MultiThread  HP max: -
+  MultiThread  SP max:   71.878 GFLOPS
+  MultiThread  DP max:   35.941 GFLOPS
+
+
+* Group 0:  Thread=1  Clock=1.500000 GHz  (mask:7)
+* FPU/NEON (SP fp)
+                                      TIME(s)   MFLOPS      MOPS     FOP   IPC
+FPU fmul (32bit x1) n8            :    0.301     2989.1     2989.1  (  1.0 2.0)
+FPU fadd (32bit x1) n8            :    0.200     4499.1     4499.1  (  1.0 3.0)
+FPU fmadd (32bit x1) n8           :    0.301     5980.7     2990.4  (  2.0 2.0)
+NEON fmul.2s (32bit x2) n8        :    0.301     5989.0     2994.5  (  2.0 2.0)
+NEON fadd.2s (32bit x2) n8        :    0.200     8989.6     4494.8  (  2.0 3.0)
+NEON fmla.2s (32bit x2) n8        :    0.300    11983.3     2995.8  (  4.0 2.0)
+NEON fmul.4s (32bit x4) n8        :    0.300    12002.0     3000.5  (  4.0 2.0)
+NEON fadd.4s (32bit x4) n8        :    0.202    17796.3     4449.1  (  4.0 3.0)
+NEON fmla.4s (32bit x4) n8        :    0.300    23978.7     2997.3  (  8.0 2.0)
+FPU fmul (32bit x1) ns4           :    0.601     1498.3     1498.3  (  1.0 1.0)
+FPU fadd (32bit x1) ns4           :    0.562     1600.4     1600.4  (  1.0 1.1)
+FPU fmadd (32bit x1) ns4          :    0.601     2995.1     1497.6  (  2.0 1.0)
+NEON fmul.2s (32bit x2) ns4       :    0.602     2990.7     1495.3  (  2.0 1.0)
+NEON fadd.2s (32bit x2) ns4       :    0.561     3206.2     1603.1  (  2.0 1.1)
+NEON fmla.2s (32bit x2) ns4       :    0.603     5966.4     1491.6  (  4.0 1.0)
+NEON fmul.4s (32bit x4) ns4       :    0.601     5985.6     1496.4  (  4.0 1.0)
+NEON fadd.4s (32bit x4) ns4       :    0.561     6414.7     1603.7  (  4.0 1.1)
+NEON fmla.4s (32bit x4) ns4       :    0.601    11978.9     1497.4  (  8.0 1.0)
+FPU fmul (32bit x1) n1            :    0.301     2992.8     2992.8  (  1.0 2.0)
+FPU fadd (32bit x1) n1            :    0.200     4489.7     4489.7  (  1.0 3.0)
+FPU fmadd (32bit x1) n1           :    3.008      598.4      299.2  (  2.0 0.2)
+NEON fmul.2s (32bit x2) n1        :    0.300     5997.7     2998.9  (  2.0 2.0)
+NEON fadd.2s (32bit x2) n1        :    0.200     9001.0     4500.5  (  2.0 3.0)
+NEON fmla.2s (32bit x2) n1        :    3.003     1198.8      299.7  (  4.0 0.2)
+NEON fmul.4s (32bit x4) n1        :    0.301    11979.1     2994.8  (  4.0 2.0)
+NEON fadd.4s (32bit x4) n1        :    0.200    17969.5     4492.4  (  4.0 3.0)
+NEON fmla.4s (32bit x4) n1        :    3.011     2391.6      298.9  (  8.0 0.2)
+NEON fmul.4s (32bit x4) n12       :    0.452    11960.1     2990.0  (  4.0 2.0)
+NEON fadd.4s (32bit x4) n12       :    0.301    17946.9     4486.7  (  4.0 3.0)
+NEON fmla.4s (32bit x4) n12       :    0.450    23997.2     2999.7  (  8.0 2.0)
+Average                           :    0.648     8245.6     2634.6  (  3.3 1.8)
+Highest                           :    0.200    23997.2     4500.5  (  8.0 3.0)
+
+
+* Group 0:  Thread=1  Clock=1.500000 GHz  (mask:7)
+* FPU/NEON (DP fp)
+                                      TIME(s)   MFLOPS      MOPS     FOP   IPC
+FPU fmul (64bit x1) n8            :    0.301     2991.2     2991.2  (  1.0 2.0)
+FPU fadd (64bit x1) n8            :    0.200     4500.0     4500.0  (  1.0 3.0)
+FPU fmadd (64bit x1) n8           :    0.380     4733.5     2366.7  (  2.0 1.6)
+NEON fmul.2d (64bit x2) n8        :    0.301     5975.5     2987.8  (  2.0 2.0)
+NEON fadd.2d (64bit x2) n8        :    0.200     8991.6     4495.8  (  2.0 3.0)
+NEON fmla.2d (64bit x2) n8        :    0.378     9526.0     2381.5  (  4.0 1.6)
+FPU fmul (64bit x1) ns4           :    0.753     1195.1     1195.1  (  1.0 0.8)
+FPU fadd (64bit x1) ns4           :    0.563     1599.8     1599.8  (  1.0 1.1)
+FPU fmadd (64bit x1) ns4          :    0.751     2397.0     1198.5  (  2.0 0.8)
+NEON fmul.2d (64bit x2) ns4       :    0.752     2392.2     1196.1  (  2.0 0.8)
+NEON fadd.2d (64bit x2) ns4       :    0.560     3214.1     1607.0  (  2.0 1.1)
+NEON fmla.2d (64bit x2) ns4       :    0.753     4780.6     1195.2  (  4.0 0.8)
+FPU fmul (64bit x1) n1            :    0.301     2991.0     2991.0  (  1.0 2.0)
+FPU fadd (64bit x1) n1            :    0.200     4495.2     4495.2  (  1.0 3.0)
+FPU fmadd (64bit x1) n1           :    3.605      499.3      249.6  (  2.0 0.2)
+NEON fmul.2d (64bit x2) n1        :    0.301     5972.0     2986.0  (  2.0 2.0)
+NEON fadd.2d (64bit x2) n1        :    0.200     8984.8     4492.4  (  2.0 3.0)
+NEON fmla.2d (64bit x2) n1        :    3.610      997.3      249.3  (  4.0 0.2)
+NEON fmul.2d (64bit x2) n12       :    0.451     5987.1     2993.6  (  2.0 2.0)
+NEON fadd.2d (64bit x2) n12       :    0.300     8985.6     4492.8  (  2.0 3.0)
+NEON fmla.2d (64bit x2) n12       :    0.451    11971.2     2992.8  (  4.0 2.0)
+Average                           :    0.729     4913.3     2555.1  (  2.1 1.7)
+Highest                           :    0.200    11971.2     4500.0  (  4.0 3.0)
+
+
+* Group 0:  Thread=3  Clock=1.500000 GHz  (mask:7)
+* FPU/NEON (SP fp) multi-thread
+                                      TIME(s)   MFLOPS      MOPS     FOP   IPC
+FPU fmul (32bit x1) n8            :    0.300     8985.4     2995.1  (  3.0 2.0)
+FPU fadd (32bit x1) n8            :    0.200    13468.3     4489.4  (  3.0 3.0)
+FPU fmadd (32bit x1) n8           :    0.301    17941.4     2990.2  (  6.0 2.0)
+NEON fmul.2s (32bit x2) n8        :    0.301    17948.2     2991.4  (  6.0 2.0)
+NEON fadd.2s (32bit x2) n8        :    0.201    26905.7     4484.3  (  6.0 3.0)
+NEON fmla.2s (32bit x2) n8        :    0.300    35951.9     2996.0  ( 12.0 2.0)
+NEON fmul.4s (32bit x4) n8        :    0.301    35859.2     2988.3  ( 12.0 2.0)
+NEON fadd.4s (32bit x4) n8        :    0.202    53575.7     4464.6  ( 12.0 3.0)
+NEON fmla.4s (32bit x4) n8        :    0.301    71818.8     2992.4  ( 24.0 2.0)
+FPU fmul (32bit x1) ns4           :    0.603     4479.0     1493.0  (  3.0 1.0)
+FPU fadd (32bit x1) ns4           :    0.563     4799.7     1599.9  (  3.0 1.1)
+FPU fmadd (32bit x1) ns4          :    0.604     8941.1     1490.2  (  6.0 1.0)
+NEON fmul.2s (32bit x2) ns4       :    0.602     8971.7     1495.3  (  6.0 1.0)
+NEON fadd.2s (32bit x2) ns4       :    0.561     9627.5     1604.6  (  6.0 1.1)
+NEON fmla.2s (32bit x2) ns4       :    0.602    17933.1     1494.4  ( 12.0 1.0)
+NEON fmul.4s (32bit x4) ns4       :    0.602    17948.3     1495.7  ( 12.0 1.0)
+NEON fadd.4s (32bit x4) ns4       :    0.561    19239.0     1603.2  ( 12.0 1.1)
+NEON fmla.4s (32bit x4) ns4       :    0.602    35897.0     1495.7  ( 24.0 1.0)
+FPU fmul (32bit x1) n1            :    0.300     8987.9     2996.0  (  3.0 2.0)
+FPU fadd (32bit x1) n1            :    0.201    13453.3     4484.4  (  3.0 3.0)
+FPU fmadd (32bit x1) n1           :    3.004     1797.4      299.6  (  6.0 0.2)
+NEON fmul.2s (32bit x2) n1        :    0.301    17934.2     2989.0  (  6.0 2.0)
+NEON fadd.2s (32bit x2) n1        :    0.200    26961.2     4493.5  (  6.0 3.0)
+NEON fmla.2s (32bit x2) n1        :    3.008     3591.0      299.2  ( 12.0 0.2)
+NEON fmul.4s (32bit x4) n1        :    0.301    35926.4     2993.9  ( 12.0 2.0)
+NEON fadd.4s (32bit x4) n1        :    0.200    53890.6     4490.9  ( 12.0 3.0)
+NEON fmla.4s (32bit x4) n1        :    3.008     7181.0      299.2  ( 24.0 0.2)
+NEON fmul.4s (32bit x4) n12       :    0.451    35918.3     2993.2  ( 12.0 2.0)
+NEON fadd.4s (32bit x4) n12       :    0.301    53870.2     4489.2  ( 12.0 3.0)
+NEON fmla.4s (32bit x4) n12       :    0.451    71878.3     2994.9  ( 24.0 2.0)
+Average                           :    0.648    24722.7     2632.9  ( 10.0 1.8)
+Highest                           :    0.200    71878.3     4493.5  ( 24.0 3.0)
+
+
+* Group 0:  Thread=3  Clock=1.500000 GHz  (mask:7)
+* FPU/NEON (DP fp) multi-thread
+                                      TIME(s)   MFLOPS      MOPS     FOP   IPC
+FPU fmul (64bit x1) n8            :    0.300     8987.7     2995.9  (  3.0 2.0)
+FPU fadd (64bit x1) n8            :    0.200    13480.3     4493.4  (  3.0 3.0)
+FPU fmadd (64bit x1) n8           :    0.379    14265.6     2377.6  (  6.0 1.6)
+NEON fmul.2d (64bit x2) n8        :    0.301    17929.1     2988.2  (  6.0 2.0)
+NEON fadd.2d (64bit x2) n8        :    0.200    26952.6     4492.1  (  6.0 3.0)
+NEON fmla.2d (64bit x2) n8        :    0.379    28506.3     2375.5  ( 12.0 1.6)
+FPU fmul (64bit x1) ns4           :    0.752     3590.3     1196.8  (  3.0 0.8)
+FPU fadd (64bit x1) ns4           :    0.561     4810.0     1603.3  (  3.0 1.1)
+FPU fmadd (64bit x1) ns4          :    0.753     7173.6     1195.6  (  6.0 0.8)
+NEON fmul.2d (64bit x2) ns4       :    0.753     7171.3     1195.2  (  6.0 0.8)
+NEON fadd.2d (64bit x2) ns4       :    0.562     9611.7     1602.0  (  6.0 1.1)
+NEON fmla.2d (64bit x2) ns4       :    0.753    14344.9     1195.4  ( 12.0 0.8)
+FPU fmul (64bit x1) n1            :    0.301     8977.5     2992.5  (  3.0 2.0)
+FPU fadd (64bit x1) n1            :    0.201    13463.4     4487.8  (  3.0 3.0)
+FPU fmadd (64bit x1) n1           :    3.612     1495.1      249.2  (  6.0 0.2)
+NEON fmul.2d (64bit x2) n1        :    0.301    17929.1     2988.2  (  6.0 2.0)
+NEON fadd.2d (64bit x2) n1        :    0.200    26938.2     4489.7  (  6.0 3.0)
+NEON fmla.2d (64bit x2) n1        :    3.611     2991.0      249.3  ( 12.0 0.2)
+NEON fmul.2d (64bit x2) n12       :    0.452    17907.9     2984.7  (  6.0 2.0)
+NEON fadd.2d (64bit x2) n12       :    0.301    26916.1     4486.0  (  6.0 3.0)
+NEON fmla.2d (64bit x2) n12       :    0.451    35940.6     2995.0  ( 12.0 2.0)
+Average                           :    0.730    14732.5     2554.0  (  6.3 1.7)
+Highest                           :    0.200    35940.6     4493.4  ( 12.0 3.0)
+
+
+
+
+
+
+
+
+
+
+HW INFO: Machine = iPad5,3
+HW INFO: Model = J81AP
+HW INFO: Arch = J81AP
+HW INFO: NCPU = 3
+HW INFO: ByteOrder = 1234
+HW INFO: PhysMem = 2085486592
+HW INFO: UserMem = 1819115520
+HW INFO: PageSize = 16384
+HW INFO: Float = 0
+HW INFO: VectorUnit = 0
+HW INFO: BusFreq = 0
+HW INFO: CpuFreq = 0
+HW INFO: CacheLine = 64
+HW INFO: L1Size I = 65536
+HW INFO: L1Size D = 65536
+HW INFO: L2Settings = 0
+HW INFO: L2CacheSize = 2097152
+HW INFO: L3Settings = 0
+HW INFO: L3CacheSize = 0
+HW INFO: TB_FREQ = 24000000
+HW INFO: MemSize = 2085486592
+HW INFO: AvailCpu = 3
+max_cpus         = 3
+avail_cpus       = 3
+memory_size      = 2085486592
+cpu_type         = 16777228
+cpu_subtype      = 1
+cpu_threadtype   = 0
+physical_cpu     = 3
+physical_cpu_max = 3
+logical_cpu      = 3
+logical_cpu_max  = 3
+max_mem          = 2085486592
+*processor***********
+processor_count = 3 15 20 20 5
+   cpu_type    = 0100000c
+   cpu_subtype = 1
+   running     = 1
+   slot_num    = 0
+   is_master   = 1
+   cpu_type    = 0100000c
+   cpu_subtype = 1
+   running     = 1
+   slot_num    = 1
+   is_master   = 0
+   cpu_type    = 0100000c
+   cpu_subtype = 1
+   running     = 1
+   slot_num    = 2
+   is_master   = 0
+*processor***********
+
+
+

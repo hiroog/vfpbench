@@ -1,9 +1,9 @@
 // 2014/01/15 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/Matrix4.h>
-#include	<minilib/SystemInfo.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/math/Matrix4.h>
+#include	<flatlib/core/system/SystemInfo.h>
 #include	"TimerClass.h"
 #include	"MatrixTest_SSESP.h"
 
@@ -965,13 +965,13 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 
 	Result	result_LIB;
 	SetResult( RESULT_LIB, Matrix_Mul_LIB_A( result_LIB.dest, src1, src2, Loop ) );
-	Progress++;
+	Progress.Increment();
 
 
 	Result	result_FLATLIB;
 	SetResult( RESULT_FLATLIB, Matrix_Mul_FLATLIB_A( result_FLATLIB.dest, src1, src2, Loop ) );
 	CHECK_( result_FLATLIB );
-	Progress++;
+	Progress.Increment();
 
 
 
@@ -980,7 +980,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 	CHECK_( result_A128 );
 
 
-	Progress++;
+	Progress.Increment();
 
 
 
@@ -990,7 +990,7 @@ FL_LOG( "Matrix loop=%d\n", Loop );
 		SetResult( RESULT_AVX_A256, Matrix_Mul_AVX_A256( result_A256.dest, src1, src2, Loop ) );
 		CHECK_( result_A256 );
 
-		Progress++;
+		Progress.Increment();
 
 	}
 
@@ -1046,7 +1046,5 @@ const char*	MatrixTest::GetTestName() const
 //-----------------------------------------------------------------------------
 #endif // FL_CPU_X86 || FL_CPU_X64
 //-----------------------------------------------------------------------------
-
-
 
 

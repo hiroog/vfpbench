@@ -4,7 +4,7 @@
 #ifndef	VFP64SP_TEST_H_
 #define	VFP64SP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace VFP64SP {
@@ -19,7 +19,7 @@ public:
 		PER_LOOP_INST	=	5 * 8,
 		PER_LOOP_INST_12=	5 * 12,
 	};
-	enum {
+	enum : unsigned int {
 		RESULT_VFP_FMUL_IR8,
 		RESULT_VFP_FADD_IR8,
 		RESULT_VFP_FMADD_IR8,
@@ -59,10 +59,14 @@ public:
 		RESULT_NEON_FMLA_S4_IR1,
 
 
-
 		RESULT_NEON_FMUL_S4_IR12,
 		RESULT_NEON_FADD_S4_IR12,
 		RESULT_NEON_FMLA_S4_IR12,
+
+
+		RESULT_SVE_FMUL_S_IR12,
+		RESULT_SVE_FADD_S_IR12,
+		RESULT_SVE_FMLA_S_IR12,
 
 		RESULT_MAX,
 	};

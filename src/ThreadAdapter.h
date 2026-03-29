@@ -4,8 +4,8 @@
 #ifndef	THREAD_ADAPTER_H_
 #define	THREAD_ADAPTER_H_
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/ThreadFunction.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/thread//ThreadInstance.h>
 #include	"TestBase.h"
 
 
@@ -14,7 +14,7 @@ class ThreadAdapter : public ITestBase {
 public:
 private:
 	T	Instance;
-	flatlib::thread::ThreadFunctionBase*	BenchThread;
+	flatlib::thread::ThreadInstance*	BenchThread;
 public:
 
 	ThreadAdapter( unsigned int group ) : ITestBase( false, group ), BenchThread( nullptr )
@@ -45,14 +45,14 @@ public:
 			FL_LOG( "ThreadAdapter Join\n" );
 			BenchThread->Join();
 			FL_LOG( "ThreadAdapter Join COMPLETE\n" );
-			flatlib::memory::ZDelete( BenchThread );
+			FL_MEMORY::ZDelete( BenchThread );
 		}
 	}
 
 	void	Run() override
 	{
 		BenchThread= flatlib::thread::CreateThreadFunction(
-			[=](){
+			[=,this](){
 				FL_LOG( "Run : In Thread\n" );
 				this->SetCpuAffinity();
 				this->Instance.SetIsMultithread( false );
@@ -62,7 +62,7 @@ public:
 		BenchThread->Run();
 	}
 
-	volatile unsigned int	IsDone() override
+	unsigned int	IsDone() override
 	{
 		if( Instance.IsDone() ){
 			Join();
@@ -70,7 +70,7 @@ public:
 		}
 		return	false;
 	}
-	volatile unsigned int	GetProgress() override
+	unsigned int	GetProgress() override
 	{
 		return	Instance.GetProgress();
 	}

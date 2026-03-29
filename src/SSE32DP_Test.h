@@ -4,7 +4,7 @@
 #ifndef	SSE32DP_TEST_H_
 #define	SSE32DP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace SSE32DP {

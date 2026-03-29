@@ -1,26 +1,29 @@
 // 2014 Hiroyuki Ogasawara
 // vim:ts=4 sw=4 noet:
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/SystemInfo.h>
-#include	<minilib/SystemAPI.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/system/CoreContext.h>
+#include	<flatlib/core/system/SystemInfo.h>
+#include	<flatlib/core/memory/MemoryAddress.h>
+#include	<flatlib/core/thread/Processor.h>
 #include	"TestBase.h"
 
 using namespace flatlib;
 
 
-
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-
 
 void	ITestBase::SetCpuAffinity()
 {
+	const auto&	Info= system::RCore().RSystemInfo();
 	unsigned int	group= GetCoreGroup();
 	unsigned int	thread_count= Info.GetThreadCount( group );
 	unsigned int	core_clock= Info.GetCoreClock( group );
 	auto			affinity_mask= Info.GetAffinityMask( group );
-	system::SetAffinityMask( affinity_mask );
+#if !FL_OS_DARWIN
+	thread::SetAffinityMask( affinity_mask );
+#endif
 	FL_PRINT( "GROUP=%d  THREAD=%d  Affinity=%08llx  Clock=%d\n",
 					group,
 					thread_count,
@@ -29,11 +32,12 @@ void	ITestBase::SetCpuAffinity()
 }
 
 
-
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-TestBase::TestBase() : LoopCount( BASE_DEFAULT_LOOP_FPU )
+TestBase::TestBase() :
+	Info( system::RCore().RSystemInfo() ),
+	LoopCount( BASE_DEFAULT_LOOP_FPU )
 {
 	InitClear();
 }
@@ -60,12 +64,12 @@ void	TestBase::SetLoop( unsigned int loop )
 	LoopCount= loop;
 }
 
-volatile unsigned int	TestBase::GetProgress()
+unsigned int	TestBase::GetProgress()
 {
 	return	Progress.Get();
 }
 
-volatile unsigned int	TestBase::IsDone()
+unsigned int	TestBase::IsDone()
 {
 	return	DoneFlag.Get();
 }
@@ -101,7 +105,6 @@ void	TestBase::SetResult( unsigned int index, uint64_t time )
 	auto&	result= TestResult[index];
 	result.Time= time;
 }
-
 
 
 unsigned int	TestBase::GetResult( unsigned int index ) const

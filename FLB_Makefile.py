@@ -33,22 +33,10 @@ src_list= [
         'src/ResultData.cpp',
         'src/BenchApplication.cpp',
         'src/BenchmarkTest.cpp',
-        'src/minilib/SystemAPI.cpp',
-        'src/minilib/Thread.cpp',
-        'src/minilib/MemoryAllocator.cpp',
-        'src/minilib/Matrix4.cpp',
-        'src/minilib/Math.cpp',
-        'src/minilib/SystemInfo.cpp',
-        'src/minilib/ConsoleLog.cpp',
-        'src/minilib/PlatformString.cpp',
-        'src/minilib/DateTime.cpp',
     ]
 
-#        'src/MatrixTest_SSESP.cpp',
-#        'src/MatrixTest_VFP32SP.cpp',
-#        'src/MatrixTest_VFP64SP.cpp',
-
 TargetName= 'vfpbench'
+
 
 #------------------------------------------------------------------------------
 
@@ -61,8 +49,12 @@ def get_arm64_arch( env ):
     if env.getTargetPlatform() == 'Linux':
         pat_fphp= re.compile( r'\bfphp\b' )
         pat_asimdhp= re.compile( r'\basimdhp\b' )
+        pat_sve2= re.compile( r'\bsve2\b' )
         with open( '/proc/cpuinfo', 'r' ) as fi:
             for line in fi:
+                pat3= pat_sve2.search( line )
+                if pat3:
+                    return  'armv9-a'
                 pat1= pat_fphp.search( line )
                 pat2= pat_asimdhp.search( line )
                 if pat1 and pat2:
@@ -71,17 +63,48 @@ def get_arm64_arch( env ):
 
 #------------------------------------------------------------------------------
 
+if os.path.exists( 'src/flatlib' ):
+    FLATLIB_ROOT= 'src'
+else:
+    FLATLIB_ROOT= tool.findPath( '../../flatlib5', 'FLATLIB5' )
+
+flatlib_base_list= [
+        'flatlib/core/memory/MemoryBuffer.cpp',
+        'flatlib/core/memory/MemoryAllocator.cpp',
+        'flatlib/core/memory/MemoryAddress.cpp',
+        'flatlib/core/system/ConsoleLog.cpp',
+        'flatlib/core/system/Assert.cpp',
+        'flatlib/core/system/CoreContext.cpp',
+        'flatlib/core/system/SystemInfo.cpp',
+        'flatlib/core/time/DateTime.cpp',
+        'flatlib/core/time/SystemClock.cpp',
+        'flatlib/core/thread/Sleep.cpp',
+        'flatlib/core/thread/Mutex.cpp',
+        'flatlib/core/thread/CriticalSection.cpp',
+        'flatlib/core/thread/ThreadInstance.cpp',
+        'flatlib/core/thread/Processor.cpp',
+        'flatlib/core/math/Float.cpp',
+        'flatlib/core/math/Matrix4.cpp',
+        'flatlib/core/ut/BinaryPool.cpp',
+        'flatlib/core/platform/WinString.cpp',
+        'flatlib/core/text/TextPool.cpp',
+    ]
+
+#------------------------------------------------------------------------------
+
 env= tool.createTargetEnvironment()
-env.addIncludePaths( ['src'] )
+env.addIncludePaths( [ 'src', FLATLIB_ROOT ] )
+env.addCCFlags( ['-DFL_USE_FILESYSTEM=0', '-DFL_USE_DATABASE=0', '-DFL_USE_VECT4=0'] )
 
 if env.getHostPlatform() == 'macOS':
-    env.addCCFlags( ['-DFL_PRESET_OSX=1'] )
-elif env.getHostPlatform() == 'Linux':
-    env.addCCFlags( ['-DFL_PRESET_LINUX=1'] )
+    flatlib_base_list.append( 'flatlib/core/system/SystemInfo_darwin.mm' )
+flatlib_src_list= [ os.path.join( FLATLIB_ROOT, src ) for src in flatlib_base_list ]
+src_list.extend( flatlib_src_list )
 
 env.refresh()
 
 def addCustomBuild( env, TargetName, src_list, config ):
+    global FLATLIB_ROOT
     is_termux= False
     if env.getHostPlatform() == 'Linux':
         is_termux= env.isTermux()
@@ -99,9 +122,10 @@ def addCustomBuild( env, TargetName, src_list, config ):
             elif arch == 'x64':
                 local_env.setTargetArch( 'x86' )
         if arch == 'arm64':
-                global get_arm64_arch
-                if local_env.getTargetPlatform() == 'Linux':
-                    local_env.addCCFlags( ['-march=' + get_arm64_arch( env ) ] )
+            global get_arm64_arch
+            if local_env.getTargetPlatform() == 'Linux':
+                arm64_arch= get_arm64_arch( env )
+                local_env.addCCFlags( ['-march=' + arm64_arch] )
         if config == 'Release':
             exe_name= TargetName
         else:
@@ -191,11 +215,15 @@ def ListLog( task ):
     thread_pat= re.compile( r'^CPU\s+Thread:\s+([0-9]+)' )
     core_pat=   re.compile( r'^CPU\s+Core\s+:\s+([0-9]+)' )
     clock_pat=  re.compile( r'^\s+Group\s+[0-9]+\s*:.*Clock=\s*([0-9.-]+)\s*GHz' )
+    ext_ignore= { '.swp' }
     device_list= []
     for log in log_list:
         score= []
         min_clock= 1e30
         max_clock= 0
+        _,ext= os.path.splitext(log)
+        if ext in ext_ignore:
+            continue
         with open( os.path.join( 'log', log ), 'r' ) as fi:
             for line in fi:
                 for p in plist:
@@ -268,7 +296,5 @@ class Converter:
         for root,dirs,files in os.walk( 'log' ):
             for file_name in files:
                 self.convet_filename_to_header( root, file_name )
-
-
 
 

@@ -4,9 +4,10 @@
 #ifndef	RESULT_DATA_H_
 #define	RESULT_DATA_H_
 
-#include	<minilib/CoreLib.h>
-#include	<minilib/FixedArray.h>
+#include	<flatlib/core/CoreBase.h>
+#include	<flatlib/core/ut/FixedArray.h>
 
+//-----------------------------------------------------------------------------
 
 struct ResultLine {
 public:
@@ -37,9 +38,7 @@ public:
 	}
 };
 
-
-
-
+//-----------------------------------------------------------------------------
 
 class ResultData {
 private:
@@ -92,10 +91,9 @@ public:
 
 	void	Clear()
 	{
-		DataList.Clear();
+		DataList.Finalize();
 		UpdatePosition= 0;
 	}
-
 
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------
@@ -106,7 +104,6 @@ public:
 	}
 	void	UpdateEnd();
 	void	Update( double time, double flops, double ops, double fop, double ipc );
-
 
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------
@@ -123,7 +120,7 @@ public:
 
 	unsigned int	GetSize() const
 	{
-		return	DataList.GetSize();
+		return	DataList.GetDataSize();
 	}
 
 	const ResultLine&	GetAverage() const
@@ -141,22 +138,15 @@ public:
 		return	Get( GetSize() -1 );
 	}
 
-
 	ResultLine&	GetHighest()
 	{
 		return	Get( GetSize() -1 );
 	}
 
-
-
 	//-------------------------------------------------------------------------
 	//-------------------------------------------------------------------------
 	void	Dump();
 };
-
-
-
-
 
 
 #endif

@@ -4,7 +4,7 @@
 #ifndef	MIPSSP_TEST_H_
 #define	MIPSSP_TEST_H_
 
-#include	<minilib/CoreLib.h>
+#include	<flatlib/core/CoreBase.h>
 #include	"TestBase.h"
 
 namespace MIPSSP {
