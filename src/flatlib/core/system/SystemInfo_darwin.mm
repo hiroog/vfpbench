@@ -517,6 +517,24 @@ void SystemInfo::DecodeCpuTopology()
 	if( dumpSystemInt( "hw.optional.arm.FEAT_SME2" ) == 1 ){
 		SetInstructionSet( CPUFeature::ARM_SME2 );
 	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_CRC32" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_CRC32 );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_SHA1" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SHA1 );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_SHA256" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SHA2 );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_SHA512" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SHA512 );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_SHA3" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SHA3 );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_AES" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_AES );
+	}
 
 #else
 
