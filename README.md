@@ -3,7 +3,7 @@
 Benchmark test for FPU and SIMD instructions.
 
 
-### For Linux and macOS
+### Linux
 
 ```bash
 $ git clone https://github.com/hiroog/FlatBuildTool
@@ -16,7 +16,7 @@ $ more output_log.txt
 $ flmake list
 ```
 
-### For Android + termux
+### Android + termux
 
 ```bash
 $ pkg install git python clang
@@ -30,7 +30,7 @@ $ more output_log.txt
 $ flmake list
 ```
 
-### For Windows
+### Windows
 
 Use WSL1 if you want to run on windows.
 
