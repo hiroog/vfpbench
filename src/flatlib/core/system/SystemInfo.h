@@ -56,26 +56,27 @@ enum class CPUFeature : unsigned int {
 	IA_X64,
 	IA_AVXVNNI,
 	//--
-	ARM_NEON,
-	ARM_VFPV4,		// include fma/half
-	ARM_FPHP,
-	ARM_SIMDHP,
-	ARM_SIMDDP,
-	ARM_SVE,
-	ARM_SVE2,
-	ARM_CRC32,
-	ARM_SHA1,
-	ARM_SHA2,
-	ARM_SHA3,
-	ARM_SHA512,
-	ARM_AES,
+	ARM_NEON,		// AdvSIMD		asimd
+	ARM_VFPV4,		// (32bit only = fma/half)
+	ARM_FPHP,		// FEAT_FP16	fphp
+	ARM_SIMDHP,		// FEAT_FP16	asimdhp
+	ARM_SIMDDP,		// FEAT_DotProd	asimddp			dotprod
+	ARM_SVE,		// FEAT_SVE		sve
+	ARM_SVE2,		// FEAT_SVE2	sve2
+	ARM_CRC32,		// FEAT_CRC32	crc32
+	ARM_SHA1,		// FEAT_SHA1	sha1
+	ARM_SHA2,		// FEAT_SHA256	sha2
+	ARM_SHA3,		// FEAT_SHA3	sha3
+	ARM_SHA512,		// FEAT_SHA512	sha512
+	ARM_AES,		// FEAT_AES		aes
 	ARM_64,
-	ARM_I8MM,
-	ARM_BF16,
-	ARM_SVEI8MM,
-	ARM_SVEBF16,
-	ARM_SME,
-	ARM_SME2,
+	ARM_I8MM,		// FEAT_I8MM	i8mm
+	ARM_BF16,		// FEAT_BF16	bf16			vbfmmla
+	ARM_SVEI8MM,	// FEAT_I8MM	svei8mm
+	ARM_SVEBF16,	// FEAT_BF16	svebf16
+	ARM_SME,		// FEAT_SME		sme
+	ARM_SME2,		// FEAT_SME2	sme2
+	ARM_FHM,		// FEAT_FHM		asimdfhm		vfmmla
 	//--
 	MIPS_MSA,
 	MIPS_F64,

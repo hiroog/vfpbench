@@ -149,16 +149,8 @@ void	SystemInfo::DecodeCpuTopology()
 
 		for( unsigned int ii= 0 ; info_ptr< info_ptr_end ; ii++ ){
 			const auto*		info= reinterpret_cast<const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*>( info_ptr );
-			//FL_LOG( "%2d: re=%d size=%d\n", ii, info->Relationship, info->Size );
 			switch( info->Relationship ){
 			case RelationProcessorCore: { // 0
-#if 0
-					FL_LOG( "   core flags=%08x clas=%d group_count=%d %llx\n",
-								info->Processor.Flags,
-								info->Processor.EfficiencyClass,
-								info->Processor.GroupCount,
-								info->Processor.GroupMask[0].Mask );
-#endif
 					int		htCount= 0;
 					auto	mask= info->Processor.GroupMask[0].Mask;
 					for( unsigned int mi= 0 ; mi< 64 ; mi++ ){
@@ -301,7 +293,6 @@ static bool	IsWSL2()
 		}
 	}
 	fclose( fp );
-	//FL_LOG( "IS WSL2 %d\n", is_wsl2 );
 	return	is_wsl2;
 }
 
@@ -591,7 +582,6 @@ void SystemInfo::DecodeCpuInfo()
 		return;
 	}
 	for(; fgets( linebuffer, MAX_LINE_BYTE, fp ) ;){
-//FL_LOG( "[%s]\n", linebuffer );
 		if( !info_feature ){
 			if(
 #if FL_CPU_ARM6 || FL_CPU_ARM7 || FL_CPU_ARM64
@@ -610,7 +600,6 @@ void SystemInfo::DecodeCpuInfo()
 						if( *lp && *lp <= ' ' ){
 							*lp++= '\0';
 						}
-  //FL_LOG( "word=[%s]\n", top );
 #if FL_CPU_ARM7 || FL_CPU_ARM64
 						if( !strcmp( top, "neon" ) ){
 							SetInstructionSet( CPUFeature::ARM_NEON );
@@ -650,6 +639,12 @@ void SystemInfo::DecodeCpuInfo()
 							SetInstructionSet( CPUFeature::ARM_SVEI8MM );
 						}else if( !strcmp( top, "svebf16" ) ){
 							SetInstructionSet( CPUFeature::ARM_SVEBF16 );
+						}else if( !strcmp( top, "sme" ) ){
+							SetInstructionSet( CPUFeature::ARM_SME );
+						}else if( !strcmp( top, "sme2" ) ){
+							SetInstructionSet( CPUFeature::ARM_SME2 );
+						}else if( !strcmp( top, "asimdfhm" ) ){
+							SetInstructionSet( CPUFeature::ARM_FHM );
 						}
 #else
 						if( !strcmp( top, "aes" ) ){
@@ -897,7 +892,6 @@ void	SystemInfo::GetCPUSpecification()
 {
 #if FL_CPU_ARM64
 	SetInstructionSet( CPUFeature::ARM_NEON );
-	//SetInstructionSet( CPUFeature::ARM_VFPV4 );
 	SetInstructionSet( CPUFeature::ARM_64 );
 #endif
 }
@@ -1091,6 +1085,7 @@ DEF_CPUFEATURE_NAME_ARM( SVEI8MM ),
 DEF_CPUFEATURE_NAME_ARM( SVEBF16 ),
 DEF_CPUFEATURE_NAME_ARM( SME ),
 DEF_CPUFEATURE_NAME_ARM( SME2 ),
+DEF_CPUFEATURE_NAME_ARM( FHM ),
 
 DEF_CPUFEATURE_NAME_MIPS( MSA ),
 DEF_CPUFEATURE_NAME_MIPS( F64 ),
@@ -1203,7 +1198,7 @@ const char* SystemInfo::GetArchNameLong( CPUArch arch ) const
 {
 	switch( arch ){
 	case CPUArch::CPU_ARM64:
-		if( HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+		if( HasInstructionSet( CPUFeature::ARM_SVE2 ) || HasInstructionSet( CPUFeature::ARM_SME ) ){
 			return	"ARMv9A AArch64";
 		}
 		if( HasInstructionSet( CPUFeature::ARM_FPHP ) ){
@@ -1234,7 +1229,7 @@ const char* SystemInfo::GetArchNameShort( CPUArch arch ) const
 {
 	switch( arch ){
 	case CPUArch::CPU_ARM64:
-		if( HasInstructionSet( CPUFeature::ARM_SVE2 ) ){
+		if( HasInstructionSet( CPUFeature::ARM_SVE2 ) || HasInstructionSet( CPUFeature::ARM_SME ) ){
 			return	"ARMv9A";
 		}
 		return	"ARMv8A";
@@ -1261,7 +1256,6 @@ const char* SystemInfo::GetArchNameShort( CPUArch arch ) const
 bool	SystemInfo::HasIPV6_() const
 {
 	FL_ASSERT( Initialized != 0 );
-	//FL_LOG( "Has IPv6 = %d\n", Net_HasIPV6 );
 	return	Net_HasIPV6;
 }
 

@@ -492,24 +492,17 @@ void SystemInfo::DecodeCpuTopology()
 
 #if FL_OS_MACOS
 
-	if( dumpSystemInt( "hw.optional.arm64" ) == 1 ){
-		SetInstructionSet( CPUFeature::ARM_64 );
-	}
-	if( dumpSystemInt( "hw.optional.arm.AdvSIMD" ) == 1 ){
-		SetInstructionSet( CPUFeature::ARM_NEON );
-	}
-	if( dumpSystemInt( "hw.optional.arm.FEAT_FP16" ) == 1 ){
-		SetInstructionSet( CPUFeature::ARM_FPHP );
-		SetInstructionSet( CPUFeature::ARM_SIMDHP );
-	}
-	if( dumpSystemInt( "hw.optional.arm.FEAT_BF16" ) == 1 ){
-		SetInstructionSet( CPUFeature::ARM_BF16 );
-	}
+	SetInstructionSet( CPUFeature::ARM_64 );
+	SetInstructionSet( CPUFeature::ARM_NEON );
+
 	if( dumpSystemInt( "hw.optional.arm.FEAT_DotProd" ) == 1 ){
 		SetInstructionSet( CPUFeature::ARM_SIMDDP );
 	}
-	if( dumpSystemInt( "hw.optional.arm.FEAT_I8MM" ) == 1 ){
-		SetInstructionSet( CPUFeature::ARM_I8MM );
+	if( dumpSystemInt( "hw.optional.arm.FEAT_SVE" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SVE );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_SVE2" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_SVE2 );
 	}
 	if( dumpSystemInt( "hw.optional.arm.FEAT_SME" ) == 1 ){
 		SetInstructionSet( CPUFeature::ARM_SME );
@@ -534,6 +527,25 @@ void SystemInfo::DecodeCpuTopology()
 	}
 	if( dumpSystemInt( "hw.optional.arm.FEAT_AES" ) == 1 ){
 		SetInstructionSet( CPUFeature::ARM_AES );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_FHM" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_FHM );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_FP16" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_FPHP );
+		SetInstructionSet( CPUFeature::ARM_SIMDHP );
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_I8MM" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_I8MM );
+		if( HasInstructionSet( CPUFeature::ARM_SVE ) ){
+			SetInstructionSet( CPUFeature::ARM_SVEI8MM );
+		}
+	}
+	if( dumpSystemInt( "hw.optional.arm.FEAT_BF16" ) == 1 ){
+		SetInstructionSet( CPUFeature::ARM_BF16 );
+		if( HasInstructionSet( CPUFeature::ARM_SVE ) ){
+			SetInstructionSet( CPUFeature::ARM_SVEBF16 );
+		}
 	}
 
 #else
@@ -631,7 +643,6 @@ void SystemInfo::DecodeCpuTopology()
 					FL_ASSERT( group.GroupID == gi );
 				}
 				need_setup= false;
-				//FL_ASSERT( TotalThreadCount == total_count );
 				if( TotalThreadCount != total_count ){
 					CoreGroupCount= 1;
 				}
