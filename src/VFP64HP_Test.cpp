@@ -1907,8 +1907,8 @@ FL_LOG( "VFP64 loop=%d\n", Loop );
     //------------------------------------------------------
 
 
-	DoneFlag= true;
 #endif
+	DoneFlag= true;
 }
 
 

@@ -23,11 +23,15 @@ src_list= [
         'src/SSE32DP_Test.cpp',
         'src/SSE64SP_Test.cpp',
         'src/SSE64DP_Test.cpp',
+        'src/SSE64BF16_Test.cpp',
+        'src/SSE64INT8_Test.cpp',
         'src/VFP32SP_Test.cpp',
         'src/VFP32DP_Test.cpp',
         'src/VFP64SP_Test.cpp',
         'src/VFP64DP_Test.cpp',
         'src/VFP64HP_Test.cpp',
+        'src/VFP64BF16_Test.cpp',
+        'src/VFP64INT8_Test.cpp',
         'src/MIPSSP_Test.cpp',
         'src/MIPSDP_Test.cpp',
         'src/ResultData.cpp',
@@ -44,22 +48,43 @@ tool.addCleanTask( genv, 'clean' )
 
 #------------------------------------------------------------------------------
 
-def get_arm64_arch( env ):
-    global re
-    if env.getTargetPlatform() == 'Linux':
-        pat_fphp= re.compile( r'\bfphp\b' )
-        pat_asimdhp= re.compile( r'\basimdhp\b' )
-        pat_sve2= re.compile( r'\bsve2\b' )
-        with open( '/proc/cpuinfo', 'r' ) as fi:
-            for line in fi:
-                pat3= pat_sve2.search( line )
-                if pat3:
-                    return  'armv9-a'
-                pat1= pat_fphp.search( line )
-                pat2= pat_asimdhp.search( line )
-                if pat1 and pat2:
-                    return  'armv8.2-a+simd+fp16'
-    return  'armv8-a+simd'
+def get_macos_arm64_arch():
+    import subprocess
+    def has_feat( key ):
+        try:
+            result= subprocess.run( ['sysctl', '-n', 'hw.optional.arm.' + key], capture_output=True, text=True )
+            return result.stdout.strip() == '1'
+        except:
+            return False
+    ext= ''
+    if has_feat( 'FEAT_FP16' ):
+        ext+= '+fp16'
+    if has_feat( 'FEAT_BF16' ):
+        ext+= '+bf16'
+    if has_feat( 'FEAT_I8MM' ):
+        ext+= '+i8mm'
+    if has_feat( 'FEAT_DotProd' ):
+        ext+= '+dotprod'
+    return  'armv8.2-a+simd' + ext
+
+def get_linux_arm64_arch():
+    base_arch= 'armv8-a+simd'
+    with open( '/proc/cpuinfo', 'r' ) as fi:
+        for line in fi:
+            if line.startswith( 'Features' ) or line.startswith( 'flags' ):
+                feature_set= set(line.split())
+                if 'sve2' in feature_set:
+                    base_arch= 'armv9-a'
+                if ('fphp' in feature_set) and ('asimdhp' in feature_set):
+                    base_arch+= '+fp16'
+                if 'asimddp' in feature_set:
+                    base_arch+= '+dotprod'
+                if 'i8mm' in feature_set:
+                    base_arch+= '+i8mm'
+                if 'bf16' in feature_set:
+                    base_arch+= '+bf16'
+                break
+    return  base_arch
 
 #------------------------------------------------------------------------------
 
@@ -122,10 +147,14 @@ def addCustomBuild( env, TargetName, src_list, config ):
             elif arch == 'x64':
                 local_env.setTargetArch( 'x86' )
         if arch == 'arm64':
-            global get_arm64_arch
-            if local_env.getTargetPlatform() == 'Linux':
-                arm64_arch= get_arm64_arch( env )
-                local_env.addCCFlags( ['-march=' + arm64_arch] )
+            if local_env.getTargetPlatform() == 'macOS':
+                global get_macos_arm64_arch
+                local_env.addCCFlags( ['-march=' + get_macos_arm64_arch()] )
+            else:
+                global get_linux_arm64_arch
+                local_env.addCCFlags( ['-march=' + get_linux_arm64_arch()] )
+        elif arch == 'x64':
+            local_env.addCCFlags( ['-march=native'] )
         if config == 'Release':
             exe_name= TargetName
         else:
@@ -171,28 +200,45 @@ task= tool.addScriptTask( env, 'run', BenchRun )
 
 #------------------------------------------------------------------------------
 
-def PushLog( task ):
-    global re
-    import datetime
+def GetName():
     src_file= 'output_log.txt'
-    #cdate= datetime.datetime.today().strftime( '%Y%m%d_%H%M%S' )
-    fdate= datetime.datetime.fromtimestamp( os.stat( src_file ).st_mtime ).strftime( '%Y%m%d_%H%M%S' )
+    name= ''
     with open( src_file, 'r' ) as fi:
-        name= None
         name_pat= re.compile( '^Name: (.*)$' )
         for line in fi:
             pat= name_pat.search( line )
             if pat is not None:
                 name= pat.group(1).strip()
+                break
     if os.path.exists( '.processor_name' ):
-        with open( '.processor_name', 'r' ) as fp:
-            name= fp.read().strip()
+        with open( '.processor_name', 'r' ) as fi:
+            name= fi.readline().strip()
+            if name.startswith( 'NAME:' ):
+                name= name[5:].strip()
+    name= name.replace( '/', '_' )
+    return  name
+
+def PushLog( task ):
+    global re
+    import datetime
+    src_file= 'output_log.txt'
+    fdate= datetime.datetime.fromtimestamp( os.stat( src_file ).st_mtime ).strftime( '%Y%m%d_%H%M%S' )
+    global GetName
+    name= GetName()
+    if name == '':
+        return
     if not os.path.exists( 'log' ):
         os.mkdir( 'log' )
-    #file_name= os.path.join( 'log', '%s_%s.txt' % (name, fdate) )
     file_name= os.path.join( 'log', '%s.txt' % name )
     import shutil
     shutil.copy( src_file, file_name )
+    if os.path.exists( '.processor_name' ):
+        with open( '.processor_name', 'r' ) as fi:
+            processor= fi.read()
+        with open( file_name, 'a' ) as fa:
+            fa.write( '\n\n' )
+            fa.write( processor )
+            fa.write( '\n\n' )
     print( file_name )
 
 task= tool.addScriptTask( env, 'push', PushLog )
@@ -208,9 +254,13 @@ def ListLog( task ):
             re.compile( r'^SingleThread\s+HP\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^SingleThread\s+SP\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^SingleThread\s+DP\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^SingleThread\s+BF16\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^SingleThread\s+INT8\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^MultiThread\s+HP\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^MultiThread\s+SP\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^MultiThread\s+DP\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^MultiThread\s+BF16\s+max:\s+([0-9.-]+)' ),
+            re.compile( r'^MultiThread\s+INT8\s+max:\s+([0-9.-]+)' ),
         ]
     thread_pat= re.compile( r'^CPU\s+Thread:\s+([0-9]+)' )
     core_pat=   re.compile( r'^CPU\s+Core\s+:\s+([0-9]+)' )
@@ -218,7 +268,7 @@ def ListLog( task ):
     ext_ignore= { '.swp' }
     device_list= []
     for log in log_list:
-        score= []
+        score= [0.0]*10
         min_clock= 1e30
         max_clock= 0
         _,ext= os.path.splitext(log)
@@ -226,14 +276,14 @@ def ListLog( task ):
             continue
         with open( os.path.join( 'log', log ), 'r' ) as fi:
             for line in fi:
-                for p in plist:
+                for index,p in enumerate(plist):
                     pat= p.search( line )
                     if pat is not None:
                         flops= pat.group(1)
                         if flops == '-':
-                            score.append( 0.0 )
+                            score[index]= 0.0
                         else:
-                            score.append( float(flops) )
+                            score[index]= float(flops)
                         break
                 pat= thread_pat.search( line )
                 if pat is not None:
@@ -250,19 +300,19 @@ def ListLog( task ):
                         max_clock= cpu_clock
         name,_= os.path.splitext( log )
         device_list.append( (name,score,log,cpu_thread,cpu_core,min_clock,max_clock) )
-    device_list_sp= sorted( device_list, key=lambda a: a[1][4], reverse=True )
+    device_list_sp= sorted( device_list, key=lambda a: a[1][6], reverse=True )
     if task.table:
         print( '^ Device  ^ Clock ^ Thread ^  Single Thread                      ^^^  Multi Thread                     ^^^' )
         print( '^ :::     ^ :::   ^ :::    ^  Half-p    ^   Single-p  ^  Double-p  ^  Half-p   ^  Single-p  ^  Double-p  ^' )
     else:
-        print( 'Device                                              Clock  C/T      S-HP     S-SP     S-DP      M-HP     M-SP     M-DP' )
+        print( 'Device                                              Clock  C/T     S-HP    S-SP    S-DP  S-BF16  S-INT8     M-HP    M-SP    M-DP  M-BF16  M-INT8' )
     for name,sc,log,core,thread,mic,mac in device_list_sp:
         if task.table:
             url= 'https://github.com/hiroog/vfpbench/blob/master/log/' + urllib.parse.quote( log )
-            line= '| [[%s|%-70s]]  |  %5.3f GHz |  %d/%d |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |' % (url,name[:70], mac, thread, core, sc[0], sc[1], sc[2], sc[3], sc[4], sc[5])
+            line= '| [[%s|%-70s]]  |  %5.3f GHz |  %d/%d |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |  %8.3f |' % (url,name[:70], mac, thread, core, sc[0], sc[1], sc[2],  sc[5], sc[6], sc[7], sc[3], sc[4], sc[8], sc[9])
             print( line.replace( '0.000', '--' ) )
         else:
-            print( '%-50s  %5.3f %2d/%2d %8.3f %8.3f %8.3f  %8.3f %8.3f %8.3f' % (name[:50], mac, thread, core, sc[0], sc[1], sc[2], sc[3], sc[4], sc[5]) )
+            print( '%-50s  %5.3f %2d/%2d %7.2f %7.2f %7.2f %7.2f %7.1f  %7.2f %7.2f %7.2f %7.2f %7.1f' % (name[:50], mac, thread, core, sc[0], sc[1], sc[2], sc[3], sc[4], sc[5], sc[6], sc[7], sc[8], sc[9]) )
 
 task= tool.addScriptTask( env, 'list', ListLog )
 task.table= False

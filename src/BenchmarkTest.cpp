@@ -77,10 +77,12 @@ void	BenchmarkTestBase::UpdateLoop( float loop_sclae )
 		unsigned int	mat_default= static_cast<unsigned int>( 1000000 * loop_sclae * clock_scale );
 		unsigned int	loop= 0;
 		switch( bench->GetLoopType() ){
-		case LOOPTYPE_HP: loop= hp_default; break;
-		case LOOPTYPE_SP: loop= sp_default; break;
-		case LOOPTYPE_DP: loop= dp_default; break;
+		case LOOPTYPE_HP:  loop= hp_default;  break;
+		case LOOPTYPE_SP:  loop= sp_default;  break;
+		case LOOPTYPE_DP:  loop= dp_default;  break;
 		case LOOPTYPE_MAT: loop= mat_default; break;
+		case LOOPTYPE_BF16: loop= hp_default; break;
+		case LOOPTYPE_INT8: loop= hp_default; break;
 		}
 		FL_LOG( "%2d: loop=%8d  %s\n", bi, loop, bench->GetTestName() );
 		bench->SetLoop( loop );

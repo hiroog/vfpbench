@@ -65,7 +65,16 @@ const char*	GetWord( char* buffer, size_t buffer_size, const char* ptr )
 static void	format_GFLOPS( text::TextPool& pool, const char* text, double flops )
 {
 	if( flops != 0.0 ){
-		pool.AddFormat( "%s: %8.3f GFLOPS\n", text, flops / 1000.0 );
+		pool.AddFormat( "%s: %9.3f GFLOPS\n", text, flops / 1000.0 );
+	}else{
+		pool.AddFormat( "%s: -\n", text );
+	}
+}
+
+static void	format_GOPS( text::TextPool& pool, const char* text, double ops )
+{
+	if( ops != 0.0 ){
+		pool.AddFormat( "%s: %9.3f GOPS\n", text, ops / 1000.0 );
 	}else{
 		pool.AddFormat( "%s: -\n", text );
 	}
@@ -222,13 +231,14 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 		break;
 	case CPUArch::CPU_X86:
 	case CPUArch::CPU_X64:
-		pool.AddFormat( "SSE    : %s\n", Info.HasInstructionSet( CPUFeature::IA_SSE2 ) ? "yes" : "no" );
-		pool.AddFormat( "AVX    : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX ) ? "yes" : "no" );
-		pool.AddFormat( "FMA    : %s\n", Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ? "yes" : "no" );
-		pool.AddFormat( "F16C   : %s\n", Info.HasInstructionSet( CPUFeature::IA_F16C ) ? "yes" : "no" );
-		pool.AddFormat( "AVXVNNI: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVXVNNI ) ? "yes" : "no" );
-		pool.AddFormat( "AVX512 : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ? "yes" : "no" );
-		pool.AddFormat( "512VNNI: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512VNNI ) ? "yes" : "no" );
+		pool.AddFormat( "SSE       : %s\n", Info.HasInstructionSet( CPUFeature::IA_SSE2 ) ? "yes" : "no" );
+		pool.AddFormat( "AVX       : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX ) ? "yes" : "no" );
+		pool.AddFormat( "FMA       : %s\n", Info.HasInstructionSet( CPUFeature::IA_FMA3 ) ? "yes" : "no" );
+		pool.AddFormat( "F16C      : %s\n", Info.HasInstructionSet( CPUFeature::IA_F16C ) ? "yes" : "no" );
+		pool.AddFormat( "AVXVNNI   : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVXVNNI ) ? "yes" : "no" );
+		pool.AddFormat( "AVX512    : %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512F ) ? "yes" : "no" );
+		pool.AddFormat( "AVX512VNNI: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512VNNI ) ? "yes" : "no" );
+		pool.AddFormat( "AVX512BF16: %s\n", Info.HasInstructionSet( CPUFeature::IA_AVX512BF16 ) ? "yes" : "no" );
 		break;
 	case CPUArch::CPU_MIPS32:
 	case CPUArch::CPU_MIPS64:
@@ -255,23 +265,31 @@ void BenchApplication::ExportCPUInfo( text::TextPool& pool ) const
 void BenchApplication::ExportFlops( text::TextPool& pool ) const
 {
 	pool.AddFormat( "\nTotal:\n" );
-	format_GFLOPS( pool, "SingleThread HP max", GetMaxMFLOPS( LOOPTYPE_HP, false ) );
-	format_GFLOPS( pool, "SingleThread SP max", GetMaxMFLOPS( LOOPTYPE_SP, false ) );
-	format_GFLOPS( pool, "SingleThread DP max", GetMaxMFLOPS( LOOPTYPE_DP, false ) );
-	format_GFLOPS( pool, "MultiThread  HP max", GetTotalMFLOPS( LOOPTYPE_HP, true  ) );
-	format_GFLOPS( pool, "MultiThread  SP max", GetTotalMFLOPS( LOOPTYPE_SP, true  ) );
-	format_GFLOPS( pool, "MultiThread  DP max", GetTotalMFLOPS( LOOPTYPE_DP, true  ) );
+	format_GFLOPS( pool, "SingleThread HP   max", GetMaxMFLOPS( LOOPTYPE_HP,   false ) );
+	format_GFLOPS( pool, "SingleThread SP   max", GetMaxMFLOPS( LOOPTYPE_SP,   false ) );
+	format_GFLOPS( pool, "SingleThread DP   max", GetMaxMFLOPS( LOOPTYPE_DP,   false ) );
+	format_GFLOPS( pool, "SingleThread BF16 max", GetMaxMFLOPS( LOOPTYPE_BF16, false ) );
+	format_GOPS(   pool, "SingleThread INT8 max", GetMaxMFLOPS( LOOPTYPE_INT8, false ) );
+	format_GFLOPS( pool, "MultiThread  HP   max", GetTotalMFLOPS( LOOPTYPE_HP,   true  ) );
+	format_GFLOPS( pool, "MultiThread  SP   max", GetTotalMFLOPS( LOOPTYPE_SP,   true  ) );
+	format_GFLOPS( pool, "MultiThread  DP   max", GetTotalMFLOPS( LOOPTYPE_DP,   true  ) );
+	format_GFLOPS( pool, "MultiThread  BF16 max", GetTotalMFLOPS( LOOPTYPE_BF16, true  ) );
+	format_GOPS(   pool, "MultiThread  INT8 max", GetTotalMFLOPS( LOOPTYPE_INT8, true  ) );
 
 	const auto&	Info= system::RCore().RSystemInfo();
 	unsigned int	group_count= Info.GetCoreGroupCount();
 	for( unsigned int gi= 0 ; gi< group_count ; gi++ ){
 		pool.AddFormat( "\nGroup %d:  Thread=%d  Clock=%f GHz  (mask:%llx)\n", gi, Info.GetThreadCount( gi ), Info.GetCoreClock( gi )/1000000.0, Info.GetAffinityMask( gi ) );
-		format_GFLOPS( pool, "  SingleThread HP max", GetMFLOPS( LOOPTYPE_HP, false, gi ) );
-		format_GFLOPS( pool, "  SingleThread SP max", GetMFLOPS( LOOPTYPE_SP, false, gi ) );
-		format_GFLOPS( pool, "  SingleThread DP max", GetMFLOPS( LOOPTYPE_DP, false, gi ) );
-		format_GFLOPS( pool, "  MultiThread  HP max", GetMFLOPS( LOOPTYPE_HP, true,  gi ) );
-		format_GFLOPS( pool, "  MultiThread  SP max", GetMFLOPS( LOOPTYPE_SP, true,  gi ) );
-		format_GFLOPS( pool, "  MultiThread  DP max", GetMFLOPS( LOOPTYPE_DP, true,  gi ) );
+		format_GFLOPS( pool, "  SingleThread HP   max", GetMFLOPS( LOOPTYPE_HP,   false, gi ) );
+		format_GFLOPS( pool, "  SingleThread SP   max", GetMFLOPS( LOOPTYPE_SP,   false, gi ) );
+		format_GFLOPS( pool, "  SingleThread DP   max", GetMFLOPS( LOOPTYPE_DP,   false, gi ) );
+		format_GFLOPS( pool, "  SingleThread BF16 max", GetMFLOPS( LOOPTYPE_BF16, false, gi ) );
+		format_GOPS(   pool, "  SingleThread INT8 max", GetMFLOPS( LOOPTYPE_INT8, false, gi ) );
+		format_GFLOPS( pool, "  MultiThread  HP   max", GetMFLOPS( LOOPTYPE_HP,   true,  gi ) );
+		format_GFLOPS( pool, "  MultiThread  SP   max", GetMFLOPS( LOOPTYPE_SP,   true,  gi ) );
+		format_GFLOPS( pool, "  MultiThread  DP   max", GetMFLOPS( LOOPTYPE_DP,   true,  gi ) );
+		format_GFLOPS( pool, "  MultiThread  BF16 max", GetMFLOPS( LOOPTYPE_BF16, true,  gi ) );
+		format_GOPS(   pool, "  MultiThread  INT8 max", GetMFLOPS( LOOPTYPE_INT8, true,  gi ) );
 	}
 	pool.AddFormat( "\n" );
 }
@@ -284,7 +302,7 @@ void	BenchApplication::ExportLine( text::TextPool& pool, const ResultLine& line 
 {
 	if( line.IsActive() ){
 #if USE_MAX_EXPORT
-		pool.AddFormat( "%-34s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f) %9.1f\n",
+		pool.AddFormat( "%-34s: %8.3f %10.1f  %9.1f  (%5.1f %3.1f) %9.1f\n",
 				line.Title,
 				line.Time,
 				line.Flops,
@@ -294,7 +312,7 @@ void	BenchApplication::ExportLine( text::TextPool& pool, const ResultLine& line 
 				line.Max
 			);
 #else
-		pool.AddFormat( "%-34s: %8.3f  %9.1f  %9.1f  (%5.1f %3.1f)\n",
+		pool.AddFormat( "%-34s: %8.3f %10.1f  %9.1f  (%5.1f %3.1f)\n",
 				line.Title,
 				line.Time,
 				line.Flops,

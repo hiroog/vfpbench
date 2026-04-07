@@ -23,6 +23,8 @@ enum LoopType : unsigned int {
 	LOOPTYPE_SP,
 	LOOPTYPE_DP,
 	LOOPTYPE_MAT,
+	LOOPTYPE_BF16,
+	LOOPTYPE_INT8,
 };
 
 struct ResultTable {

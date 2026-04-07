@@ -23,7 +23,7 @@ public:
 	MultiAdapter( unsigned int group ) : ITestBase( true, group )
 	{
 		unsigned int	core= flatlib::system::RCore().RSystemInfo().GetThreadCount( group );
-FL_PRINT( "CORE=%d\n", core );
+		FL_LOG( "CORE=%d\n", core );
 		InstanceArray.SetArraySize( core );
 		ThreadArray.SetArraySize( core );
 		for( unsigned int ti= 0 ; ti< core ; ti++ ){
