@@ -262,10 +262,20 @@ def ListLog( task ):
             re.compile( r'^MultiThread\s+BF16\s+max:\s+([0-9.-]+)' ),
             re.compile( r'^MultiThread\s+INT8\s+max:\s+([0-9.-]+)' ),
         ]
+    sort_key_map= {
+        's-half': 0, 's-float': 1, 's-double': 2, 's-bf16': 3, 's-int8': 4,
+        'm-half': 5, 'm-float': 6, 'm-double': 7, 'm-bf16': 8, 'm-int8': 9,
+    }
+    sort_index= sort_key_map['m-float']
+    if hasattr( task, 'sort_key' ):
+        sort_index= sort_key_map[task.sort_key]
     thread_pat= re.compile( r'^CPU\s+Thread:\s+([0-9]+)' )
     core_pat=   re.compile( r'^CPU\s+Core\s+:\s+([0-9]+)' )
     clock_pat=  re.compile( r'^\s+Group\s+[0-9]+\s*:.*Clock=\s*([0-9.-]+)\s*GHz' )
     ext_ignore= { '.swp' }
+    src_file= 'output_log.txt'
+    if os.path.exists( src_file ):
+        log_list.append( '=====> '+ src_file )
     device_list= []
     for log in log_list:
         score= [0.0]*10
@@ -274,7 +284,11 @@ def ListLog( task ):
         _,ext= os.path.splitext(log)
         if ext in ext_ignore:
             continue
-        with open( os.path.join( 'log', log ), 'r' ) as fi:
+        if log[0] == '=':
+            log_path= log.strip( ' =>' )
+        else:
+            log_path= os.path.join( 'log', log )
+        with open( log_path, 'r' ) as fi:
             for line in fi:
                 for index,p in enumerate(plist):
                     pat= p.search( line )
@@ -300,7 +314,7 @@ def ListLog( task ):
                         max_clock= cpu_clock
         name,_= os.path.splitext( log )
         device_list.append( (name,score,log,cpu_thread,cpu_core,min_clock,max_clock) )
-    device_list_sp= sorted( device_list, key=lambda a: a[1][6], reverse=True )
+    device_list_sp= sorted( device_list, key=lambda a: a[1][sort_index], reverse=True )
     if task.table:
         print( '^ Device  ^ Clock ^ Thread ^  Single Thread                      ^^^  Multi Thread                     ^^^' )
         print( '^ :::     ^ :::   ^ :::    ^  Half-p    ^   Single-p  ^  Double-p  ^  Half-p   ^  Single-p  ^  Double-p  ^' )
@@ -314,11 +328,26 @@ def ListLog( task ):
         else:
             print( '%-50s  %5.3f %2d/%2d %7.2f %7.2f %7.2f %7.2f %7.1f  %7.2f %7.2f %7.2f %7.2f %7.1f' % (name[:50], mac, thread, core, sc[0], sc[1], sc[2], sc[3], sc[4], sc[5], sc[6], sc[7], sc[8], sc[9]) )
 
-task= tool.addScriptTask( env, 'list', ListLog )
-task.table= False
-task= tool.addScriptTask( env, 'table', ListLog )
-task.table= True
 
+def addlist( tool, env, name, key, log, table= False ):
+    task= tool.addScriptTask( env, name, log )
+    task.table= table
+    task.sort_key= key
+
+addlist( tool, env, 'list',         'm-float',  ListLog )
+addlist( tool, env, 'list-half',    'm-half',   ListLog )
+addlist( tool, env, 'list-float',   'm-float',  ListLog )
+addlist( tool, env, 'list-double',  'm-double', ListLog )
+addlist( tool, env, 'list-bf16',    'm-bf16',   ListLog )
+addlist( tool, env, 'list-int8',    'm-int8',   ListLog )
+
+addlist( tool, env, 'list-s-half',  's-half',   ListLog )
+addlist( tool, env, 'list-s-float', 's-float',  ListLog )
+addlist( tool, env, 'list-s-double','s-double', ListLog )
+addlist( tool, env, 'list-s-bf16',  's-bf16',   ListLog )
+addlist( tool, env, 'list-s-int8',  's-int8',   ListLog )
+
+addlist( tool, env, 'table',        's-float',  ListLog, True )
 
 #------------------------------------------------------------------------------
 class Converter:
