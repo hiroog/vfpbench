@@ -1,6 +1,6 @@
 # vfpbenchmark
 
-Benchmark test for FPU and SIMD instructions.
+Runs benchmark tests for the FPU and SIMD units.
 
 
 ### Linux
@@ -16,6 +16,11 @@ $ more output_log.txt
 $ flmake list
 ```
 
+### macOS
+
+macOS is not supported.
+
+
 ### Android + termux
 
 ```bash
@@ -30,9 +35,10 @@ $ more output_log.txt
 $ flmake list
 ```
 
+
 ### Windows
 
-Use WSL1 if you want to run on windows.
+If you want to run this on Windows, please use WSL1.
 
 
 

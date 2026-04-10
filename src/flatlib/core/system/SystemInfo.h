@@ -60,7 +60,7 @@ enum class CPUFeature : unsigned int {
 	ARM_VFPV4,		// (32bit only = fma/half)
 	ARM_FPHP,		// FEAT_FP16	fphp
 	ARM_SIMDHP,		// FEAT_FP16	asimdhp
-	ARM_SIMDDP,		// FEAT_DotProd	asimddp			dotprod
+	ARM_SIMDDP,		// FEAT_DotProd	asimddp
 	ARM_SVE,		// FEAT_SVE		sve
 	ARM_SVE2,		// FEAT_SVE2	sve2
 	ARM_CRC32,		// FEAT_CRC32	crc32
@@ -71,12 +71,12 @@ enum class CPUFeature : unsigned int {
 	ARM_AES,		// FEAT_AES		aes
 	ARM_64,
 	ARM_I8MM,		// FEAT_I8MM	i8mm
-	ARM_BF16,		// FEAT_BF16	bf16			vbfmmla
+	ARM_BF16,		// FEAT_BF16	bf16
 	ARM_SVEI8MM,	// FEAT_I8MM	svei8mm
 	ARM_SVEBF16,	// FEAT_BF16	svebf16
 	ARM_SME,		// FEAT_SME		sme
 	ARM_SME2,		// FEAT_SME2	sme2
-	ARM_FHM,		// FEAT_FHM		asimdfhm		vfmmla
+	ARM_FHM,		// FEAT_FHM		asimdfhm
 	//--
 	MIPS_MSA,
 	MIPS_F64,
@@ -132,6 +132,7 @@ private:
 	void	DecodeCpuInfo();
 	void	DecodeCpuTopologyImmediate();
 	void	DecodeCpuTopology();
+	void	DecodeCpuClock();
 	void	DecodeVersion();
 	void	GetCPUSpecification();
 	void	SetCoreInfo( unsigned int cpu_id, unsigned int cpu_count, unsigned int group_id, unsigned int physical_id, unsigned int core_clock, unsigned int ht_step= 1 );

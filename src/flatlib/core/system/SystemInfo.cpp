@@ -678,6 +678,36 @@ void SystemInfo::DecodeCpuInfo()
 }
 
 
+void SystemInfo::DecodeCpuClock()
+{
+#if FL_CPU_X64 || FL_CPU_X86
+	const int	MAX_LINE_BYTE= 1024 * 2;
+	char	linebuffer[MAX_LINE_BYTE+8];
+	FILE*	fp= fopen( "/proc/cpuinfo", "r" );
+	if( !fp ){
+		return;
+	}
+	int		cpu_index= 0;
+	for(; fgets( linebuffer, MAX_LINE_BYTE, fp ) ;){
+		if( !strncmp( linebuffer, "processor", 9 ) ){
+			char*	lp= SkipColon( linebuffer );
+			cpu_index= atoi( lp );
+		}
+		if( !strncmp( linebuffer, "cpu MHz", 7 ) ){
+			char*	lp= SkipColon( linebuffer );
+			unsigned int	cpu_clock= static_cast<unsigned int>( atof( lp ) * 1000.0 );	// MHz to KHz
+			auto&	core= CoreList[cpu_index];
+			if( core.CoreClock == 0 ){
+				core.BaseClock= cpu_clock;
+				core.CoreClock= cpu_clock;
+			}
+		}
+	}
+	fclose( fp );
+#endif
+}
+
+
 void SystemInfo::DecodeVersion()
 {
 	if( IsWSL2() ){
@@ -970,6 +1000,7 @@ void	SystemInfo::Init()
 	DecodeCpuInfo();
 	DecodeCpuTopology();
 	DecodeVersion();
+	DecodeCpuClock();
 #elif FL_OS_DARWIN
 	DecodeCpuTopology();
 #endif
