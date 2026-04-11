@@ -203,16 +203,16 @@ def BenchRun_Linux( task ):
 #------------------------------------------------------------------------------
 
 def GetName():
-    processor_name= {}
-    src_file= 'output_log.txt'
     name= ''
-    with open( src_file, 'r' ) as fi:
-        name_pat= re.compile( '^Name: (.*)$' )
-        for line in fi:
-            pat= name_pat.search( line )
-            if pat is not None:
-                name= pat.group(1).strip()
-                break
+    src_file= 'output_log.txt'
+    if os.path.exists( src_file ):
+        with open( src_file, 'r' ) as fi:
+            name_pat= re.compile( '^Name: (.*)$' )
+            for line in fi:
+                pat= name_pat.search( line )
+                if pat is not None:
+                    name= pat.group(1).strip()
+                    break
     cpu_list= []
     if os.path.exists( '.processor_name' ):
         with open( '.processor_name', 'r' ) as fi:
@@ -224,9 +224,7 @@ def GetName():
                     cpus= line[4:].strip().split()  # name x1 clock
                     cpu_list.append( (cpus[0],cpus[1],float(cpus[2])) )
     name= name.replace( '/', '_' )
-    processor_name['name']= name
-    processor_name['cpus']= cpu_list
-    return  processor_name
+    return  { 'name': name, 'cpus': cpu_list }
 
 def decode_benchmark_list( bench_text ):
     global re
