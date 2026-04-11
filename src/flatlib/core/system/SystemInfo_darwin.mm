@@ -657,8 +657,6 @@ void SystemInfo::DecodeCpuTopology()
 		}
 	}
 #endif
-
-	DumpCpuGroup();
 }
 
 

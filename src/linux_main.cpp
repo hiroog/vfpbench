@@ -11,7 +11,7 @@
 using namespace flatlib;
 
 enum : unsigned int {
-	BTYPE_ALL	=	1000,
+	BTYPE_ALL	=	0x10000,
 };
 
 enum : unsigned int {
@@ -20,10 +20,19 @@ enum : unsigned int {
 	INFO_LOG,
 };
 
+enum : unsigned int {
+	FLAG_PRINT_RESULT	=	1<<0,
+	FLAG_LIST_MODE		=	1<<1,
+	FLAG_INFO_CPU		=	1<<2,
+	FLAG_INFO_LOG		=	1<<3,
+	FLAG_INFO_BENCH		=	1<<4,
+};
+
 class AppModule {
 private:
 	BenchmarkTest		BenchmarkInstance;
 	BenchApplication	App;
+	unsigned int		Flags= 0;
 public:
 	AppModule()
 	{
@@ -31,9 +40,10 @@ public:
 	~AppModule()
 	{
 	}
-	void	Init( float loop_scale, const char* save_file= ".save.log" )
+	void	Init( float loop_scale, const char* save_file= ".save.log", unsigned int flags= 0 )
 	{
 		system::RCore().RSystemInfo().Init();
+		Flags= flags;
 		auto	bcount= BenchmarkInstance.GetBenchCount();
 		App.Init( bcount );
 		for( unsigned int bi= 0 ; bi< bcount ; bi++ ){
@@ -63,24 +73,21 @@ public:
 		pool.AddChar( '\0' );
 		FL_PRINT( "%s\n", pool.GetText() );
 	}
-	void	List( unsigned int info_mode )
+	void	List( unsigned int info_flags )
 	{
-		switch( info_mode ){
-		case INFO_CPU:
+		if( info_flags & FLAG_INFO_CPU ){
 			PrintInfo();
 			system::RCore().RSystemInfo().DumpSystemInfo();
-			break;
-		case INFO_BENCH: {
-				auto	bcount= BenchmarkInstance.GetBenchCount();
-				for( unsigned int bi= 0 ; bi< bcount ; bi++ ){
-					auto*	bench= BenchmarkInstance.GetBenchmark( bi );
-					FL_PRINT( "%d: %s\n", bi, bench->GetTestName() );
-				}
-			}
-			break;
-		case INFO_LOG:
+		}
+		if( info_flags & FLAG_INFO_LOG ){
 			PrintLog();
-			break;
+		}
+		if( info_flags & FLAG_INFO_BENCH ){
+			auto	bcount= BenchmarkInstance.GetBenchCount();
+			for( unsigned int bi= 0 ; bi< bcount ; bi++ ){
+				const auto*	bench= BenchmarkInstance.GetBenchmark( bi );
+				FL_PRINT( "%2d: G=%d T=%d %s\n", bi, bench->GetCoreGroup(), bench->IsMultithread(), bench->GetTestName() );
+			}
 		}
 	}
 	void Dump( unsigned int btype )
@@ -136,10 +143,10 @@ public:
 		}
 
 		PrintLog();
-#if 0
-		PrintInfo();
-		PrintFlops();
-#endif
+		if( Flags & FLAG_PRINT_RESULT ){
+			PrintInfo();
+			PrintFlops();
+		}
 	}
 };
 
@@ -147,7 +154,7 @@ public:
 static void usage()
 {
 	FL_PRINT(
-		"vfpbench v2.2 2014-2020 Hiroyuki Ogasawara\n"
+		"vfpbench v2.3 2014-2026 Hiroyuki Ogasawara\n"
 		"usage: vfpbench [options]\n"
 		" -l                  List benchmark tests\n"
 		" -i                  Display system info\n"
@@ -155,6 +162,7 @@ static void usage()
 		" -b<bench_index>     Select benchmark test 0..n (1000=all)\n"
 		" -c<loop_scale>      Loop count scale (default 1.0)\n"
 		" --log <log_file>    Log filename (default 'output_log.txt')\n"
+		" --pr                Print result\n"
 		);
 	exit( 1 );
 }
@@ -169,27 +177,28 @@ int main( int argc, char** argv )
 		unsigned int	btype= BTYPE_ALL;
 		const char*		log_file= "output_log.txt";
 		const char*		save_file= ".save.log";
-		bool			list_mode= false;
-		unsigned int	info_mode= INFO_BENCH;
+		unsigned int	flags= 0;
 		for(; --argc ;){
 			if( **++argv == '-' ){
 				switch( (*argv)[1] ){
 				case 'l':
-					list_mode= true;
+					flags|= FLAG_LIST_MODE|FLAG_INFO_BENCH;
 					break;
 				case 'i':
-					info_mode= INFO_CPU;
-					list_mode= true;
+					flags|= FLAG_LIST_MODE|FLAG_INFO_CPU;
 					break;
 				case 'r':
-					info_mode= INFO_LOG;
-					list_mode= true;
+					flags|= FLAG_LIST_MODE|FLAG_INFO_LOG;
 					if( (*argv)[2] ){
 						save_file= *argv+2;
 					}
 					break;
 				case 'b':
-					btype= atoi( *argv + 2 );
+					if( (*argv)[2] != '\0' ){
+						btype= atoi( *argv + 2 );
+					}else{
+						usage();
+					}
 					break;
 				case 'c':
 					loop_scale= atof( *argv+2 );
@@ -197,6 +206,10 @@ int main( int argc, char** argv )
 				case '-': {
 						char	ch= (*argv)[2];
 						switch( ch ){
+						case 'p': {
+								flags|= FLAG_PRINT_RESULT;
+							}
+							break;
 						case 'l': {
 								if( argc >= 2 ){
 									log_file= *++argv;
@@ -224,9 +237,9 @@ int main( int argc, char** argv )
 
 		{
 			AppModule	app;
-			app.Init( loop_scale, save_file );
-			if( list_mode ){
-				app.List( info_mode );
+			app.Init( loop_scale, save_file, flags );
+			if( flags & FLAG_LIST_MODE ){
+				app.List( flags );
 			}else{
 				app.RunBenchmark( btype, log_file );
 			}

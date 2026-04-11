@@ -174,8 +174,7 @@ tool.addGroupTask( env, 'debug', task_list )
 
 #------------------------------------------------------------------------------
 
-def BenchRun( task ):
-    import  subprocess
+def BackupSaveFile():
     if os.path.exists( '.save.log' ):
         if not os.path.exists( 'save' ):
             os.mkdir( 'save' )
@@ -191,9 +190,69 @@ def BenchRun( task ):
                     nname= 'save_%s_%s.log' % (fdate, ftime)
                     break
         os.rename( '.save.log', os.path.join( 'save', nname ) )
+
+def BenchRun_Linux( task ):
+    global BackupSaveFile
+    BackupSaveFile()
     if os.path.exists( 'vfpbench' ):
+        import  subprocess
         proc= subprocess.Popen( ['./vfpbench'] )
         proc.wait()
+
+
+#------------------------------------------------------------------------------
+
+def decode_benchmark_list( bench_text ):
+    global re
+    bench_id_list= []
+    bench_pat= re.compile( '^\s*(\d+):\s+G=(\d+)\s+T=(\d+)\s+' )
+    for line in bench_text.split( '\n' ):
+        pat= bench_pat.search( line )
+        if pat:
+            bench_id= int(pat.group( 1 ))
+            core_group= int(pat.group( 2 ))
+            multi_thread= int(pat.group( 3 ))
+            bench_id_list.append( { 'id': bench_id, 'group': core_group, 'thread': multi_thread } )
+    return  bench_id_list
+
+def get_core_groups():
+    import  subprocess
+    group_name_list= []
+    for gi in range(8):
+        result= subprocess.run( ['sysctl', '-n', 'hw.perflevel%d.name' % gi], capture_output=True, text=True )
+        name= result.stdout.strip()
+        if name != '':
+            group_name_list.append( (gi,name) )
+    return  group_name_list
+
+def BenchRun_Mac( task ):
+    BackupSaveFile()
+    if not os.path.exists( 'vfpbench' ):
+        return
+    import  subprocess
+    result= subprocess.run( ['./vfpbench', '-l'], capture_output=True, text=True )
+    global decode_benchmark_list
+    benchmark_list= decode_benchmark_list( result.stdout )
+    global get_core_groups
+    group_name_list= get_core_groups()
+    for gi,group_name in group_name_list:
+        for bi,bench_map in enumerate(benchmark_list):
+            if bench_map['group'] == gi:
+                if group_name == 'Performance':
+                    subprocess.run( ['./vfpbench', '-b%d' % bi] )
+                elif group_name == 'Efficiency':
+                    subprocess.run( ['taskpolicy', '-c', 'background', './vfpbench', '-b%d' % bi] )
+
+
+#------------------------------------------------------------------------------
+
+def BenchRun( task ):
+    if task.env.getHostPlatform() == 'macOS':
+        global BenchRun_Mac
+        BenchRun_Mac( task )
+    else:
+        global BenchRun_Linux
+        BenchRun_Linux( task )
 
 task= tool.addScriptTask( env, 'run', BenchRun )
 
