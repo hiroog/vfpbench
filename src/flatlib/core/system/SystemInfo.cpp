@@ -1172,6 +1172,17 @@ unsigned int	SystemInfo::GetCoreClock( unsigned int group_index ) const
 	return	0;
 }
 
+void	SystemInfo::SetCoreClock( unsigned int group_index, unsigned int clock_kh )
+{
+	unsigned int	core_count= TotalThreadCount;
+	for( unsigned int ci= 0 ; ci< core_count ; ci++ ){
+		auto&	core= CoreList[ci];
+		if( core.CoreGroupID == group_index ){
+			core.CoreClock= clock_kh;
+		}
+	}
+}
+
 unsigned int	SystemInfo::GetThreadCount( unsigned int group_index ) const
 {
 	FL_ASSERT( Initialized != 0 );

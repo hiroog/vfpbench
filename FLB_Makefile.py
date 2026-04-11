@@ -202,6 +202,32 @@ def BenchRun_Linux( task ):
 
 #------------------------------------------------------------------------------
 
+def GetName():
+    processor_name= {}
+    src_file= 'output_log.txt'
+    name= ''
+    with open( src_file, 'r' ) as fi:
+        name_pat= re.compile( '^Name: (.*)$' )
+        for line in fi:
+            pat= name_pat.search( line )
+            if pat is not None:
+                name= pat.group(1).strip()
+                break
+    cpu_list= []
+    if os.path.exists( '.processor_name' ):
+        with open( '.processor_name', 'r' ) as fi:
+            name= fi.readline().strip()
+            if name.startswith( 'NAME:' ):
+                name= name[5:].strip()
+            for line in fi:
+                if line.startswith( 'CPU:' ):
+                    cpus= line[4:].strip().split()  # name x1 clock
+                    cpu_list.append( (cpus[0],cpus[1],float(cpus[2])) )
+    name= name.replace( '/', '_' )
+    processor_name['name']= name
+    processor_name['cpus']= cpu_list
+    return  processor_name
+
 def decode_benchmark_list( bench_text ):
     global re
     bench_id_list= []
@@ -235,13 +261,30 @@ def BenchRun_Mac( task ):
     benchmark_list= decode_benchmark_list( result.stdout )
     global get_core_groups
     group_name_list= get_core_groups()
+    global GetName
+    processor_name= GetName()
+    clock_options= []
+    for gi,group_name in group_name_list:
+        for cpu_name,_,cpu_clock in  processor_name['cpus']:
+            if group_name == cpu_name:
+                clock_options.append( '-g%d,%d' % (gi, int(cpu_clock*1000*1000)) ) # GHz -> KHz
     for gi,group_name in group_name_list:
         for bi,bench_map in enumerate(benchmark_list):
             if bench_map['group'] == gi:
+                command_list= ['./vfpbench', '-b%d' % bi]
+                command_list.extend( clock_options )
                 if group_name == 'Performance':
-                    subprocess.run( ['./vfpbench', '-b%d' % bi] )
+                    loop_scale= 3.0
+                    command_list.append( '-c%f'% loop_scale )
+                    print( command_list )
+                    subprocess.run( command_list )
                 elif group_name == 'Efficiency':
-                    subprocess.run( ['taskpolicy', '-c', 'background', './vfpbench', '-b%d' % bi] )
+                    loop_scale= 1.0
+                    command_list.append( '-c%f'% loop_scale )
+                    task_command_list= ['taskpolicy', '-c', 'background']
+                    task_command_list.extend( command_list )
+                    print( task_command_list )
+                    subprocess.run( task_command_list )
 
 
 #------------------------------------------------------------------------------
@@ -259,31 +302,13 @@ task= tool.addScriptTask( env, 'run', BenchRun )
 
 #------------------------------------------------------------------------------
 
-def GetName():
-    src_file= 'output_log.txt'
-    name= ''
-    with open( src_file, 'r' ) as fi:
-        name_pat= re.compile( '^Name: (.*)$' )
-        for line in fi:
-            pat= name_pat.search( line )
-            if pat is not None:
-                name= pat.group(1).strip()
-                break
-    if os.path.exists( '.processor_name' ):
-        with open( '.processor_name', 'r' ) as fi:
-            name= fi.readline().strip()
-            if name.startswith( 'NAME:' ):
-                name= name[5:].strip()
-    name= name.replace( '/', '_' )
-    return  name
-
 def PushLog( task ):
     global re
     import datetime
     src_file= 'output_log.txt'
     fdate= datetime.datetime.fromtimestamp( os.stat( src_file ).st_mtime ).strftime( '%Y%m%d_%H%M%S' )
     global GetName
-    name= GetName()
+    name= GetName().get( 'name', '' )
     if name == '':
         return
     if not os.path.exists( 'log' ):

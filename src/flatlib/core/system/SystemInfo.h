@@ -153,6 +153,7 @@ public:
 	}
 	unsigned int	GetThreadCount( unsigned int group_index ) const;
 	unsigned int	GetCoreClock( unsigned int group_index ) const;
+	void			SetCoreClock( unsigned int group_index, unsigned int clock_kh );
 	uint64_t		GetAffinityMask( unsigned int group_index ) const;
 	bool IsSingleThread() const
 	{

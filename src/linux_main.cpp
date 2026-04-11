@@ -161,6 +161,7 @@ static void usage()
 		" -r[<savefile>]      Show last results\n"
 		" -b<bench_index>     Select benchmark test 0..n (1000=all)\n"
 		" -c<loop_scale>      Loop count scale (default 1.0)\n"
+		" -g<group>,<clock>   Clock override (KHz)\n"
 		" --log <log_file>    Log filename (default 'output_log.txt')\n"
 		" --pr                Print result\n"
 		);
@@ -202,6 +203,15 @@ int main( int argc, char** argv )
 					break;
 				case 'c':
 					loop_scale= atof( *argv+2 );
+					break;
+				case 'g': {
+						const char*	ptr= *argv + 2;
+						if( *ptr && ptr[1] == ',' ){
+							unsigned int	group_index= *ptr & 0x0f;
+							unsigned int	core_clock= atoi( ptr+2 );
+							system::RCore().RSystemInfo().SetCoreClock( group_index, core_clock );
+						}
+					}
 					break;
 				case '-': {
 						char	ch= (*argv)[2];
